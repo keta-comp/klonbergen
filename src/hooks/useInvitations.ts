@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { idbSet } from "@/lib/idb";
-import type { Tables, TablesInsert } from "@/integrations/supabase/types";
+import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 
 export type Invitation = Tables<"invitations">;
 
@@ -109,6 +109,7 @@ async function uploadPhotos(slug: string, files: File[]) {
 async function uploadMusicFile(slug: string, file: File) {
   const ext = file.name.split(".").pop()?.toLowerCase() || "mp3";
   const path = `invitations/${slug}-music-${Date.now()}.${ext}`;
+  console.log(`[MUSIC] uploading music for slug=${slug} -> ${path} (${file.type || "unknown"} ${file.size} bytes)`);
   const { error } = await supabase.storage
     .from("hall-assets")
     .upload(path, file, {
@@ -118,7 +119,26 @@ async function uploadMusicFile(slug: string, file: File) {
     });
   if (error) throw error;
   const { data } = supabase.storage.from("hall-assets").getPublicUrl(path);
+  console.log(`[MUSIC] uploaded OK, publicUrl=${data.publicUrl}`);
   return data.publicUrl;
+}
+
+/** Extract the storage object path from a hall-assets public URL so it can
+ *  be deleted when the track is replaced/removed. Returns null if the URL is
+ *  not a hall-assets public object. */
+function musicPathFromUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const marker = "/public/hall-assets/";
+  const idx = url.indexOf(marker);
+  if (idx === -1) return null;
+  return decodeURIComponent(url.slice(idx + marker.length));
+}
+
+async function deleteMusicFile(url: string | null | undefined) {
+  const path = musicPathFromUrl(url);
+  if (!path) return;
+  console.log(`[MUSIC] deleting old music object: ${path}`);
+  await supabase.storage.from("hall-assets").remove([path]);
 }
 
 // The remote policy currently only allows these `template` values. The
@@ -131,6 +151,7 @@ export function useCreateInvitation() {
   return useMutation({
     mutationFn: async (draft: InvitationDraft) => {
       const slug = makeSlug(draft.brideName, draft.groomName);
+      console.log(`[MUSIC] createInvitation start for slug=${slug}`);
 
       const realPhotos = (draft.galleryImages || []).filter(
         (u) => u && !u.startsWith("blob:")
@@ -140,6 +161,21 @@ export function useCreateInvitation() {
         : null;
 
       const photos = cover ? [cover, ...realPhotos] : realPhotos;
+
+      // Upload the optional background music FIRST so we can persist its URL
+      // on the invitation row. A failure must not sink the whole invitation.
+      let musicUrl: string | undefined;
+      if (draft.music) {
+        try {
+          musicUrl = await uploadMusicFile(slug, draft.music);
+        } catch (e) {
+          console.warn(`[MUSIC] upload failed, continuing without music:`, e);
+          musicUrl = undefined;
+        }
+        // Keep a per-device copy in IndexedDB as a last-resort fallback for
+        // the creating device (e.g. if the storage backend is unreachable).
+        idbSet(MUSIC_KEY(slug), draft.music).catch(() => {});
+      }
 
       const payload: TablesInsert<"invitations"> = {
         slug,
@@ -152,28 +188,34 @@ export function useCreateInvitation() {
         photos,
         template: STORED_TEMPLATE,
         views: 0,
+        music_url: musicUrl ?? null,
       };
 
-      const { data, error } = await supabase
+      // Try the full payload. If the remote DB has not yet run the music_url
+      // migration the column is missing — strip it and retry so creation still
+      // works (music simply won't persist until the migration lands).
+      let inserted: Tables<"invitations">;
+      let dbError: unknown;
+      const res = await supabase
         .from("invitations")
         .insert(payload)
         .select()
         .single();
-      if (error) throw error;
-
-      // Upload the optional background music. A failure here must not sink
-      // the whole invitation, so swallow it and proceed without music.
-      let musicUrl: string | undefined;
-      if (draft.music) {
-        try {
-          musicUrl = await uploadMusicFile(slug, draft.music);
-        } catch {
-          musicUrl = undefined;
-        }
-        // Always keep a local copy of the file so the final page can play it
-        // even if the storage upload above was blocked (e.g. missing RLS).
-        idbSet(MUSIC_KEY(slug), draft.music).catch(() => {});
+      if (res.error && /music_url/.test(res.error.message)) {
+        console.warn(`[MUSIC] music_url column missing on remote, retrying without it`);
+        const res2 = await supabase
+          .from("invitations")
+          .insert({ ...payload, music_url: undefined })
+          .select()
+          .single();
+        inserted = res2.data as Tables<"invitations">;
+        dbError = res2.error;
+      } else {
+        inserted = res.data as Tables<"invitations">;
+        dbError = res.error;
       }
+      if (dbError) throw dbError;
+      console.log(`[MUSIC] invitation created, music_url=${musicUrl ?? "none"}`);
 
       // Stash the editorial extras so the final page shows the user's
       // custom copy on the device that created the invitation.
@@ -187,7 +229,7 @@ export function useCreateInvitation() {
         musicUrl,
       });
 
-      return data;
+      return inserted;
     },
   });
 }
@@ -215,8 +257,46 @@ export function useInvitation(slug?: string) {
         final_text: data.final_text ?? extras.finalText ?? null,
         phone: data.phone ?? extras.phone ?? null,
         maps_url: data.maps_url ?? extras.mapsUrl ?? null,
-        music_url: (data as Record<string, unknown>).music_url ?? extras.musicUrl ?? null,
+        music_url: data.music_url ?? extras.musicUrl ?? null,
       } as typeof data;
+    },
+  });
+}
+
+/**
+ * Replace or remove the background music of an existing invitation.
+ * - `{ file }`  → upload the new track, delete the old object, persist new URL
+ * - `{ remove: true }` → delete the old object and clear music_url
+ * Returns the resulting music_url (or null when removed).
+ */
+export function useUpdateInvitationMusic(slug: string) {
+  return useMutation({
+    mutationFn: async (opts: { file?: File | null; remove?: boolean }) => {
+      console.log(`[MUSIC] useUpdateInvitationMusic slug=${slug} remove=${!!opts.remove}`);
+      const { data: cur } = await supabase
+        .from("invitations")
+        .select("music_url")
+        .eq("slug", slug)
+        .maybeSingle();
+      const oldUrl = (cur as { music_url?: string | null } | null)?.music_url ?? null;
+
+      let newUrl: string | null = oldUrl;
+      if (opts.remove) {
+        await deleteMusicFile(oldUrl);
+        newUrl = null;
+      } else if (opts.file) {
+        const uploaded = await uploadMusicFile(slug, opts.file);
+        await deleteMusicFile(oldUrl);
+        newUrl = uploaded;
+      }
+
+      const { error } = await supabase
+        .from("invitations")
+        .update({ music_url: newUrl } satisfies Partial<TablesUpdate<"invitations">>)
+        .eq("slug", slug);
+      if (error) throw error;
+      console.log(`[MUSIC] music updated -> ${newUrl ?? "removed"}`);
+      return newUrl;
     },
   });
 }

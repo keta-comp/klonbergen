@@ -51,7 +51,12 @@ function LegacyRedirect({ to }: { to: string }) {
   const { pathname, search } = useLocation();
   const params = useParams();
   const { locale } = useTranslation();
-  const target = to.replace(":slug", params.slug ?? "");
+  // Substitute EVERY `:param` segment (e.g. :slug, :hallId) with its real value
+  // from the matched route. The previous code only replaced `:slug`, so routes
+  // like `/hall/:hallId` kept the literal placeholder `:hallId` in the redirect
+  // target — GuestPage then received the string ":hallId" and Supabase was
+  // queried with `id=eq.:hallId` (HTTP 400 → "Toyxana tabılmadı").
+  const target = to.replace(/:([a-zA-Z_][a-zA-Z0-9_]*)/g, (_m, key) => params[key] ?? "");
   return <Navigate to={`/${locale}${target}${search}`} replace />;
 }
 

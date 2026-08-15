@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, MapPin, Share2 } from "lucide-react";
+import { ArrowLeft, MapPin, Share2, Music, Volume2, VolumeX, Play, Pause } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
@@ -16,6 +16,10 @@ const MONTHS = [
   "yanvar", "fevral", "mart", "aprel", "may", "iyun",
   "iyul", "avgust", "sentabr", "oktabr", "noyabr", "dekabr",
 ];
+
+/** Per-slug preference: whether the guest left music muted / playing. Lets the
+ *  track resume in the same state after a refresh or reopen. */
+const MUSIC_PREF = (slug: string) => `vowly:music-pref:${slug}`;
 
 function fmtDate(iso: string) {
   if (!iso) return { day: "01", month: "oktabr", year: "2026", weekday: "Du" };
@@ -70,6 +74,14 @@ export default function InvitationPage() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  // ---- background music state ----
+  const [musicPlaying, setMusicPlaying] = useState(false);
+  const [musicMuted, setMusicMuted] = useState(false);
+  const [musicBlocked, setMusicBlocked] = useState(false); // autoplay blocked → show manual play
+  const [musicFailed, setMusicFailed] = useState(false); // url unreachable (404/403/400)
+  const musicUrlRef = useRef<string | null>(null);
+  const triedLocalRef = useRef(false);
+
   // Stop any background music when leaving the invitation.
   useEffect(() => {
     return () => {
@@ -77,10 +89,9 @@ export default function InvitationPage() {
     };
   }, []);
 
-  // Recover the picked music file from IndexedDB (persisted at create time). This
-  // is the reliable source of the background track — the Supabase storage upload
-  // can be blocked by missing RLS, so `music_url` is often empty. Reading the
-  // local File back lets the music survive a refresh of the published page.
+  // Recover the picked music file from IndexedDB (per-device fallback persisted
+  // at create time). The primary source is the server `music_url`; this is only
+  // used if that is empty (e.g. storage was unreachable at create time).
   const [localMusicUrl, setLocalMusicUrl] = useState<string | null>(null);
   const localMusicRef = useRef<string | null>(null);
   useEffect(() => {
@@ -102,6 +113,20 @@ export default function InvitationPage() {
         localMusicRef.current = null;
       }
     };
+  }, [data?.slug]);
+
+  // Restore the guest's last mute/play preference for this invitation.
+  useEffect(() => {
+    if (!data?.slug) return;
+    try {
+      const raw = window.localStorage.getItem(MUSIC_PREF(data.slug));
+      if (raw) {
+        const pref = JSON.parse(raw) as { muted?: boolean; playing?: boolean };
+        if (typeof pref.muted === "boolean") setMusicMuted(pref.muted);
+      }
+    } catch {
+      /* ignore */
+    }
   }, [data?.slug]);
 
   if (isLoading) return <LoadingSpinner />;
@@ -135,25 +160,108 @@ export default function InvitationPage() {
   const welcomeText = data.welcome_text || t("invitation.defaults.welcome");
   const invitationText = data.invitation_text || t("invitation.defaults.invitation");
   const finalText = data.final_text || t("invitation.defaults.final");
-  const musicUrl = (data as { music_url?: string | null }).music_url || null;
-  // Prefer the server URL, but fall back to the locally-stored file so music
-  // keeps working (and keeps playing) even without a working storage backend.
+
+  // Type-safe read (music_url column now exists in the generated types).
+  const musicUrl = data.music_url || null;
+  musicUrlRef.current = musicUrl;
+  // Prefer the server URL; fall back to the locally-stored file so music keeps
+  // working on the device that created it even without a working storage backend.
   const effectiveMusicUrl = musicUrl || localMusicUrl;
+
+  const savePref = (muted: boolean, playing: boolean) => {
+    if (!data.slug) return;
+    try {
+      window.localStorage.setItem(MUSIC_PREF(data.slug), JSON.stringify({ muted, playing }));
+    } catch {
+      /* ignore */
+    }
+  };
+
+  // Resume playback on the very next user interaction if autoplay was blocked
+  // (browsers only allow sound after a gesture — `video.onEnded` is not one).
+  const armUnlock = () => {
+    const handler = () => {
+      const a = audioRef.current;
+      if (a && a.paused) {
+        a.play()
+          .then(() => {
+            setMusicBlocked(false);
+            savePref(a.muted, true);
+          })
+          .catch(() => {});
+      }
+      window.removeEventListener("pointerdown", handler);
+      window.removeEventListener("touchstart", handler);
+    };
+    window.addEventListener("pointerdown", handler, { once: true });
+    window.addEventListener("touchstart", handler, { once: true });
+  };
+
+  const startMusic = async () => {
+    const a = audioRef.current;
+    if (!a || !effectiveMusicUrl) return;
+    if (a.src !== effectiveMusicUrl) a.src = effectiveMusicUrl;
+    a.loop = true;
+    a.volume = musicMuted ? 0 : 0.7;
+    try {
+      await a.play();
+      console.log(`[MUSIC] playback started -> ${effectiveMusicUrl}`);
+      setMusicBlocked(false);
+      savePref(musicMuted, true);
+    } catch (e) {
+      console.warn(`[MUSIC] autoplay blocked, waiting for user gesture`, e);
+      setMusicBlocked(true);
+      armUnlock();
+    }
+  };
 
   const dismissVideo = () => {
     if (!showVideo) return;
     setShowVideo(false);
-    // Start the background music once the invitation is revealed. Browsers
-    // require a user gesture for audio, and the tap that dismisses the gate
-    // satisfies that, so playback should succeed.
-    if (effectiveMusicUrl && audioRef.current) {
-      audioRef.current.src = effectiveMusicUrl;
-      audioRef.current.loop = true;
-      audioRef.current.volume = 0.7;
-      audioRef.current.play().catch(() => {
-        /* autoplay blocked — user can still tap elsewhere; harmless */
-      });
+    // Start the background music once the invitation is revealed.
+    if (effectiveMusicUrl) startMusic();
+  };
+
+  const handleAudioError = () => {
+    const a = audioRef.current;
+    const src = a?.src ?? "";
+    console.error(`[MUSIC] <audio> error (src=${src})`);
+    // If the server URL failed but a local copy exists, try it once.
+    if (musicUrl && localMusicUrl && src === musicUrl && !triedLocalRef.current) {
+      triedLocalRef.current = true;
+      console.warn(`[MUSIC] server url failed (likely 404/403), falling back to local copy`);
+      a!.src = localMusicUrl;
+      a!.play().catch(() => setMusicFailed(true));
+      return;
     }
+    setMusicFailed(true);
+    setMusicBlocked(false);
+  };
+
+  const onTogglePlay = () => {
+    const a = audioRef.current;
+    if (!a || !effectiveMusicUrl) return;
+    if (a.paused) {
+      a.play()
+        .then(() => {
+          setMusicBlocked(false);
+          savePref(a.muted, true);
+        })
+        .catch(() => setMusicBlocked(true));
+    } else {
+      a.pause();
+      savePref(a.muted, false);
+    }
+  };
+
+  const onToggleMute = () => {
+    const a = audioRef.current;
+    if (!a) return;
+    const next = !a.muted;
+    a.muted = next;
+    a.volume = next ? 0 : 0.7;
+    setMusicMuted(next);
+    savePref(next, !a.paused);
   };
 
   // Intro video gate — the envelope video does NOT autoplay. The bottom
@@ -344,13 +452,105 @@ export default function InvitationPage() {
         <Link to="/taklifnoma/yangi" className="inv-btn">
           <ArrowLeft className="mr-1.5 inline h-3.5 w-3.5" /> {t("invitation.actions.create")}
         </Link>
-        <button onClick={copyLink} className="inv-btn">
+        <button type="button" onClick={copyLink} className="inv-btn">
           <Share2 className="mr-1.5 inline h-3.5 w-3.5" /> {t("invitation.actions.copy")}
         </button>
       </div>
 
-      {/* Background music (started after the video gate is dismissed). */}
-      <audio ref={audioRef} className="hidden" />
+      {/* ---- background music control ---- */}
+      {effectiveMusicUrl && !musicFailed && (
+        <MusicController
+          playing={musicPlaying}
+          muted={musicMuted}
+          blocked={musicBlocked}
+          url={effectiveMusicUrl}
+          onPlayPause={onTogglePlay}
+          onMute={onToggleMute}
+        />
+      )}
+
+      {/* Background music (single persistent <audio> element — never recreated
+          per render or per section, so playback is uninterrupted). */}
+      <audio
+        ref={audioRef}
+        className="hidden"
+        loop
+        preload="auto"
+        onPlay={() => {
+          setMusicPlaying(true);
+          savePref(musicMuted, true);
+        }}
+        onPause={() => {
+          setMusicPlaying(false);
+          savePref(musicMuted, false);
+        }}
+        onError={handleAudioError}
+      />
+    </div>
+  );
+}
+
+function MusicController({
+  playing,
+  muted,
+  blocked,
+  url,
+  onPlayPause,
+  onMute,
+}: {
+  playing: boolean;
+  muted: boolean;
+  blocked: boolean;
+  url: string;
+  onPlayPause: () => void;
+  onMute: () => void;
+}) {
+  const showEq = playing && !muted;
+  return (
+    <div className="inv-music-ctrl" role="group" aria-label="Music control">
+      <span className="inv-music-ctrl-icon">
+        <Music className="h-4 w-4" />
+      </span>
+
+      {/* equalizer indicator — animates only while actually playing */}
+      <span className={`inv-eq ${showEq ? "is-on" : ""}`} aria-hidden="true">
+        <span className="inv-eq-bar" />
+        <span className="inv-eq-bar" />
+        <span className="inv-eq-bar" />
+        <span className="inv-eq-bar" />
+      </span>
+
+      {blocked ? (
+        <button
+          type="button"
+          className="inv-music-btn inv-music-btn--play"
+          onClick={onPlayPause}
+          aria-label="Play music"
+          title="Play music"
+        >
+          <Play className="h-4 w-4" />
+        </button>
+      ) : (
+        <button
+          type="button"
+          className="inv-music-btn"
+          onClick={onPlayPause}
+          aria-label={playing ? "Pause music" : "Play music"}
+          title={playing ? "Pause" : "Play"}
+        >
+          {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+        </button>
+      )}
+
+      <button
+        type="button"
+        className="inv-music-btn"
+        onClick={onMute}
+        aria-label={muted ? "Unmute music" : "Mute music"}
+        title={muted ? "Unmute" : "Mute"}
+      >
+        {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+      </button>
     </div>
   );
 }

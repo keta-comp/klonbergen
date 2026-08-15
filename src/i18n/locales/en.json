@@ -261,6 +261,9 @@
       "musicUpload": "Upload music",
       "musicRemove": "Remove music",
       "musicHint": "This music plays automatically when the invitation opens and after the video plays.",
+      "musicType": "Only music files (MP3, WAV, M4A, AAC, OGG) are supported",
+      "musicReplace": "Replace music",
+      "musicStatus": "Music selected — it will be uploaded when you publish the invitation.",
       "musicTooLarge": "Music file must be smaller than 12 MB"
     },
     "gallery": {

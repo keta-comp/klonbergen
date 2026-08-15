@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import { ImagePlus, MapPin, Music, Phone, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ImagePlus, MapPin, Music, Phone, RotateCw, X } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import type {
@@ -12,6 +12,13 @@ type UpdateFn = <K extends keyof BuilderState>(
   key: K,
   value: BuilderState[K]
 ) => void;
+
+function formatBytes(bytes: number): string {
+  if (!bytes) return "0 B";
+  const units = ["B", "KB", "MB", "GB"];
+  const i = Math.min(units.length - 1, Math.floor(Math.log(bytes) / Math.log(1024)));
+  return `${(bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
+}
 
 const TEMPLATES: { id: InvitationTemplateId; label: string; asset: string }[] = [
   { id: "t1", label: "Template 01", asset: "/1.png" },
@@ -255,15 +262,39 @@ export function MessageForm({
   const { t } = useTranslation();
   const musicRef = useRef<HTMLInputElement>(null);
 
+  // Allowed background-music formats (matches the upload pipeline).
+  const ALLOWED_EXT = ["mp3", "wav", "m4a", "aac", "ogg"];
+
   const onMusicPick = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = ""; // reset so the same file can be re-picked
     if (!file) return;
+    const ext = file.name.split(".").pop()?.toLowerCase() || "";
+    const okType = file.type.startsWith("audio/") || ALLOWED_EXT.includes(ext);
+    if (!okType) {
+      toast.error(t("builder.message.musicType"));
+      return;
+    }
     if (file.size > 12 * 1024 * 1024) {
       toast.error(t("builder.message.musicTooLarge"));
       return;
     }
+    console.log(`[MUSIC] picked ${file.name} (${file.type || ext}, ${file.size} bytes)`);
     update("music", file);
   };
+
+  // Local preview of the picked track (not uploaded until the invitation is
+  // published — this is just so the creator can confirm the right file).
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!state.music) {
+      setPreviewUrl(null);
+      return;
+    }
+    const u = URL.createObjectURL(state.music);
+    setPreviewUrl(u);
+    return () => URL.revokeObjectURL(u);
+  }, [state.music]);
 
   return (
     <div>
@@ -318,12 +349,23 @@ export function MessageForm({
         {state.music ? (
           <div className="inv-music-chip">
             <Music className="mr-1.5 inline h-3.5 w-3.5" />
-            <span className="inv-music-name">{state.music.name}</span>
+            <span className="inv-music-name" title={state.music.name}>{state.music.name}</span>
+            <span className="inv-music-size">{formatBytes(state.music.size)}</span>
+            <button
+              type="button"
+              className="inv-music-remove"
+              onClick={() => musicRef.current?.click()}
+              aria-label={t("builder.message.musicReplace")}
+              title={t("builder.message.musicReplace")}
+            >
+              <RotateCw className="h-3 w-3" />
+            </button>
             <button
               type="button"
               className="inv-music-remove"
               onClick={() => update("music", null)}
               aria-label={t("builder.message.musicRemove")}
+              title={t("builder.message.musicRemove")}
             >
               <X className="h-3 w-3" />
             </button>
@@ -342,13 +384,18 @@ export function MessageForm({
         <input
           ref={musicRef}
           type="file"
-          accept="audio/*"
+          accept="audio/mp3,audio/wav,audio/x-m4a,audio/aac,audio/ogg,.mp3,.wav,.m4a,.aac,.ogg"
           className="hidden"
           onChange={onMusicPick}
           style={{ display: "none" }}
         />
+        {state.music && previewUrl && (
+          <audio className="inv-music-preview" controls src={previewUrl} preload="none" />
+        )}
         <p className="inv-step-sub" style={{ marginTop: "0.4rem", fontSize: "0.62rem" }}>
-          {t("builder.message.musicHint")}
+          {state.music
+            ? t("builder.message.musicStatus")
+            : t("builder.message.musicHint")}
         </p>
       </div>
     </div>

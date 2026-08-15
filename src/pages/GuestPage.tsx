@@ -20,24 +20,30 @@ export default function GuestPage() {
   const [searchParams] = useSearchParams();
   const tableNum = searchParams.get('table');
 
+  // Routing is the source of truth for the hall id. Guard against a leftover
+  // route placeholder (e.g. ":hallId") or a missing id so we NEVER fire an
+  // invalid Supabase query (root cause of the previous `id=eq.:hallId` 400).
+  const isValidHallId = !!hallId && !hallId.includes(':');
+  const safeHallId = isValidHallId ? hallId! : '';
+
   const { data: hall, isLoading: hallLoading } = useQuery({
     queryKey: ['hall', hallId],
     queryFn: async () => {
-      const { data, error } = await supabase.from('wedding_halls').select('*').eq('id', hallId!).single();
+      const { data, error } = await supabase.from('wedding_halls').select('*').eq('id', safeHallId).single();
       if (error) throw error;
       return data;
     },
-    enabled: !!hallId,
+    enabled: isValidHallId,
   });
 
-  const { data: brideGroom } = useBrideGroom(hallId!);
-  const { data: foods } = useFoodItems(hallId!);
-  const { data: artists } = useArtists(hallId!);
-  const { data: banners } = useBanners(hallId!);
-  const { data: timeline } = useTimelineEvents(hallId!);
+  const { data: brideGroom } = useBrideGroom(safeHallId);
+  const { data: foods } = useFoodItems(safeHallId);
+  const { data: artists } = useArtists(safeHallId);
+  const { data: banners } = useBanners(safeHallId);
+  const { data: timeline } = useTimelineEvents(safeHallId);
 
   if (hallLoading) return <LoadingSpinner />;
-  if (!hall)
+  if (!isValidHallId || !hall)
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <p className="text-muted-foreground">Toyxana tabılmadı</p>

@@ -261,6 +261,9 @@
       "musicUpload": "Musiqani yuklash",
       "musicRemove": "Musiqani o'chirish",
       "musicHint": "Taklifnoma ochilganda va video o'ynatilgandan keyin bu musiqa avtomatik eshitiladi.",
+      "musicType": "Faqat musiqa fayllari (MP3, WAV, M4A, AAC, OGG) qo'llab-quvvatlanadi",
+      "musicReplace": "Musiqani almashtirish",
+      "musicStatus": "Musiqa tanlandi — taklifnoma chop etilganda yuklanadi.",
       "musicTooLarge": "Musiqa fayli 12 MB dan kichik bo'lishi kerak"
     },
     "gallery": {

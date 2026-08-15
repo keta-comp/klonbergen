@@ -261,6 +261,9 @@
       "musicUpload": "Musıqanı júklew",
       "musicRemove": "Musıqanı óshiriw",
       "musicHint": "Taklifnoma ashılǵanda hám video oynalgandan keyin bul musıqa avtomatik esitiledi.",
+      "musicType": "Text musıqa faylları ǵana (MP3, WAV, M4A, AAC, OGG) qollanıladı",
+      "musicReplace": "Musıqanı almastırıw",
+      "musicStatus": "Musıqa saylandı — taklifnoma jarıyalanǵanda júklenegi.",
       "musicTooLarge": "Musıqa faylı 12 MB tan kishi bolıwı kerek"
     },
     "gallery": {

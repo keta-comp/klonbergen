@@ -221,6 +221,7 @@ export type Database = {
           id: string
           invitation_text: string | null
           maps_url: string | null
+          music_url: string | null
           phone: string | null
           photos: string[]
           slug: string
@@ -241,6 +242,7 @@ export type Database = {
           id?: string
           invitation_text?: string | null
           maps_url?: string | null
+          music_url?: string | null
           phone?: string | null
           photos?: string[]
           slug: string
@@ -261,6 +263,7 @@ export type Database = {
           id?: string
           invitation_text?: string | null
           maps_url?: string | null
+          music_url?: string | null
           phone?: string | null
           photos?: string[]
           slug?: string

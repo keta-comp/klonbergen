@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Download, QrCode } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from '@/i18n/LanguageContext';
 
 interface Props { hallId: string; }
 
@@ -15,8 +16,11 @@ export default function QRCodeGenerator({ hallId }: Props) {
   const [tableCount, setTableCount] = useState(10);
   const [generated, setGenerated] = useState(false);
   const qrRefs = useRef<Map<number, HTMLCanvasElement>>(new Map());
+  const { locale } = useTranslation();
 
-  const baseUrl = `${window.location.origin}/hall/${hallId}`;
+  // Localized so the guest lands directly on the correct language route
+  // (/<locale>/hall/<realId>) and never relies on the legacy redirect.
+  const baseUrl = `${window.location.origin}/${locale}/hall/${hallId}`;
 
   const handleGenerate = () => {
     setGenerated(true);
