@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Vowly — Qaraqalpaq (kaa) Text Audit</title>
+<style>
+body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:#f6f6f4;color:#1a1a1a;}
+header{background:#1f2d3d;color:#fff;padding:20px 28px;}
+header h1{margin:0;font-size:20px;} header p{margin:4px 0 0;opacity:.8;font-size:13px;}
+.wrap{max-width:1100px;margin:0 auto;padding:24px;}
+.summary{background:#fff;border:1px solid #ddd;border-radius:10px;padding:16px 20px;margin-bottom:24px;}
+.summary table{border-collapse:collapse;width:100%;font-size:14px;}
+.summary td,.summary th{border:1px solid #e2e2e2;padding:6px 10px;text-align:left;}
+.summary th{background:#eef2f6;}
+h2{background:#1f2d3d;color:#fff;padding:10px 14px;border-radius:8px;font-size:17px;margin-top:34px;}
+h3{color:#2b4a6f;border-bottom:2px solid #d9e2ec;padding-bottom:4px;margin-top:26px;font-size:15px;}
+.card{background:#fff;border:1px solid #e3e3e0;border-radius:8px;padding:10px 14px;margin:8px 0;}
+.card .meta{font-size:12px;color:#666;margin-bottom:3px;}
+.card .key{font-family:ui-monospace,Menlo,Consolas,monospace;color:#0b6;font-weight:600;}
+.card .val{font-size:15px;font-weight:600;color:#111;}
+.card .loc{font-size:12px;color:#999;margin-top:3px;}
+.flag{display:inline-block;background:#fff3cd;color:#856404;border:1px solid #ffe69c;border-radius:4px;padding:0 6px;font-size:11px;margin-left:6px;}
+footer{margin:40px 0;text-align:center;color:#888;font-size:13px;}
+</style></head><body>
+<header><h1>Vowly — Qaraqalpaq (kaa / QQ) Text Audit</h1>
+<p>Phase 1 (AUDIT ONLY). Source of truth: <code>src/i18n/locales/kaa.json</code>. Every string copied verbatim. Nothing was changed.</p></header>
+<div class="wrap">
+<div class="summary"><h3 style="border:0;margin-top:0">Summary Counts</h3><table>
+<tr><th>Section</th><th>String count</th></tr>
+<tr><td>LANDING PAGE</td><td>133</td></tr>
+<tr><td>DIGITAL INVITATION / TAKLIFNAMA (EDITOR)</td><td>94</td></tr>
+<tr><td>GUEST-FACING INVITATION</td><td>88</td></tr>
+<tr><td>OTHER UI (AUTH)</td><td>14</td></tr>
+<tr><th>TOTAL</th><th>329</th></tr>
+</table>
+<p style='font-size:12px;color:#666'>Note: counts include each array element (weekdays, months, plan features, timeline events) as an individual string, and dynamic/list keys accessed via <code>tList()</code>.</p>
+</div>
+<h2>LANDING PAGE</h2>
+<h3>Header / Navigation</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.nav.links.nege</span></div>
+<div class="val">Nege Vowly?</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:122; src\pages\Index.tsx:152</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.nav.links.mumkinshilikler</span></div>
+<div class="val">Múmkinshilikler</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:122; src\pages\Index.tsx:152</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.nav.links.qalay</span></div>
+<div class="val">Qalay isleydi?</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:122; src\pages\Index.tsx:152</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.nav.links.bahalar</span></div>
+<div class="val">Bahalar</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:122; src\pages\Index.tsx:152</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.nav.links.baylanis</span></div>
+<div class="val">Baylanıs</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:122; src\pages\Index.tsx:152</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.nav.demo</span></div>
+<div class="val">Demo soraw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:134; src\pages\Index.tsx:164</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.nav.menuOpen</span></div>
+<div class="val">Menyuni jabıw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:139</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.nav.menuClosed</span></div>
+<div class="val">Menyuni ashıw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:139</div>
+</div>
+<h3>Hero</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.hero.eyebrow</span></div>
+<div class="val">SANLI MIRÁTNAMA</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:207</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.hero.title1</span></div>
+<div class="val">Ómirińizdegi</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:216</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.hero.title2</span></div>
+<div class="val">eń ullı kúnińiz</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:218</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.hero.sub</span></div>
+<div class="val">Atları, sáne hám súwretleri kórip, sanlı mirátnama jaratıwıńız.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:227</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.hero.ctaPrimary</span></div>
+<div class="val">Tógın mirátnama jaratıw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:242</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.hero.ctaDemo</span></div>
+<div class="val">Demo kórıw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:251</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.hero.bottomHow</span></div>
+<div class="val">QALAY ISLEYDI? OQÍW ARQALÍ ÚYRENIW</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:262</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.hero.bottomDown</span></div>
+<div class="val">ASAGA</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:269; src\pages\Index.tsx:271</div>
+</div>
+<h3>QR Section</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.qr.eyebrow</span></div>
+<div class="val">Bir QR kópúlik toy</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:292</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.qr.title1</span></div>
+<div class="val">Stolıńızdaǵı QR —</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:296</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.qr.title2</span></div>
+<div class="val">toyıńızdıń sanlı esigi.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:298</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.qr.sub</span></div>
+<div class="val">Mehmanlar stolındaǵı QR kódi skanerlep, haq toyıńızdıń sanlı tájiriybesine kiredi.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:302</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.qr.flow.qr</span></div>
+<div class="val">QR kod stolıda</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:315</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.qr.flow.scan</span></div>
+<div class="val">Skanerlewi</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:315</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.qr.flow.open</span></div>
+<div class="val">Vowly eshildi</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:315</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.qr.flow.experience</span></div>
+<div class="val">Toy tájiriybesi baslandı</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:315</div>
+</div>
+<h3>Features</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.features.eyebrow</span></div>
+<div class="val">Barcha qóllap-quwatlaw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:364</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.features.title1</span></div>
+<div class="val">Hár bir jerde —</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:368</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.features.title2</span></div>
+<div class="val">mehmanlar ushın eń jaqsı tájiriybe.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:370</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.features.items.liveToy</span></div>
+<div class="val">Live toy</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:381</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.features.items.couple</span></div>
+<div class="val">Kelin-kúyew</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:381</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.features.items.gallery</span></div>
+<div class="val">Galereya</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:381</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.features.items.shows</span></div>
+<div class="val">Ilajlar</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:381</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.features.items.menu</span></div>
+<div class="val">Menu</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:381</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.features.items.rsvp</span></div>
+<div class="val">RSVP</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:381</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.features.descs.liveToy</span></div>
+<div class="val">Toy basına jetip atırgan waqıt hám baǵdarlamanı kóriw.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:382</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.features.descs.couple</span></div>
+<div class="val">Kelin-kúyew haqqında maǵlıwmatlar hám súwretler.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:382</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.features.descs.gallery</span></div>
+<div class="val">Mehmanlar jaqsılaw súwretlerin bólisedi.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:382</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.features.descs.shows</span></div>
+<div class="val">Artistler hám ilaj háreketlerin basqarıw.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:382</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.features.descs.menu</span></div>
+<div class="val">Toy menyu hám awqatlar haqqında maǵlıwmat.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:382</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.features.descs.rsvp</span></div>
+<div class="val">Qatnasıwshılardı basqarıw hám ruqsat tizimi.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:382</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.features.more</span></div>
+<div class="val">Bilip alıw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:384</div>
+</div>
+<h3>Timeline</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.eyebrow</span></div>
+<div class="val">Toy kúni</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:443</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.title1</span></div>
+<div class="val">Bir kinolenta —</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:447</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.title2</span></div>
+<div class="val">waqıyali hám tássirli.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:448</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.sub</span></div>
+<div class="val">Sáhárden túnge shekemgi to'y kúni — bir cinematic hikáya. Hár bir waqıya óz watında hám óz ornında.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:452</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.cta</span></div>
+<div class="val">Toy qádarma arqalında kórıw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:462</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.arrival.time</span></div>
+<div class="val">18:00</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.arrival.title</span></div>
+<div class="val">Mehmonlar keliwi</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.arrival.desc</span></div>
+<div class="val">Mehmonlar to'y maydanchasina keledi, kútilip alinadı hám óz orinlarına jaylasadı.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.entrance.time</span></div>
+<div class="val">18:15</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.entrance.title</span></div>
+<div class="val">Kelin-kúyew kiriwi</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.entrance.desc</span></div>
+<div class="val">Kelin hám kúyew to'y zalina tantanalı kiriw etedi.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.congrats.time</span></div>
+<div class="val">18:30</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.congrats.title</span></div>
+<div class="val">Tabriklaw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.congrats.desc</span></div>
+<div class="val">Ata-analar, tuwsanlar hám jaqın doslar ılıwlı tabriklawların aytadı.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.dinner.time</span></div>
+<div class="val">19:00</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.dinner.title</span></div>
+<div class="val">Taǵam beriledi</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.dinner.desc</span></div>
+<div class="val">Keşki taǵam beriledi hám mehmonlar to'y ziyofatınan lezzetlenedi.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.firstDance.time</span></div>
+<div class="val">19:45</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.firstDance.title</span></div>
+<div class="val">Birinshi raqs</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.firstDance.desc</span></div>
+<div class="val">Birinshi raqs baslanadı hám to'y bayramı rásmiy tárzde raqs baǵdarlamasina ótedi.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.games.time</span></div>
+<div class="val">20:15</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.games.title</span></div>
+<div class="val">Viktorina hám o'yınlar</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.games.desc</span></div>
+<div class="val">Mehmonlar ushın qızıqlı to'y o'yınları, viktorinalar hám interaktiv mashqlar.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.waltz.time</span></div>
+<div class="val">21:00</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.waltz.title</span></div>
+<div class="val">Vals</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.waltz.desc</span></div>
+<div class="val">Kelin hám kúyew ózleriniń ájáyıp to'y valsinında birge raqsga túsedi.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.dancing.time</span></div>
+<div class="val">21:30</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.dancing.title</span></div>
+<div class="val">Raqslar</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.dancing.desc</span></div>
+<div class="val">Raqs maydanchası ashıladı hám bayram muzıka hám raqs penen dawam etedi.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.farewell.time</span></div>
+<div class="val">22:30</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.farewell.title</span></div>
+<div class="val">Kelin-kúyewdi uzatıw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.timeline.events.farewell.desc</span></div>
+<div class="val">Kelin hám kúyew uzatıp jiberilgende to'y bayramı tásirli tamamlanadı.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:482; src\pages\Index.tsx:489; src\pages\Index.tsx:490; src\pages\Index.tsx:491</div>
+</div>
+<h3>Gallery</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.gallery.eyebrow</span></div>
+<div class="val">Sezimleri bóliw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:525</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.gallery.title1</span></div>
+<div class="val">Eń ájıyıp</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:529</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.gallery.title2</span></div>
+<div class="val">momentler.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:530</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.gallery.sub</span></div>
+<div class="val">Mehmanlar jaqsılaw súwretlerin payda bolıp atırgan jıllarına túsin.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:534</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.gallery.photos</span></div>
+<div class="val">súwret</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:542</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.gallery.cta</span></div>
+<div class="val">Galereyanı kórıw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:550</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.gallery.captions.hero</span></div>
+<div class="val">Kelin-kúyew</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:566; src\pages\Index.tsx:573</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.gallery.captions.details</span></div>
+<div class="val">Tafsilíyler</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:566; src\pages\Index.tsx:573</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.gallery.captions.ceremony</span></div>
+<div class="val">Tuyaław</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:566; src\pages\Index.tsx:573</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.gallery.captions.emotion</span></div>
+<div class="val">Usı lahza</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:566; src\pages\Index.tsx:573</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.gallery.captions.dance</span></div>
+<div class="val">Birinshi ows</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:566; src\pages\Index.tsx:573</div>
+</div>
+<h3>Management (Toyxana)</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.management.eyebrow</span></div>
+<div class="val">Toyxana úshın</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:597</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.management.title1</span></div>
+<div class="val">Basqarıw endi</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:601</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.management.title2</span></div>
+<div class="val">jeńil.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:602</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.management.sub</span></div>
+<div class="val">Zakazlar, stollar, QR kodlar hám daromat — bári bir jerde basqarıladı.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:606</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.management.ctaMore</span></div>
+<div class="val">Tolıǵıraq kórıw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:615</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.management.ctaHow</span></div>
+<div class="val">Qalay isleydi?</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:627</div>
+</div>
+<h3>Pricing</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.eyebrow</span></div>
+<div class="val">Jáne de saplıq kúbiw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:671</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.title1</span></div>
+<div class="val">En jaqsı tarif</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:675</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.title2</span></div>
+<div class="val">pılánnıznı tańlań.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:676</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.badge</span></div>
+<div class="val">Eń jaqsı saylaw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:704</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.qr.name</span></div>
+<div class="val">Vowly QR</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.qr.unit</span></div>
+<div class="val">mıń som</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.qr.feats[0]</span></div>
+<div class="val">Sheksiz QR kodlar</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.qr.feats[1]</span></div>
+<div class="val">Live baǵdarlama</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.qr.feats[2]</span></div>
+<div class="val">Galereya</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.qr.feats[3]</span></div>
+<div class="val">RSVP</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.qr.feats[4]</span></div>
+<div class="val">Menyu</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.qr.cta</span></div>
+<div class="val">Demo soraw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.qr.price</span></div>
+<div class="val">299</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.venue.name</span></div>
+<div class="val">Vowly Venue</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.venue.unit</span></div>
+<div class="val">mıń som</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.venue.feats[0]</span></div>
+<div class="val">Band sanalar</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.venue.feats[1]</span></div>
+<div class="val">Zakazlar</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.venue.feats[2]</span></div>
+<div class="val">Stollar</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.venue.feats[3]</span></div>
+<div class="val">Artistler</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.venue.feats[4]</span></div>
+<div class="val">Daromat</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.venue.cta</span></div>
+<div class="val">Demo soraw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.venue.price</span></div>
+<div class="val">99</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.combo.name</span></div>
+<div class="val">Vowly 2-in-1</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.combo.unit</span></div>
+<div class="val">mıń som</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.combo.feats[0]</span></div>
+<div class="val">QR + Venue</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.combo.feats[1]</span></div>
+<div class="val">Analitika</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.combo.feats[2]</span></div>
+<div class="val">Sheksiz toy</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.combo.feats[3]</span></div>
+<div class="val">Premium qollap-quwatlaw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.combo.cta</span></div>
+<div class="val">Búgin baslaw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.pricing.plans.combo.price</span></div>
+<div class="val">399</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:685; src\pages\Index.tsx:686; src\pages\Index.tsx:687; src\pages\Index.tsx:690; src\pages\Index.tsx:699</div>
+</div>
+<h3>Footer</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.footer.tagline</span></div>
+<div class="val">Túyılıwlar hár bir jaǵday — sanlı mirátnama tájiriybesine aylanadı.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:735</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.footer.menuTitle</span></div>
+<div class="val">Toy Menu</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:739</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.footer.links.nege</span></div>
+<div class="val">Nege Vowly?</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:748</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.footer.links.mumkinshilikler</span></div>
+<div class="val">Múmkinshilikler</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:748</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.footer.links.qalay</span></div>
+<div class="val">Qalay isleydi?</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:748</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.footer.links.bahalar</span></div>
+<div class="val">Bahalar</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:748</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.footer.contactTitle</span></div>
+<div class="val">Baylanıs</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:753</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.footer.newsletterTitle</span></div>
+<div class="val">Newsletter</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:792</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.footer.newsletterSub</span></div>
+<div class="val">Jańalıqlar hám arnawlı usınıslar.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:794</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.footer.emailPlaceholder</span></div>
+<div class="val">Email</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:804; src\pages\Index.tsx:806</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.footer.send</span></div>
+<div class="val">Jiberiw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:811</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">home.footer.copyright</span></div>
+<div class="val">© {year} Vowly. Barlıq huqıqlar qorǵalǵan.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\Index.tsx:819</div>
+</div>
+<h3>SEO (meta)</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">seo.home.title</span></div>
+<div class="val">Vowly — sanlı mirátnama hám to'yxana platforması</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\seo\LocalizedSeo.tsx:26</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">seo.home.description</span></div>
+<div class="val">Vowly — QR kod arqalı online sanlı mirátnama, raqamli to'y sayti hám to'yxana basqarıw platforması. Ózbekstan hám Qaraqalpaqstan to'y xizmetleri ushın.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\seo\LocalizedSeo.tsx:27</div>
+</div>
+<h2>DIGITAL INVITATION / TAKLIFNAMA (EDITOR)</h2>
+<h3>Editor Steps (sidebar)</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.steps.couple.label</span></div>
+<div class="val">Juftlıq</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:57</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.steps.couple.sub</span></div>
+<div class="val">Kelin hám kúyew atları</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:57</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.steps.date.label</span></div>
+<div class="val">Sana</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:58</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.steps.date.sub</span></div>
+<div class="val">To'y sanası hám waqtı</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:58</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.steps.venue.label</span></div>
+<div class="val">Manzil</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:59</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.steps.venue.sub</span></div>
+<div class="val">Toy orayı hám jaylasıwı</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:59</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.steps.message.label</span></div>
+<div class="val">Taklif mátni</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:60</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.steps.message.sub</span></div>
+<div class="val">Meymanlarǵa sóz</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:60</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.steps.gallery.label</span></div>
+<div class="val">Súwretler</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:61</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.steps.gallery.sub</span></div>
+<div class="val">Cover hám galereya</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:61</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.steps.template.label</span></div>
+<div class="val">Shablon</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:62</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.steps.template.sub</span></div>
+<div class="val">Axırǵı usıl</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:62</div>
+</div>
+<h3>Form: Couple</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.couple.t1</span></div>
+<div class="val">Kelin</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:37</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.couple.t2</span></div>
+<div class="val">Kúyew</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:37</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.couple.sub</span></div>
+<div class="val">Eki at ta taklifnamanıń hárbir betinde kórinedi. Xáripler derrew jazıladı hám previewde jonli aks etedi.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:40</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.couple.bride</span></div>
+<div class="val">Kelin atı</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:45</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.couple.bridePh</span></div>
+<div class="val">Aygúl</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:37; src\components\invitation\builder\forms\index.tsx:40; src\components\invitation\builder\forms\index.tsx:45; src\components\invitation\builder\forms\index.tsx:57; src\pages\InvitationBuilder.tsx:354; src\pages\InvitationBuilder.tsx:355</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.couple.groom</span></div>
+<div class="val">Kúyew atı</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:57</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.couple.groomPh</span></div>
+<div class="val">Marat</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:37; src\components\invitation\builder\forms\index.tsx:40; src\components\invitation\builder\forms\index.tsx:45; src\components\invitation\builder\forms\index.tsx:57; src\pages\InvitationBuilder.tsx:354; src\pages\InvitationBuilder.tsx:355</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.couple.errBride</span></div>
+<div class="val">Kelin atı kirgiziliwi kerek</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:354</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.couple.errGroom</span></div>
+<div class="val">Kúyew atı kirgiziliwi kerek</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:355</div>
+</div>
+<h3>Form: Date</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.t1</span></div>
+<div class="val">To'y</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:97</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.t2</span></div>
+<div class="val">sanası</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:97</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.sub</span></div>
+<div class="val">Sana hám waqtı saylań. Cover, kalendar, countdown hám axırǵı bettegi barlıq maglıwmatlar avtomatik jańalanadı.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:100</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.label</span></div>
+<div class="val">Sana</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:105</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.timeLabel</span></div>
+<div class="val">Baslaw waqtı</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:115</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.errDate</span></div>
+<div class="val">Sana saylanıwı kerek</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:356</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.errTime</span></div>
+<div class="val">Waqt saylanıwı kerek</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:357</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.weekdays[0]</span></div>
+<div class="val">Jekshenbe</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:87</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.weekdays[1]</span></div>
+<div class="val">Dúyshembi</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:87</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.weekdays[2]</span></div>
+<div class="val">Siseksembe</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:87</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.weekdays[3]</span></div>
+<div class="val">Sársembe</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:87</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.weekdays[4]</span></div>
+<div class="val">Payyshembe</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:87</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.weekdays[5]</span></div>
+<div class="val">Juma</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:87</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.weekdays[6]</span></div>
+<div class="val">Shembi</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:87</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.months[0]</span></div>
+<div class="val">Yan</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:88</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.months[1]</span></div>
+<div class="val">Fev</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:88</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.months[2]</span></div>
+<div class="val">Mar</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:88</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.months[3]</span></div>
+<div class="val">Apr</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:88</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.months[4]</span></div>
+<div class="val">May</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:88</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.months[5]</span></div>
+<div class="val">Iyun</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:88</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.months[6]</span></div>
+<div class="val">Iyul</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:88</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.months[7]</span></div>
+<div class="val">Avg</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:88</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.months[8]</span></div>
+<div class="val">Sen</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:88</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.months[9]</span></div>
+<div class="val">Okt</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:88</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.months[10]</span></div>
+<div class="val">Noy</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:88</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.date.months[11]</span></div>
+<div class="val">Dek</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:88</div>
+</div>
+<h3>Form: Venue</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.venue.title</span></div>
+<div class="val">Qayerde?</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:171</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.venue.sub</span></div>
+<div class="val">Toy orayı, manzil, telefon hám xarita siltemesi. 'Xaritada kórúw' túymesi avtomatik payda boladı.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:174</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.venue.name</span></div>
+<div class="val">Toy orayı</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:178</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.venue.namePh</span></div>
+<div class="val">Zarafshon Ceremony Hall</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:171; src\components\invitation\builder\forms\index.tsx:174; src\components\invitation\builder\forms\index.tsx:178; src\components\invitation\builder\forms\index.tsx:190; src\components\invitation\builder\forms\index.tsx:204; src\components\invitation\builder\forms\index.tsx:217; src\components\invitation\builder\forms\index.tsx:238; src\pages\InvitationBuilder.tsx:358</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.venue.address</span></div>
+<div class="val">Manzil</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:190</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.venue.addressPh</span></div>
+<div class="val">Nókis qalası, Berdaq kóshesi 12</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:171; src\components\invitation\builder\forms\index.tsx:174; src\components\invitation\builder\forms\index.tsx:178; src\components\invitation\builder\forms\index.tsx:190; src\components\invitation\builder\forms\index.tsx:204; src\components\invitation\builder\forms\index.tsx:217; src\components\invitation\builder\forms\index.tsx:238; src\pages\InvitationBuilder.tsx:358</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.venue.phone</span></div>
+<div class="val">Telefon nomeri</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:204</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.venue.phonePh</span></div>
+<div class="val">+998 90 123 45 67</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:171; src\components\invitation\builder\forms\index.tsx:174; src\components\invitation\builder\forms\index.tsx:178; src\components\invitation\builder\forms\index.tsx:190; src\components\invitation\builder\forms\index.tsx:204; src\components\invitation\builder\forms\index.tsx:217; src\components\invitation\builder\forms\index.tsx:238; src\pages\InvitationBuilder.tsx:358</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.venue.maps</span></div>
+<div class="val">Google Maps siltemesi</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:217</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.venue.mapsPh</span></div>
+<div class="val">https://maps.google.com/...</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:171; src\components\invitation\builder\forms\index.tsx:174; src\components\invitation\builder\forms\index.tsx:178; src\components\invitation\builder\forms\index.tsx:190; src\components\invitation\builder\forms\index.tsx:204; src\components\invitation\builder\forms\index.tsx:217; src\components\invitation\builder\forms\index.tsx:238; src\pages\InvitationBuilder.tsx:358</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.venue.mapBtn</span></div>
+<div class="val">Xaritada kórúw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:238</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.venue.err</span></div>
+<div class="val">Toy orayı kirgiziliwi kerek</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:358</div>
+</div>
+<h3>Form: Message</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.message.t1</span></div>
+<div class="val">Sóz</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:271</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.message.t2</span></div>
+<div class="val">tortması</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:271</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.message.sub</span></div>
+<div class="val">Taklifnoma betlerinde kórinetuǵın matnler. Barlıǵın ózgertiwińiz múmkin. Eger hesh nársa yazbasańız, default shıraylı matn qollanıladı.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:274</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.message.welcome</span></div>
+<div class="val">Meymanlarǵa múracaat</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:278</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.message.invitation</span></div>
+<div class="val">Tiykarǵı taklif matni</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:290</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.message.final</span></div>
+<div class="val">Axırǵı tilek</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:302</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.message.musicLabel</span></div>
+<div class="val">Musıqa qosıw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:316</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.message.musicUpload</span></div>
+<div class="val">Musıqanı júklew</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:339</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.message.musicRemove</span></div>
+<div class="val">Musıqanı óshiriw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:326</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.message.musicHint</span></div>
+<div class="val">Taklifnoma ashılǵanda hám video oynalgandan keyin bul musıqa avtomatik esitiledi.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:351</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.message.musicTooLarge</span></div>
+<div class="val">Musıqa faylı 12 MB tan kishi bolıwı kerek</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:262</div>
+</div>
+<h3>Form: Gallery</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.gallery.t1</span></div>
+<div class="val">Súwretler</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:396</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.gallery.t2</span></div>
+<div class="val">tortması</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:396</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.gallery.sub</span></div>
+<div class="val">Cover foto hám galereya súwretlerin júkleń. Eger súwret qospasańız, taklifnoma shablon súwretleri arqalı isleydi.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:399</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.gallery.cover</span></div>
+<div class="val">Cover fotosurat</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:403; src\components\invitation\builder\forms\index.tsx:425</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.gallery.gallery</span></div>
+<div class="val">Galereya</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:441</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.gallery.coverAdd</span></div>
+<div class="val">Cover</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:425</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.gallery.add</span></div>
+<div class="val">Qosıw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:469</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.gallery.remove</span></div>
+<div class="val">Óshiriw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:413; src\components\invitation\builder\forms\index.tsx:456</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.gallery.alt</span></div>
+<div class="val">Galereya {n}</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:446</div>
+</div>
+<h3>Form: Template</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.template.t1</span></div>
+<div class="val">Axırǵı</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:498</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.template.t2</span></div>
+<div class="val">usıl</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:498</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.template.sub</span></div>
+<div class="val">4 tayar shablon. Hárbiri ushın súwret, matn hám fake-life preview jaratılǵan. Jańa template qosıw ońay — tek bul massivke jańa entry qosıń.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:501</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.template.label</span></div>
+<div class="val">Shablon {n}</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:514</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.template.selected</span></div>
+<div class="val">Saylandı</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\builder\forms\index.tsx:516</div>
+</div>
+<h3>Editor Nav (Back/Next/Create)</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.nav.back</span></div>
+<div class="val">Artqa</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:310</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.nav.next</span></div>
+<div class="val">Dawam etiw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:318</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.nav.create</span></div>
+<div class="val">Taklifnomanı jaratıw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:326</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.nav.creating</span></div>
+<div class="val">Jaratılmaqta...</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:326</div>
+</div>
+<h3>Preview</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.preview.label</span></div>
+<div class="val">Jonli preview</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:336</div>
+</div>
+<h3>Success</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.success.title</span></div>
+<div class="val">Mirátnamańız tayyar</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:230; src\pages\InvitationBuilder.tsx:240</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.success.sub</span></div>
+<div class="val">Avtomatik túrde tayar betke ótiw...</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:241</div>
+</div>
+<h3>SEO (meta)</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.seo.title</span></div>
+<div class="val">Taklifnoma jaratıw — Vowly</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:252</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.seo.desc</span></div>
+<div class="val">Bir neshe minutta professional raqamlı to'y taklifnoması jaratıń. Real-time preview, premium shablonlar, bir neshe minutta tayar.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:253</div>
+</div>
+<h3>Generic Error</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">builder.errorGeneric</span></div>
+<div class="val">Qátelik júz berdi</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationBuilder.tsx:220</div>
+</div>
+<h2>GUEST-FACING INVITATION</h2>
+<h3>Copy link</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.copyOk</span></div>
+<div class="val">Siltew kóshirildi!</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:112; src\pages\InvitationPage.tsx:178</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.copyFail</span></div>
+<div class="val">Kóshiriw sátsiz. Siltewdi qolda kóshiriń.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:114; src\pages\InvitationPage.tsx:180</div>
+</div>
+<h3>Story export</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.story.loading</span></div>
+<div class="val">Story súwreti tayarlanbaqta…</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:140</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.story.ok</span></div>
+<div class="val">Story súwreti júklendi (1080×1920)</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:150</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.story.fail</span></div>
+<div class="val">Súwret jaratıw sátsiz boldı</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:152</div>
+</div>
+<h3>Not found</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.notFound.title</span></div>
+<div class="val">Mirátnama tabılmadı</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationPage.tsx:112; src\pages\InvitationPage.tsx:114</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.notFound.desc</span></div>
+<div class="val">Sorałǵan mirátnama tabılmadı.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationPage.tsx:112</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.notFound.sub</span></div>
+<div class="val">Siltew qáte yamasa mirátnama óshirilgen.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationPage.tsx:115</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.notFound.cta</span></div>
+<div class="val">Ózińiz tegin jasań</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationPage.tsx:120</div>
+</div>
+<h3>Cover</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.cover.eyebrow</span></div>
+<div class="val">Sanlı mirátnama</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationPage.tsx:241</div>
+</div>
+<h3>Venue</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.venue.eyebrow</span></div>
+<div class="val">Toy markazı</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationPage.tsx:262</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.venue.mapBtn</span></div>
+<div class="val">Xarıtada kóriw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationPage.tsx:280</div>
+</div>
+<h3>Greeting</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.greeting.eyebrow</span></div>
+<div class="val">Hurmatlı mehmonlar</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationPage.tsx:291</div>
+</div>
+<h3>Final</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.final.eyebrow</span></div>
+<div class="val">Sizni intizorlık penen kútamız</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationPage.tsx:303</div>
+</div>
+<h3>Countdown units</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.timeline.day</span></div>
+<div class="val">kún</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:166; src\pages\InvitationPage.tsx:309</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.timeline.hour</span></div>
+<div class="val">saat</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:167; src\pages\InvitationPage.tsx:310</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.timeline.minute</span></div>
+<div class="val">minut</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:168; src\pages\InvitationPage.tsx:311</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.timeline.second</span></div>
+<div class="val">sekund</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:169; src\pages\InvitationPage.tsx:312</div>
+</div>
+<h3>Actions</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.actions.create</span></div>
+<div class="val">Ózińiz de jasań</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationPage.tsx:345</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.actions.copy</span></div>
+<div class="val">Siltewdi kóshiriw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:417; src\pages\InvitationPage.tsx:348</div>
+</div>
+<h3>Video</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.video.start</span></div>
+<div class="val">BOSING</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationPage.tsx:220</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.video.fallback</span></div>
+<div class="val">Taklifnomaga o'tish</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationPage.tsx:229</div>
+</div>
+<h3>SEO (meta)</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.seo.titleSuffix</span></div>
+<div class="val">taklifnoma</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationPage.tsx:187</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.seo.desc</span></div>
+<div class="val">{bride} hám {groom} toyına taklifnoma. {hall}.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationPage.tsx:188</div>
+</div>
+<h3>DEFAULT FALLBACK TEXT (renders when user leaves blank)</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.defaults.welcome</span><span class="flag">NOT QARAQALPAQ — appears to be Uzbek; copied verbatim</span></div>
+<div class="val">Hurmatli mehmonlar, biz sizlarni to'yimizga taklif qilamiz.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationPage.tsx:135</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.defaults.invitation</span><span class="flag">NOT QARAQALPAQ — appears to be Uzbek; copied verbatim</span></div>
+<div class="val">Sizlarning ishtirokingiz biz uchun alohida ahamiyatga ega.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationPage.tsx:136</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.defaults.final</span><span class="flag">NOT QARAQALPAQ — appears to be Uzbek; copied verbatim</span></div>
+<div class="val">Sizni intizorlik bilan kutamiz.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\InvitationPage.tsx:137</div>
+</div>
+<h3>Invitation View (guest render)</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.shareText</span></div>
+<div class="val">{bride} &amp; {groom} — toy mirátnaması</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:104</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.openAria</span></div>
+<div class="val">Mirátnamanı ashıw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:188</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.youInvited</span></div>
+<div class="val">Siz mirát etilesiz</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:197</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.tapToOpen</span></div>
+<div class="val">Ashıw ushın basıń</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:223</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.invitationLabel</span></div>
+<div class="val">Toy mirátnaması</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:248</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.bride</span></div>
+<div class="val">Kelin</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:269</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.groom</span></div>
+<div class="val">Kúyew</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:269</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.countdownTitle</span></div>
+<div class="val">Toyǵa qalǵan waqıt</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:362</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.started</span></div>
+<div class="val">Toy baslandı — qutlıqlaymız</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:374</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.mapBtn</span></div>
+<div class="val">Kartada kóriw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:390</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.share</span></div>
+<div class="val">Bólisiw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:104; src\components\invitation\InvitationView.tsx:398</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.qrDownload</span></div>
+<div class="val">QR kodtı júklew</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:439</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.storyFor</span></div>
+<div class="val">Instagram Story ushın</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:452</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.storyDownload</span></div>
+<div class="val">Story súwretin júklew · 9:16</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:462</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.storyNote</span></div>
+<div class="val">1080 × 1920 — Instagram, Telegram hám WhatsApp Status ushın</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:464</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.collectTitle</span></div>
+<div class="val">Barlıq mıyman fotolarin jıynamaqshı ma?</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:476</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.collectSub</span></div>
+<div class="val">Vowly Premium arqalı QR foto jıynaw hám jandı galereya.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:477</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.madeWith</span></div>
+<div class="val">VOWLY MENEN JARATILDI</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:489</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.photoAlt</span></div>
+<div class="val">{name} fotosureti</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:264</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.toyPhotoAlt</span></div>
+<div class="val">Toy fotosureti</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:340</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.months[0]</span></div>
+<div class="val">yanvar</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:82</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.months[1]</span></div>
+<div class="val">fevral</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:82</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.months[2]</span></div>
+<div class="val">mart</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:82</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.months[3]</span></div>
+<div class="val">aprel</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:82</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.months[4]</span></div>
+<div class="val">may</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:82</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.months[5]</span></div>
+<div class="val">iyun</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:82</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.months[6]</span></div>
+<div class="val">iyul</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:82</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.months[7]</span></div>
+<div class="val">avgust</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:82</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.months[8]</span></div>
+<div class="val">sentyabr</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:82</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.months[9]</span></div>
+<div class="val">oktyabr</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:82</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.months[10]</span></div>
+<div class="val">noyabr</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:82</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.months[11]</span></div>
+<div class="val">dekabr</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:82</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.weekdays[0]</span></div>
+<div class="val">Ekshembi</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:83</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.weekdays[1]</span></div>
+<div class="val">Dúyshembi</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:83</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.weekdays[2]</span></div>
+<div class="val">Siyshembi</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:83</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.weekdays[3]</span></div>
+<div class="val">Sárshembi</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:83</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.weekdays[4]</span></div>
+<div class="val">Piyshembi</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:83</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.weekdays[5]</span></div>
+<div class="val">Juma</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:83</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">invitation.view.weekdays[6]</span></div>
+<div class="val">Shembi</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\invitation\InvitationView.tsx:83</div>
+</div>
+<h3>Guest RSVP</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.rsvp.ok</span></div>
+<div class="val">Juwabıńız jiberildi. Raxmet!</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\RsvpSection.tsx:38</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.rsvp.fail</span></div>
+<div class="val">Jiberiwde qátelik boldı</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\RsvpSection.tsx:40</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.rsvp.doneTitle</span></div>
+<div class="val">Raxmet, {name}!</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\RsvpSection.tsx:54</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.rsvp.doneSub</span></div>
+<div class="val">Juwabıńız qabıl etildi.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\RsvpSection.tsx:55</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.rsvp.attending</span></div>
+<div class="val">Qatnasaman</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\RsvpSection.tsx:64</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.rsvp.notAttending</span></div>
+<div class="val">Qatnasa almayman</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\RsvpSection.tsx:65</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.rsvp.namePh</span></div>
+<div class="val">Atıńız hám familiyańız</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\RsvpSection.tsx:83</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.rsvp.phonePh</span></div>
+<div class="val">Telefon nomeri</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\RsvpSection.tsx:89</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.rsvp.guestsCount</span></div>
+<div class="val">Mehman sanı</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\RsvpSection.tsx:94</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.rsvp.messagePh</span></div>
+<div class="val">Qutlıqlaw sózleri...</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\RsvpSection.tsx:104</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.rsvp.submit</span></div>
+<div class="val">Juwap jiberiw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\RsvpSection.tsx:114</div>
+</div>
+<h3>Wedding Moments (photo upload)</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.moments.type</span></div>
+<div class="val">Tek ǵana súwret júkleń</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\WeddingMoments.tsx:27</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.moments.size</span></div>
+<div class="val">Súwret 10 MB tan kishi bolıwı kerek</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\WeddingMoments.tsx:31</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.moments.ok</span></div>
+<div class="val">Raxmet! Súwretińiz albomǵa qosıldı</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\WeddingMoments.tsx:36</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.moments.fail</span></div>
+<div class="val">Júklewde qátelik boldı</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\WeddingMoments.tsx:38</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.moments.intro</span></div>
+<div class="val">Bul baxıtlı kúnniń eń jaqsı sáwlelerin bizler menen bólisiń — súwretińiz sol zamat albomda kórinedi.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\WeddingMoments.tsx:47</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.moments.namePh</span></div>
+<div class="val">Atıńız (qálewińiz boyınsha)</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\WeddingMoments.tsx:52</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.moments.uploading</span></div>
+<div class="val">Júklenbekte...</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\WeddingMoments.tsx:68</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.moments.uploadBtn</span></div>
+<div class="val">Súwret júklew</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\WeddingMoments.tsx:70</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.moments.loading</span></div>
+<div class="val">Júklenbekte...</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\WeddingMoments.tsx:75</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.moments.photoAlt</span></div>
+<div class="val">Toy sáti</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\WeddingMoments.tsx:91; src\components\guest\WeddingMoments.tsx:118</div>
+</div>
+<div class="card">
+<div class="meta">KEY: <span class="key">guest.moments.empty</span></div>
+<div class="val">Álle házirge shekem súwret joq — birinshi bolıń!</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\components\guest\WeddingMoments.tsx:99</div>
+</div>
+<h2>OTHER UI (AUTH)</h2>
+<h3>error</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">auth.error</span></div>
+<div class="val">Email yaki parol qáte</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\LoginPage.tsx:40</div>
+</div>
+<h3>success</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">auth.success</span></div>
+<div class="val">Xosh keldińiz!</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\LoginPage.tsx:43</div>
+</div>
+<h3>noHallTitle</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">auth.noHallTitle</span></div>
+<div class="val">Toyxana biriktirilmegen</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\LoginPage.tsx:54</div>
+</div>
+<h3>noHallSub</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">auth.noHallSub</span></div>
+<div class="val">Akkauntıńız tastıyıqlanǵan, biraq ele hesh qanday toyxanaǵa biriktirilmegen. Admin sizdi toyxanaǵa qosqannan keyin panel ashıladı.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\LoginPage.tsx:56</div>
+</div>
+<h3>refresh</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">auth.refresh</span></div>
+<div class="val">Jańalaw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\LoginPage.tsx:60</div>
+</div>
+<h3>logout</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">auth.logout</span></div>
+<div class="val">Shıǵıw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\LoginPage.tsx:63</div>
+</div>
+<h3>subtitle</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">auth.subtitle</span></div>
+<div class="val">Toyxana basqarıw sistemasına kiriń</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\LoginPage.tsx:83</div>
+</div>
+<h3>emailPh</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">auth.emailPh</span></div>
+<div class="val">Email</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\LoginPage.tsx:91</div>
+</div>
+<h3>passwordPh</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">auth.passwordPh</span></div>
+<div class="val">Parol</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\LoginPage.tsx:103</div>
+</div>
+<h3>login</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">auth.login</span></div>
+<div class="val">Kiriw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\LoginPage.tsx:116</div>
+</div>
+<h3>loggingIn</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">auth.loggingIn</span></div>
+<div class="val">Kiriwde...</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\LoginPage.tsx:116</div>
+</div>
+<h3>noLoginTitle</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">auth.noLoginTitle</span></div>
+<div class="val">Sizde login hám parol joqpa?</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\LoginPage.tsx:121</div>
+</div>
+<h3>noLoginSub</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">auth.noLoginSub</span></div>
+<div class="val">Demo hám akkaunt ashıw ushın bizge qońıraw etiń — login hám paroldı biz beremiz.</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\LoginPage.tsx:123</div>
+</div>
+<h3>backHome</h3>
+<div class="card">
+<div class="meta">KEY: <span class="key">auth.backHome</span></div>
+<div class="val">Bas betke qaytıw</div>
+<div class="loc">FILE: src/i18n/locales/kaa.json &nbsp;|&nbsp; USED AT: src\pages\LoginPage.tsx:137</div>
+</div>
+</div>
+<footer>Audit completed. I have not changed anything. Send me the corrected Qaraqalpaq texts and I will replace them exactly in their corresponding locations.</footer>
+</body></html>
