@@ -1,19 +1,17 @@
 import { chromium } from "playwright";
+const BASE = process.env.QA_BASE || "http://localhost:4180";
 const browser = await chromium.launch();
-const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" });
-const page = await ctx.newPage();
-await page.goto("http://localhost:8085/", { waitUntil: "networkidle" });
-await page.waitForTimeout(800);
-await page.addStyleTag({ content: `*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}[style*="opacity"],[style*="transform"]{opacity:1!important;transform:none!important}` });
-const totalHeight = await page.evaluate(() => document.documentElement.scrollHeight);
-for (let y = 0; y < totalHeight; y += 500) { await page.evaluate(yy => window.scrollTo(0, yy), y); await page.waitForTimeout(80); }
-await page.evaluate(() => window.scrollTo(0, 0));
-await page.waitForTimeout(300);
-await page.screenshot({ path: "scripts/.verify-landing/desktop-1440-full.png", fullPage: true });
-await page.screenshot({ path: "scripts/.verify-landing/desktop-1440-hero.png", fullPage: false });
-const m = await page.evaluate(() => {
-  const de = document.documentElement;
-  return { sw: de.scrollWidth, iw: window.innerWidth, sh: de.scrollHeight };
-});
-console.log("desktop 1440:", JSON.stringify(m));
+const widths = [1280, 1024, 900];
+for (const w of widths) {
+  const page = await browser.newPage({ viewport: { width: w, height: 800 } });
+  await page.goto(BASE + "/ru", { waitUntil: "networkidle" });
+  await page.waitForTimeout(900);
+  for (const sel of ["#bahalar", "#qalay"]) {
+    await page.evaluate((s) => { const e = document.querySelector(s); if (e) e.scrollIntoView({ block: "start" }); }, sel);
+    await page.waitForTimeout(450);
+    await page.screenshot({ path: `scripts/shots/desktop-${w}-${sel.replace("#","")}.png` });
+    console.log("shot desktop", w, sel);
+  }
+  await page.close();
+}
 await browser.close();

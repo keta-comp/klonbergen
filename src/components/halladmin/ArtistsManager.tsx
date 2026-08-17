@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useArtists, useMutateArtist } from '@/hooks/useHallData';
+import type { Tables } from '@/integrations/supabase/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,12 +11,13 @@ import { Plus, Trash2, Edit2, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Props { hallId: string; }
+type Artist = Tables<'artists'>;
 
 export default function ArtistsManager({ hallId }: Props) {
   const { data: items, isLoading } = useArtists(hallId);
   const { create, update, remove } = useMutateArtist(hallId);
   const [open, setOpen] = useState(false);
-  const [editItem, setEditItem] = useState<any>(null);
+  const [editItem, setEditItem] = useState<Artist | null>(null);
   const [form, setForm] = useState({ name: '', performance_time: '', description: '' });
 
   const resetForm = () => setForm({ name: '', performance_time: '', description: '' });
@@ -32,7 +34,7 @@ export default function ArtistsManager({ hallId }: Props) {
     resetForm(); setEditItem(null); setOpen(false);
   };
 
-  const handleEdit = (item: any) => {
+  const handleEdit = (item: Artist) => {
     setEditItem(item);
     setForm({ name: item.name, performance_time: item.performance_time ?? '', description: item.description ?? '' });
     setOpen(true);

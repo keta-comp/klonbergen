@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useBanners, useMutateBanner, useBrideGroom, uploadHallAsset } from '@/hooks/useHallData';
+import type { Tables } from '@/integrations/supabase/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,13 +11,14 @@ import { toast } from 'sonner';
 import ImageCropDialog from '@/components/common/ImageCropDialog';
 
 interface Props { hallId: string; }
+type Banner = Tables<'banners'>;
 
 export default function BannersManager({ hallId }: Props) {
   const { data: items, isLoading } = useBanners(hallId);
   const { data: brideGroom } = useBrideGroom(hallId);
   const { create, update, remove } = useMutateBanner(hallId);
   const [open, setOpen] = useState(false);
-  const [editItem, setEditItem] = useState<any>(null);
+  const [editItem, setEditItem] = useState<Banner | null>(null);
   const [form, setForm] = useState({ title: '', image_url: '' });
   const [uploading, setUploading] = useState(false);
   const [cropSrc, setCropSrc] = useState<string | null>(null);
@@ -41,8 +43,8 @@ export default function BannersManager({ hallId }: Props) {
       const url = await uploadHallAsset(file, hallId);
       setForm(f => ({ ...f, image_url: url }));
       toast.success('Suwret júklendi!');
-    } catch (err: any) {
-      toast.error(err.message || 'Suwret júklewde qátelik');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Suwret júklewde qátelik');
     } finally {
       setUploading(false);
     }
@@ -61,7 +63,7 @@ export default function BannersManager({ hallId }: Props) {
     resetForm(); setEditItem(null); setOpen(false);
   };
 
-  const handleEdit = (item: any) => {
+  const handleEdit = (item: Banner) => {
     setEditItem(item);
     setForm({ title: item.title ?? '', image_url: item.image_url });
     setOpen(true);

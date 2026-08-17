@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import Navbar from '@/components/common/Navbar';
 import { useAuth } from '@/hooks/useAuth';
 import { useWeddingHalls, useHallAdmins, useMutateHall, useProfiles } from '@/hooks/useHallData';
+import type { Tables } from '@/integrations/supabase/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -23,7 +24,7 @@ export default function SuperAdminDashboard() {
   const qc = useQueryClient();
 
   const [addOpen, setAddOpen] = useState(false);
-  const [editHall, setEditHall] = useState<any>(null);
+  const [editHall, setEditHall] = useState<Tables<'wedding_halls'> | null>(null);
   const [form, setForm] = useState({ name: '', address: '', phone: '' });
   const [adminOpen, setAdminOpen] = useState<string | null>(null);
   const [selectedUserId, setSelectedUserId] = useState('');
@@ -72,7 +73,7 @@ export default function SuperAdminDashboard() {
       body: { ...credForm, email: credForm.email.trim(), hall_id: hallId },
     });
     setCredLoading(false);
-    const errMsg = error?.message ?? (data as any)?.error;
+    const errMsg = error?.message ?? (data as { error?: string } | null)?.error;
     if (errMsg) {
       toast.error(errMsg);
       return;

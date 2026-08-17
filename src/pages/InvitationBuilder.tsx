@@ -227,7 +227,12 @@ export default function InvitationBuilder() {
   if (done) {
     return (
       <div className="inv-shell">
-        <Seo title={t("builder.success.title")} path="/taklifnoma/yangi" noindex />
+        <Seo
+          title={t("builder.success.title")}
+          description={t("builder.success.title")}
+          path="/taklifnoma/yangi"
+          noindex
+        />
         <div className="inv-success">
           <motion.div
             initial={{ scale: 0.6, opacity: 0 }}

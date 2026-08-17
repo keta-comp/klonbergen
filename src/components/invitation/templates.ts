@@ -1,7 +1,5 @@
-import type { InvitationTemplate } from '@/hooks/useInvitations';
-
 export interface TemplateStyle {
-  id: InvitationTemplate;
+  id: string;
   label: string;
   hint: string;
   /** page background */

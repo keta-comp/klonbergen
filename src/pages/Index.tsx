@@ -7,7 +7,6 @@ import {
 } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
-import OpeningExperience from "@/components/visual/OpeningExperience";
 import CustomCursor from "@/components/visual/CustomCursor";
 import FilmGrain from "@/components/visual/FilmGrain";
 import { useAuth } from "@/hooks/useAuth";
@@ -867,7 +866,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-[var(--vow-ivory)]">
-      <OpeningExperience />
       <FilmGrain />
       <CustomCursor />
       <LandingNav />

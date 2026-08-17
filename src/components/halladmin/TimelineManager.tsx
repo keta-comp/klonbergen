@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTimelineEvents, useMutateTimeline } from '@/hooks/useHallData';
+import type { Tables } from '@/integrations/supabase/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,6 +11,7 @@ import { Plus, Trash2, Edit2, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Props { hallId: string; }
+type TimelineEvent = Tables<'timeline_events'>;
 
 const EMPTY = { title: '', description: '', icon: '', start_time: '', end_time: '' };
 
@@ -27,7 +29,7 @@ export default function TimelineManager({ hallId }: Props) {
   const { data: items, isLoading } = useTimelineEvents(hallId);
   const { create, update, remove } = useMutateTimeline(hallId);
   const [open, setOpen] = useState(false);
-  const [editItem, setEditItem] = useState<any>(null);
+  const [editItem, setEditItem] = useState<Partial<TimelineEvent> | null>(null);
   const [form, setForm] = useState(EMPTY);
 
   const handleSave = async () => {
@@ -52,7 +54,7 @@ export default function TimelineManager({ hallId }: Props) {
     setForm(EMPTY); setEditItem(null); setOpen(false);
   };
 
-  const handleEdit = (item: any) => {
+  const handleEdit = (item: Partial<TimelineEvent>) => {
     setEditItem(item);
     setForm({
       title: item.title,

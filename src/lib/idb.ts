@@ -65,7 +65,7 @@ export async function idbDel(key: string): Promise<void> {
       const tx = db.transaction(STORE, "readwrite");
       tx.objectStore(STORE).delete(key);
       tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(req.error);
+      tx.onerror = () => reject(tx.error);
     });
   } catch {
     /* ignore */

@@ -1,0 +1,11 @@
+import { chromium } from "playwright";
+const BASE = process.env.QA_BASE || "http://localhost:4184";
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 320, height: 700 } });
+await page.goto(BASE + "/ru", { waitUntil: "networkidle" });
+await page.waitForTimeout(800);
+const h1 = page.locator(".hero-premium-title");
+await h1.screenshot({ path: "scripts/shots/hero-title-320.png" });
+console.log("done");
+await page.close();
+await browser.close();

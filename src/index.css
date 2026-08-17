@@ -245,6 +245,10 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    /* Paint containment stops the zoomed hero video (transform: scale) from
+       expanding the document's horizontal scroll area — the video is clipped
+       to the hero box without leaking scrollable overflow to the page. */
+    contain: paint;
     background: var(--vow-dark);
   }
   .hero-video {
@@ -403,6 +407,33 @@
 .vow-section { position: relative; padding: clamp(5rem, 11vw, 10rem) 0; }
 .vow-wrap { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 clamp(1.25rem, 5vw, 4rem); }
 .vow-wrap-wide { width: 100%; max-width: 1480px; margin: 0 auto; padding: 0 clamp(1.25rem, 5vw, 4rem); }
+
+/* ---------- Global responsive safety net (root-cause guard) ----------
+   Fixes horizontal overflow at the source: nothing wider than the viewport can
+   ever push the page sideways. `clip` (vs `hidden`) avoids creating a scroll
+   container, so sticky/scroll behaviour is preserved. Combined with the
+   per-component fixes below, this is a backstop, not a band-aid. */
+html { overflow-x: clip; }
+img, video, svg, canvas { max-width: 100%; height: auto; }
+
+/* ---------- Text-overflow guards ----------
+   Long RU/KAА words must wrap inside their container, never run off the right
+   edge of the viewport. These props only act on words wider than their line, so
+   desktop layout (which already wraps normally) is unaffected. */
+.premium-heading,
+.premium-sub,
+.premium-feature-title,
+.premium-feature-desc,
+.premium-tl-title,
+.premium-tl-desc,
+.qr-step-text,
+.gallery-tile-cap,
+.pricing-card-name,
+.pricing-card-unit {
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
 
 /* ---------- Typography ---------- */
 .vow-display {
@@ -2225,6 +2256,19 @@
 }
 .premium-burger:hover { background: rgba(255, 255, 255, 0.9); border-color: var(--vow-gold); }
 
+/* ---------- Header: logo + RU selector + hamburger must stay on ONE row, no overflow ---------- */
+.premium-nav .vow-wrap-wide {
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+.premium-nav .brand { min-width: 0; }
+@media (max-width: 380px) {
+  .brand .logo-mark { height: 22px; }
+  .brand .font-display { font-size: 1.375rem; }
+  .premium-burger { width: 2.4rem; height: 2.4rem; }
+  .premium-lang-trigger { height: 2.1rem; padding: 0 0.6rem; }
+}
+
 .premium-mobile-menu {
   display: flex;
   flex-direction: column;
@@ -2690,19 +2734,29 @@
     padding: 0;
   }
   .premium-tl-grid {
-    flex-direction: column;
+    display: block;
     min-width: 0;
     gap: 0;
   }
+  /* Vertical editorial timeline: gold rail on the left with a minimal dot,
+     content ordered TIME ↓ IMAGE ↓ TITLE ↓ DESCRIPTION. `minmax(0, 1fr)` lets
+     the text column shrink below its longest word so copy wraps naturally
+     (no more one-word-per-line). */
   .premium-tl-step {
-    flex: none;
     display: grid;
-    grid-template-columns: 2.4rem 1fr;
-    column-gap: 1.1rem;
-    align-items: stretch;
+    grid-template-columns: 2.2rem minmax(0, 1fr);
+    grid-template-areas:
+      "rail time"
+      "rail img"
+      "rail title"
+      "rail desc";
+    column-gap: 1rem;
+    row-gap: 0.5rem;
+    align-items: start;
     text-align: left;
   }
   .premium-tl-node {
+    grid-area: rail;
     grid-column: 1;
     grid-row: 1 / -1;
     width: auto;
@@ -2716,19 +2770,83 @@
     right: auto;
     top: 0;
     bottom: 0;
-    width: 2px;
+    width: 1.5px;
     height: auto;
     transform: translateX(-50%);
-    background: linear-gradient(180deg, transparent 0%, var(--vow-gold) 10%, var(--vow-gold-soft) 50%, var(--vow-gold) 90%, transparent 100%);
+    background: linear-gradient(180deg, transparent 0%, var(--vow-gold) 8%, var(--vow-gold-soft) 50%, var(--vow-gold) 92%, transparent 100%);
   }
-  .premium-tl-marker { margin-top: 0.35rem; }
+  /* Minimal dot on mobile */
+  .premium-tl-marker {
+    width: 0.7rem;
+    height: 0.7rem;
+    margin-top: 0.5rem;
+  }
   .premium-tl-img {
+    grid-area: img;
+    width: 100%;
+    max-width: 100%;
     aspect-ratio: 16 / 10;
     border-radius: 6px;
   }
-  .premium-tl-time { margin-top: 0.35rem; }
-  .premium-tl-title { margin-top: 0.25rem; }
-  .premium-tl-desc { margin-top: 0.4rem; max-width: none; }
+  .premium-tl-time {
+    grid-area: time;
+    margin: 0;
+    font-size: clamp(1.3rem, 5vw, 1.6rem);
+  }
+  .premium-tl-title {
+    grid-area: title;
+    margin: 0;
+    font-size: clamp(0.82rem, 3.6vw, 0.95rem);
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+  .premium-tl-desc {
+    grid-area: desc;
+    margin: 0;
+    max-width: none;
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+
+  /* Premium headings: put the gold italic accent on its own line so the
+     Cormorant Garamond descender of line 1 can't visually collide with
+     the accent on line 2 (root cause of the pricing-heading overlap).
+     Covers phones AND tablets (≤900). Desktop keeps the inline accent.
+     The QR/Features headings already use an explicit <br />, so this
+     matches their line break behavior and gives every section a
+     consistent intentional two-line premium layout on mobile/tablet. */
+  .premium-heading em {
+    display: block;
+    margin-top: 0.1em;
+  }
+
+  /* Section CTAs: at tablet (≤900) the 2-column headers give the button a
+     narrow grid cell. Without a max-width cap the button renders at its
+     intrinsic width and overflows leftward, covering the subtitle's last
+     line (e.g. timeline "Смотреть по обратному отсчёту свадьбы").
+     Constraining max-width lets the label wrap cleanly inside the cell
+     instead of overflowing into the copy column. Desktop (>900) keeps the
+     natural button width. */
+  .section-premium .vow-btn {
+    max-width: 100%;
+  }
+
+  /* Hero title uses line-height: 1.04 with the Cormorant Garamond serif,
+     which makes the descender of line 1 ("жизни") visually collide with
+     the italic accent on line 2 ("ваш особенный день"). Give the title
+     breathing room on mobile/tablet; desktop keeps its tight display
+     line-height intentionally. */
+  .hero-premium-title {
+    line-height: 1.2;
+  }
+  /* The italic gold accent shares a line-box boundary with the line above,
+     so its tall ascenders visually touch the descenders of "В вашей жизни"
+     even with adequate line-height (optical collision). Give the accent
+     a small top margin so it reads as a clearly separate second line. */
+  .hero-title-accent {
+    display: inline-block;
+    margin-top: 0.12em;
+  }
 }
 
 /* ---------- Gallery editorial (curated wedding-day story) ---------- */
@@ -3218,6 +3336,25 @@
     gap: 0.4rem;
   }
   .hero-premium-bottom-link { font-size: 0.5rem; letter-spacing: 0.22em; }
+
+  /* Hero — keep premium look, fit text, stay inside the viewport */
+  .hero-content { padding-left: 1.25rem; padding-right: 1.25rem; }
+  .hero-premium-title { font-size: clamp(2.1rem, 9vw, 3.4rem); }
+
+  /* Comfortable premium gutter (20–24px) */
+  .vow-wrap-wide { padding-left: 1.5rem; padding-right: 1.5rem; }
+
+  /* CTA buttons: full-width inside content sections, label wraps (never clips),
+     icon stays inside via the existing gap + inline-flex. The nav "demo" button
+     is excluded (it lives in .premium-nav and is hidden below 640px); the footer
+     newsletter submit stays inline with its input (not forced full-width). */
+  .section-premium .vow-btn {
+    width: 100%;
+    max-width: 100%;
+  }
+  .vow-btn { white-space: normal; }
+  .pricing-card-cta { white-space: normal; }
+
   .gallery-editorial {
     grid-template-columns: 1fr 1fr;
   }

@@ -18,7 +18,7 @@ import { lazy, type ComponentType } from "react";
  * ErrorBoundary can still surface the diagnostic UI instead of a silent
  * blank screen.
  */
-export function lazyWithRetry<T extends ComponentType<any>>(
+export function lazyWithRetry<T extends ComponentType<Record<string, never>> = ComponentType<Record<string, never>>>(
   loader: () => Promise<{ default: T }>,
 ) {
   const MAX_ATTEMPTS = 3;
@@ -34,7 +34,6 @@ export function lazyWithRetry<T extends ComponentType<any>>(
           .then(resolve)
           .catch((err) => {
             if (attempt < MAX_ATTEMPTS) {
-              // eslint-disable-next-line no-console
               console.warn(
                 `[lazyWithRetry] dynamic import failed (attempt ${attempt}/${MAX_ATTEMPTS}); retrying in ${BASE_DELAY_MS * attempt}ms`,
                 err,

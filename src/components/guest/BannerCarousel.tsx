@@ -36,25 +36,27 @@ export default function BannerCarousel({ banners = [] }: { banners?: Banner[] })
   const [[page, direction], setPage] = useState([0, 0]);
   const [isHovered, setIsHovered] = useState(false);
 
-  // 🔥 Xavfsiz tekshiruv
-  if (!banners || banners.length === 0) {
-    console.warn("⚠️ BannerCarousel: No banners provided");
-    return null;
-  }
-
-  const index = ((page % banners.length) + banners.length) % banners.length;
+  const index = banners.length
+    ? ((page % banners.length) + banners.length) % banners.length
+    : 0;
 
   const paginate = useCallback((newDirection: number) => {
     setPage(([p]) => [p + newDirection, newDirection]);
   }, []);
 
   useEffect(() => {
-    if (banners.length <= 1 || isHovered) return;
+    if (!banners.length || banners.length <= 1 || isHovered) return;
     const timer = setInterval(() => paginate(1), 4500);
     return () => clearInterval(timer);
   }, [banners.length, isHovered, paginate]);
 
-  const handleDragEnd = (_: any, { offset, velocity }: PanInfo) => {
+  // 🔥 Xavfsiz tekshiruv — hook'lardan KEYIN, sharti bo'lmagan holda
+  if (!banners || banners.length === 0) {
+    console.warn("⚠️ BannerCarousel: No banners provided");
+    return null;
+  }
+
+  const handleDragEnd = (_e: unknown, { offset, velocity }: PanInfo) => {
     const swipe = swipePower(offset.x, velocity.x);
     if (swipe < -swipeConfidenceThreshold) paginate(1);
     else if (swipe > swipeConfidenceThreshold) paginate(-1);

@@ -144,11 +144,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async () => {
     const { lovable } = await import("@/integrations/lovable");
-    return lovable.auth.signInWithOAuth("google", {
+    // The OAuth redirect result is intentionally discarded — navigation is
+    // handled by the auth state listener after the callback. Returning void
+    // keeps the public `signInWithGoogle` contract simple and stable.
+    return void (await lovable.auth.signInWithOAuth("google", {
       // Managed OAuth must return to the public origin. The hydrated auth
       // state below performs the role-based navigation after the callback.
       redirect_uri: window.location.origin,
-    });
+    }));
   };
 
   const signOut = async () => {

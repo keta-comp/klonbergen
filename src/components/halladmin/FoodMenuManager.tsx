@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useFoodItems, useMutateFood } from '@/hooks/useHallData';
+import type { Tables } from '@/integrations/supabase/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,12 +12,13 @@ import { Plus, Trash2, Edit2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Props { hallId: string; }
+type FoodItem = Tables<'food_items'>;
 
 export default function FoodMenuManager({ hallId }: Props) {
   const { data: items, isLoading } = useFoodItems(hallId);
   const { create, update, remove } = useMutateFood(hallId);
   const [open, setOpen] = useState(false);
-  const [editItem, setEditItem] = useState<any>(null);
+  const [editItem, setEditItem] = useState<FoodItem | null>(null);
   const [form, setForm] = useState({ name: '', price: '', description: '', is_today: true });
 
   const resetForm = () => setForm({ name: '', price: '', description: '', is_today: true });
@@ -35,7 +37,7 @@ export default function FoodMenuManager({ hallId }: Props) {
     setOpen(false);
   };
 
-  const handleEdit = (item: any) => {
+  const handleEdit = (item: FoodItem) => {
     setEditItem(item);
     setForm({ name: item.name, price: item.price?.toString() ?? '', description: item.description ?? '', is_today: item.is_today ?? true });
     setOpen(true);
