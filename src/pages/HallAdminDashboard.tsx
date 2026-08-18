@@ -56,17 +56,24 @@ import {
 import { cn } from '@/lib/utils';
 
 export default function HallAdminDashboard() {
-  const { user, signOut, hallId } = useAuth();
+  const { user, signOut, hallId, isSuperAdmin } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { locale } = useParams();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  useArchiveOnMount(hallId);
+  // A super admin is not linked to a single hall (no `hall_admins` row), so the
+  // hall to manage is carried in the `?hall=` query param on the "Manage" link
+  // from the SuperAdmin dashboard. Hall admins / owners always use their own
+  // linked hall and ignore the query param to prevent cross-hall escalation.
+  const queryHall = new URLSearchParams(location.search).get("hall");
+  const effectiveHallId = isSuperAdmin ? (queryHall ?? hallId) : hallId;
+
+  useArchiveOnMount(effectiveHallId);
 
   // touch the active wedding so its stats stay fresh
-  useActiveWedding(hallId);
+  useActiveWedding(effectiveHallId);
 
   // Auto-close the drawer on any navigation (mobile UX)
   useEffect(() => {
@@ -82,7 +89,7 @@ export default function HallAdminDashboard() {
     return () => document.removeEventListener('keydown', onKey);
   }, []);
 
-  if (!hallId) {
+  if (!effectiveHallId) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f9f6ee]">
         <div className="rounded-2xl border border-neutral-200 bg-white p-8 text-center shadow-sm">
@@ -100,13 +107,13 @@ export default function HallAdminDashboard() {
 
   // Pull venue info to put in the sidebar footer
   const { data: hall } = useQuery({
-    queryKey: ['hall', hallId],
+    queryKey: ['hall', effectiveHallId],
     queryFn: async () => {
-      const { data, error } = await supabase.from('wedding_halls').select('*').eq('id', hallId).single();
+      const { data, error } = await supabase.from('wedding_halls').select('*').eq('id', effectiveHallId).single();
       if (error) throw error;
       return data;
     },
-    enabled: !!hallId,
+    enabled: !!effectiveHallId,
   });
 
   // Pull admin profile (avatar etc.)
@@ -179,7 +186,7 @@ export default function HallAdminDashboard() {
         {/* Main column */}
         <div className="min-w-0 flex-1">
           <AdminTopbar
-            hallId={hallId}
+            hallId={effectiveHallId}
             userName={userName}
             userEmail={user?.email ?? null}
             avatarUrl={avatarUrl}
@@ -199,20 +206,20 @@ export default function HallAdminDashboard() {
             className={cn('px-4 py-6 md:px-8 md:py-8')}
           >
             <Routes>
-              <Route index element={<AdminHome hallId={hallId} />} />
-              <Route path="bosh-sahifa" element={<AdminHome hallId={hallId} />} />
-              <Route path="bannerlar" element={<BannersManager hallId={hallId} />} />
-              <Route path="dastur" element={<TimelineManager hallId={hallId} />} />
-              <Route path="taomlar" element={<FoodMenuManager hallId={hallId} />} />
-              <Route path="artistlar" element={<ArtistsManager hallId={hallId} />} />
-              <Route path="kelin-kuyov" element={<BrideGroomEditor hallId={hallId} />} />
-              <Route path="qr" element={<QRCodeGenerator hallId={hallId} />} />
-              <Route path="suratlari" element={<MomentsManager hallId={hallId} />} />
-              <Route path="rsvp" element={<RsvpManager hallId={hallId} />} />
-              <Route path="musiqa" element={<MusicManager hallId={hallId} />} />
-              <Route path="archive" element={<ArchiveSection hallId={hallId} />} />
-              <Route path="archive/:weddingId" element={<ArchiveDetailPage hallId={hallId} />} />
-              <Route path="*" element={<AdminHome hallId={hallId} />} />
+              <Route index element={<AdminHome hallId={effectiveHallId} />} />
+              <Route path="bosh-sahifa" element={<AdminHome hallId={effectiveHallId} />} />
+              <Route path="bannerlar" element={<BannersManager hallId={effectiveHallId} />} />
+              <Route path="dastur" element={<TimelineManager hallId={effectiveHallId} />} />
+              <Route path="taomlar" element={<FoodMenuManager hallId={effectiveHallId} />} />
+              <Route path="artistlar" element={<ArtistsManager hallId={effectiveHallId} />} />
+              <Route path="kelin-kuyov" element={<BrideGroomEditor hallId={effectiveHallId} />} />
+              <Route path="qr" element={<QRCodeGenerator hallId={effectiveHallId} />} />
+              <Route path="suratlari" element={<MomentsManager hallId={effectiveHallId} />} />
+              <Route path="rsvp" element={<RsvpManager hallId={effectiveHallId} />} />
+              <Route path="musiqa" element={<MusicManager hallId={effectiveHallId} />} />
+              <Route path="archive" element={<ArchiveSection hallId={effectiveHallId} />} />
+              <Route path="archive/:weddingId" element={<ArchiveDetailPage hallId={effectiveHallId} />} />
+              <Route path="*" element={<AdminHome hallId={effectiveHallId} />} />
             </Routes>
           </motion.main>
         </div>

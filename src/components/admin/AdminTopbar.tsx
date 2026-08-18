@@ -168,8 +168,8 @@ export default function AdminTopbar({ hallId, userName, userEmail, avatarUrl, on
                           className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-neutral-50"
                           onClick={() => {
                             setNotifOpen(false);
-                            if (n.icon === 'rsvp') navigate(`/${location.pathname.split('/')[1]}/admin/rsvp`);
-                            else navigate(`/${location.pathname.split('/')[1]}/admin/suratlari`);
+                            if (n.icon === 'rsvp') navigate(`/${location.pathname.split('/')[1]}/admin/rsvp${location.search}`);
+                            else navigate(`/${location.pathname.split('/')[1]}/admin/suratlari${location.search}`);
                           }}
                         >
                           <span className="mt-0.5 grid h-8 w-8 flex-shrink-0 place-items-center rounded-full bg-[#3a4530]/10 text-[#3a4530]">
@@ -235,7 +235,7 @@ export default function AdminTopbar({ hallId, userName, userEmail, avatarUrl, on
                     setMenuOpen(false);
                     // jump to admin home (locale-aware)
                     const segs = location.pathname.split('/').filter(Boolean);
-                    navigate(`/${segs[0]}/admin/bosh-sahifa`);
+                    navigate(`/${segs[0]}/admin/bosh-sahifa${location.search}`);
                   }}
                 >
                   {t('admin.topbar.home')}

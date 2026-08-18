@@ -58,8 +58,12 @@ export default function AdminSidebar({ hallName, hallLogo, onNavigate }: Props) 
   const suffix = pathParts[2] ?? 'bosh-sahifa';
   const adminBase = `/${pathParts[0]}/admin`;
 
+  // Preserve the `?hall=` query param (used by super admins to target a hall)
+  // across sidebar navigation so a super admin isn't bounced back to the gate.
+  const search = location.search ?? '';
+
   const renderItem = (it: NavItem) => {
-    const target = buildPath(adminBase, it.to);
+    const target = buildPath(adminBase, it.to) + search;
     const active = suffix === it.to;
     const Icon = it.icon;
     return (
@@ -122,7 +126,7 @@ export default function AdminSidebar({ hallName, hallLogo, onNavigate }: Props) 
           </div>
         </a>
         <Link
-          to={`${adminBase}/bosh-sahifa`}
+          to={`${adminBase}/bosh-sahifa${search}`}
           onClick={onNavigate}
           className="flex items-center gap-3 rounded-xl bg-white px-3 py-2.5 shadow-sm transition hover:shadow"
         >
