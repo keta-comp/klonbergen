@@ -16,8 +16,29 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const url = Deno.env.get("SUPABASE_URL")!;
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    // SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are normally auto-injected by
+    // Supabase. To be bulletproof (some dashboards deploy without auto-injection),
+    // fall back to a non-reserved, user-set secret `SB_SERVICE_ROLE_KEY` and the
+    // public project URL. The URL is public (it ships in the frontend bundle),
+    // so hardcoding it as a fallback is safe.
+    const url =
+      Deno.env.get("SUPABASE_URL") ??
+      Deno.env.get("SB_PROJECT_URL") ??
+      "https://vbikhnzwnsfddgjzwuge.supabase.co";
+
+    const serviceKey =
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? Deno.env.get("SB_SERVICE_ROLE_KEY");
+
+    if (!serviceKey) {
+      return json(
+        {
+          error:
+            "SB_SERVICE_ROLE_KEY secret topilmadi. Dashboard → Edge Functions → create-hall-admin → Secrets ga qo'shing.",
+        },
+        500,
+      );
+    }
+
     const admin = createClient(url, serviceKey, { auth: { persistSession: false } });
 
     // --- authenticate caller ---

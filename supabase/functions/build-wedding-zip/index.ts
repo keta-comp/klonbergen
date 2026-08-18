@@ -55,8 +55,13 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const url = Deno.env.get("SUPABASE_URL")!;
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const url =
+      Deno.env.get("SUPABASE_URL") ??
+      Deno.env.get("SB_PROJECT_URL") ??
+      "https://vbikhnzwnsfddgjzwuge.supabase.co";
+    const serviceKey =
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? Deno.env.get("SB_SERVICE_ROLE_KEY");
+    if (!serviceKey) return json({ error: "SB_SERVICE_ROLE_KEY secret topilmadi" }, 500);
     const admin = createClient(url, serviceKey, { auth: { persistSession: false } });
 
     const incomingUrl = new URL(req.url);
