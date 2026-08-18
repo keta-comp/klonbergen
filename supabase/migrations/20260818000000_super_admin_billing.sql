@@ -24,10 +24,10 @@ alter table public.plans enable row level security;
 
 -- seed default plans
 insert into public.plans (code, name, price, period_days, display_order, description) values
-  ('venue',             'Venue',              99000,   30, 1, 'Faqat toʼyxona boshqaruvi'),
-  ('invitation',        'Invitation',        299000,   30, 2, 'Faqat raqamli taklifnoma'),
-  ('venue_invitation',  'Venue + Invitation',399000,   30, 3, 'Toʼyxona va taklifnoma birgalikda')
+  ('venue', 'Toyxona', 299000, 30, 1, 'Vowly toʼyxona tarifi — 299 000 soʼm/oy')
 on conflict (code) do nothing;
+
+delete from public.plans where code <> 'venue';
 
 -- 2. extend wedding_halls =====================================================
 alter table public.wedding_halls

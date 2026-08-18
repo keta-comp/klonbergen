@@ -38,9 +38,7 @@ begin
 
   insert into public.plans (code, name, price, period_days, description, is_active, display_order)
   values
-    ('venue',             'Venue',               99000, 30, 'Faqat toʼyxona boshqaruvi',           true, 1),
-    ('invitation',        'Invitation',         299000, 30, 'Faqat raqamli taklifnoma',            true, 2),
-    ('venue_invitation',  'Venue + Invitation', 399000, 30, 'Toʼyxona va taklifnoma birgalikda',   true, 3)
+    ('venue', 'Toyxona', 299000, 30, 'Vowly toʼyxona tarifi — 299 000 soʼm/oy', true, 1)
   on conflict (code) do update
     set name         = excluded.name,
         price        = excluded.price,
@@ -48,6 +46,8 @@ begin
         description  = excluded.description,
         is_active    = excluded.is_active,
         display_order = excluded.display_order;
+
+  delete from public.plans where code <> 'venue';
 
   select count(*) into v_count from public.plans;
   return v_count;

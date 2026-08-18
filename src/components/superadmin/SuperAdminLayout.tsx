@@ -15,7 +15,6 @@ import {
   Building2,
   Users,
   Heart,
-  CreditCard,
   Receipt,
   BarChart3,
   Settings as SettingsIcon,
@@ -40,7 +39,6 @@ export type SectionId =
   | 'toyxonalar'
   | 'adminlar'
   | 'toylar'
-  | 'tariflar'
   | 'tolovlar'
   | 'hisobotlar'
   | 'sozlamalar'
@@ -66,7 +64,6 @@ const NAV: { section: string; items: { id: SectionId; icon: React.ElementType; l
   {
     section: 'billing',
     items: [
-      { id: 'tariflar', icon: CreditCard, labelKey: 'superadmin.nav.tariflar' },
       { id: 'tolovlar', icon: Receipt, labelKey: 'superadmin.nav.tolovlar' },
     ],
   },

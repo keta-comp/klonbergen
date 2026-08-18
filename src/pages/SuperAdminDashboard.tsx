@@ -1,13 +1,13 @@
 /**
  * Vowly Super Admin — redesigned dashboard.
- * Sections: Bosh sahifa, Toyxonalar, Adminlar, To'ylar, Tariflar, To'lovlar, Hisobotlar, Sozlamalar, Bildirishnomalar, Activity Log.
+ * Sections: Bosh sahifa, Toyxonalar, Adminlar, To'ylar, To'lovlar, Hisobotlar, Sozlamalar, Bildirishnomalar, Activity Log.
  * Layout: SuperAdminLayout (sidebar + header + right column). Active section is internal state.
  */
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
-import { Search, Plus, Building2, ShieldCheck, Clock, AlertCircle, Heart, Users, CreditCard, Receipt, BarChart3, Settings as SettingsIcon, Bell as BellIcon, Activity } from 'lucide-react';
+import { Search, Plus, Building2, ShieldCheck, Clock, AlertCircle, Heart, Users, Receipt, BarChart3, Settings as SettingsIcon, Bell as BellIcon, Activity } from 'lucide-react';
 
 import { useTranslation } from '@/i18n/LanguageContext';
 import { formatNumber, formatDate, formatDateTime } from '@/i18n/format';
@@ -16,17 +16,12 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   useAdminHalls,
   useAllSubscriptions,
-  usePlans,
   usePayments,
   useAdminNotifications,
   useActivityLogs,
   useArchiveHall,
   useRestoreHall,
   useMarkNotificationRead,
-  useAllPlans,
-  useSeedDefaultPlans,
-  useDeletePlan,
-  type Plan,
 } from '@/hooks/useAdminData';
 import { daysRemaining } from '@/lib/subscription';
 
@@ -34,7 +29,6 @@ import SuperAdminLayout, { SectionId } from '@/components/superadmin/SuperAdminL
 import VenueCard from '@/components/superadmin/VenueCard';
 import AddHallModal from '@/components/superadmin/AddHallModal';
 import PaymentConfirmModal from '@/components/superadmin/PaymentConfirmModal';
-import PlanFormModal from '@/components/superadmin/PlanFormModal';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -59,7 +53,6 @@ export default function SuperAdminDashboard() {
   // For now we use the same halls list (active or archived) for the page.
   const { data: halls = [] } = useAdminHalls({ includeArchived: true });
   const { data: allSubs = [] } = useAllSubscriptions();
-  const { data: plans = [] } = usePlans();
   const archive = useArchiveHall();
   const restore = useRestoreHall();
   const markRead = useMarkNotificationRead();
@@ -215,7 +208,6 @@ export default function SuperAdminDashboard() {
       {/* Other sections — themed placeholders that route to real data where possible */}
       {active === 'adminlar' && <AdminlarPage />}
       {active === 'toylar' && <ToylarPage />}
-      {active === 'tariflar' && <TariflarPage />}
       {active === 'tolovlar' && <TolovlarPage />}
       {active === 'hisobotlar' && <ComingSoon title={t('superadmin.nav.hisobotlar')} icon={BarChart3} />}
       {active === 'sozlamalar' && <ComingSoon title={t('superadmin.nav.sozlamalar')} icon={SettingsIcon} />}
@@ -448,130 +440,6 @@ function ToylarPage() {
           </ul>
         )}
       </div>
-    </section>
-  );
-}
-
-/* ----- Tariflar (plan manager) ----- */
-function TariflarPage() {
-  const { t, locale } = useTranslation();
-  const { data: plans = [] } = useAllPlans();
-  const seed = useSeedDefaultPlans();
-  const del = useDeletePlan();
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState<Plan | null>(null);
-
-  const openCreate = () => {
-    setEditing(null);
-    setModalOpen(true);
-  };
-  const openEdit = (p: Plan) => {
-    setEditing(p);
-    setModalOpen(true);
-  };
-  const handleDelete = async (p: Plan) => {
-    if (!confirm(t('superadmin.plans.confirm_delete'))) return;
-    try {
-      await del.mutateAsync(p.id);
-      toast.success(t('superadmin.planDeleted'));
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('superadmin.errorGeneric'));
-    }
-  };
-  const handleSeed = async () => {
-    try {
-      await seed.mutateAsync();
-      toast.success(t('superadmin.plans.seed_done'));
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('superadmin.errorGeneric'));
-    }
-  };
-
-  return (
-    <section>
-      <SectionHeader
-        title={t('superadmin.nav.tariflar')}
-        subtitle={t('superadmin.managePlans')}
-        right={
-          <div className="flex gap-2">
-            {plans.length === 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleSeed}
-                disabled={seed.isPending}
-              >
-                {t('superadmin.plans.seed')}
-              </Button>
-            )}
-            <Button
-              size="sm"
-              onClick={openCreate}
-              className="rounded-lg bg-[#3a4530] px-3 py-2 text-[13px] font-medium text-white shadow-sm hover:bg-[#2f3827]"
-            >
-              <Plus className="mr-1 h-4 w-4" />
-              {t('superadmin.plans.add')}
-            </Button>
-          </div>
-        }
-      />
-
-      {plans.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-10 text-center">
-          <p className="text-[13.5px] font-medium text-neutral-800">{t('superadmin.plans.empty_title')}</p>
-          <p className="mx-auto mt-1 max-w-sm text-[12.5px] text-neutral-500">{t('superadmin.plans.empty_desc')}</p>
-          <Button
-            size="sm"
-            onClick={handleSeed}
-            disabled={seed.isPending}
-            className="mt-4 rounded-lg bg-[#3a4530] px-3 py-2 text-[13px] font-medium text-white shadow-sm hover:bg-[#2f3827]"
-          >
-            {t('superadmin.plans.seed')}
-          </Button>
-        </div>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-3">
-          {plans.map((p) => (
-            <div key={p.id} className="flex flex-col rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-sm">
-              <div className="flex items-start justify-between gap-2">
-                <p className="text-[10.5px] font-semibold uppercase tracking-wider text-neutral-400">{p.code}</p>
-                <span
-                  className={cn(
-                    'rounded-full px-2 py-0.5 text-[10px] font-semibold',
-                    p.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-neutral-100 text-neutral-500',
-                  )}
-                >
-                  {p.is_active ? t('superadmin.planActive') : t('superadmin.planInactive')}
-                </span>
-              </div>
-              <p className="mt-1 text-[16px] font-semibold text-neutral-900">{p.name}</p>
-              <p className="mt-2 text-[24px] font-semibold text-[#3a4530]">
-                {formatNumber(locale, Number(p.price))}{' '}
-                <span className="text-[12px] font-normal text-neutral-500">{t('superadmin.plans.per_month')}</span>
-              </p>
-              {p.description && <p className="mt-2 text-[12.5px] text-neutral-500">{p.description}</p>}
-              <div className="mt-4 flex gap-2 border-t border-neutral-100 pt-3">
-                <button
-                  type="button"
-                  onClick={() => openEdit(p)}
-                  className="flex-1 rounded-lg border border-neutral-200 px-3 py-1.5 text-[12.5px] font-medium text-neutral-700 hover:bg-neutral-50"
-                >
-                  {t('superadmin.plans.edit')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(p)}
-                  className="flex-1 rounded-lg border border-rose-200 px-3 py-1.5 text-[12.5px] font-medium text-rose-600 hover:bg-rose-50"
-                >
-                  {t('superadmin.plans.delete')}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {modalOpen && <PlanFormModal plan={editing} onClose={() => setModalOpen(false)} />}
     </section>
   );
 }

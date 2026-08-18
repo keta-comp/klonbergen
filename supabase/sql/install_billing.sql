@@ -44,10 +44,11 @@ CREATE TABLE IF NOT EXISTS public.plans (
 ALTER TABLE public.plans ENABLE ROW LEVEL SECURITY;
 
 INSERT INTO public.plans (code, name, price, period_days, display_order, description) VALUES
-  ('venue',             'Venue',               99000, 30, 1, 'Faqat to''yxona boshqaruvi'),
-  ('invitation',        'Invitation',         299000, 30, 2, 'Faqat raqamli taklifnoma'),
-  ('venue_invitation',  'Venue + Invitation', 399000, 30, 3, 'To''yxona va taklifnoma birgalikda')
+  ('venue', 'Toyxona', 299000, 30, 1, 'Vowly to''yxona tarifi — 299 000 so''m/oy')
 ON CONFLICT (code) DO NOTHING;
+
+-- Ensure ONLY the single 299 000 UZS "venue" plan exists.
+DELETE FROM public.plans WHERE code <> 'venue';
 
 CREATE OR REPLACE FUNCTION public.is_super_admin()
 RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
@@ -253,12 +254,13 @@ BEGIN
   END IF;
   INSERT INTO public.plans (code, name, price, period_days, description, is_active, display_order)
   VALUES
-    ('venue',             'Venue',               99000, 30, 'Faqat to''yxona boshqaruvi',           true, 1),
-    ('invitation',        'Invitation',         299000, 30, 'Faqat raqamli taklifnoma',            true, 2),
-    ('venue_invitation',  'Venue + Invitation', 399000, 30, 'To''yxona va taklifnoma birgalikda',   true, 3)
+    ('venue', 'Toyxona', 299000, 30, 'Vowly to''yxona tarifi — 299 000 so''m/oy', true, 1)
   ON CONFLICT (code) DO UPDATE
     SET name = excluded.name, price = excluded.price, period_days = excluded.period_days,
         description = excluded.description, is_active = excluded.is_active, display_order = excluded.display_order;
+
+  -- Keep ONLY the single 299 000 UZS "venue" plan.
+  DELETE FROM public.plans WHERE code <> 'venue';
   SELECT count(*) INTO v_count FROM public.plans;
   RETURN v_count;
 END $$;

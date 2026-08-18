@@ -9,14 +9,13 @@
 import { useState } from 'react';
 import { X, Plus, RefreshCw, Eye, EyeOff, Upload } from 'lucide-react';
 import { useTranslation } from '@/i18n/LanguageContext';
-import { usePlans, useConfirmPayment } from '@/hooks/useAdminData';
+import { useConfirmPayment } from '@/hooks/useAdminData';
 import { useMutateHall } from '@/hooks/useHallData';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { formatPrice } from '@/lib/subscription';
 
 interface Props {
   onClose: () => void;
@@ -30,7 +29,6 @@ const genPassword = () => {
 
 export default function AddHallModal({ onClose }: Props) {
   const { t } = useTranslation();
-  const { data: plans = [] } = usePlans();
   const { create } = useMutateHall();
   const confirm = useConfirmPayment();
   const qc = useQueryClient();
@@ -39,7 +37,6 @@ export default function AddHallModal({ onClose }: Props) {
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [coverFile, setCoverFile] = useState<File | null>(null);
-  const [planId, setPlanId] = useState<string>('');
   const [adminName, setAdminName] = useState('');
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
@@ -48,19 +45,26 @@ export default function AddHallModal({ onClose }: Props) {
   const [step, setStep] = useState<'form' | 'credentials'>('form');
   const [createdCreds, setCreatedCreds] = useState<{ email: string; password: string } | null>(null);
 
-  // Default to first plan when loaded
-  if (plans.length && !planId) {
-    const venuePlan = plans.find((p) => p.code === 'venue') ?? plans[0];
-    setPlanId(venuePlan.id);
-  }
-
   const handleCreate = async () => {
-    if (!name.trim() || !planId) {
-      toast.error(t('superadmin.halls.add_modal.name') + ' / ' + t('superadmin.halls.add_modal.plan'));
+    if (!name.trim()) {
+      toast.error(t('superadmin.halls.add_modal.name'));
       return;
     }
     setSubmitting(true);
     try {
+      // Resolve the single active plan (code 'venue', 299 000 UZS) and activate it silently.
+      const { data: activePlans } = await supabase
+        .from('plans')
+        .select('id, code, name, price')
+        .eq('is_active', true)
+        .order('price', { ascending: true });
+      const active = activePlans ?? [];
+      const plan = active.find((p) => p.code === 'venue') ?? active[0];
+      if (!plan) {
+        throw new Error(t('superadmin.halls.add_modal.no_plan_title'));
+      }
+      const planId = plan.id;
+
       // 1) cover image upload
       let coverUrl: string | null = null;
       if (coverFile) {
@@ -222,47 +226,6 @@ export default function AddHallModal({ onClose }: Props) {
                 </label>
               </Field>
 
-              <Field label={t('superadmin.halls.add_modal.plan')} required>
-                {plans.length === 0 ? (
-                  <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-[12px] text-amber-800">
-                    <p className="font-medium">{t('superadmin.halls.add_modal.no_plan_title')}</p>
-                    <p className="mt-0.5 text-[11.5px] text-amber-700">{t('superadmin.halls.add_modal.no_plan_desc')}</p>
-                  </div>
-                ) : (
-                  <div className="space-y-1.5">
-                    {plans.map((p) => (
-                      <button
-                        key={p.id}
-                        type="button"
-                        onClick={() => setPlanId(p.id)}
-                        className={`flex w-full items-center justify-between rounded-lg border px-3 py-2.5 text-left transition-colors ${
-                          planId === p.id
-                            ? 'border-[#3a4530] bg-[#3a4530]/5'
-                            : 'border-neutral-200 bg-white hover:border-neutral-300'
-                        }`}
-                      >
-                        <span className="flex items-center gap-2">
-                          <span
-                            className={`grid h-4 w-4 place-items-center rounded-full border-2 ${
-                              planId === p.id ? 'border-[#3a4530] bg-[#3a4530]' : 'border-neutral-300'
-                            }`}
-                          >
-                            {planId === p.id && <span className="h-1.5 w-1.5 rounded-full bg-white" />}
-                          </span>
-                          <span className="text-[13.5px] font-medium text-neutral-800">{p.name}</span>
-                        </span>
-                        <span className="text-[12.5px] text-neutral-500">
-                          {formatPrice(Number(p.price))} {t('superadmin.plans.per_month')}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-                <p className="mt-1.5 text-[11.5px] text-neutral-500">
-                  {t('superadmin.halls.add_modal.trial_hint')}
-                </p>
-              </Field>
-
               <div className="rounded-xl bg-neutral-50 p-3">
                 <p className="mb-2 text-[12.5px] font-semibold text-neutral-700">
                   {t('superadmin.halls.add_modal.admin')} <span className="text-[10.5px] font-normal text-neutral-500">(ixtiyoriy)</span>
@@ -311,8 +274,7 @@ export default function AddHallModal({ onClose }: Props) {
               <Button
                 className="bg-[#3a4530] text-white hover:bg-[#2f3827]"
                 onClick={handleCreate}
-                disabled={submitting || !name.trim() || !planId}
-                title={!name.trim() ? t('superadmin.halls.add_modal.name_required') : !planId ? t('superadmin.halls.add_modal.plan_required') : undefined}
+                disabled={submitting || !name.trim()}
               >
                 <Plus className="mr-1 h-4 w-4" />
                 {submitting ? t('superadmin.halls.add_modal.submitting') : t('superadmin.halls.add_modal.submit')}
