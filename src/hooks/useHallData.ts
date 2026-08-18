@@ -101,7 +101,16 @@ export function useMutateHall() {
   const qc = useQueryClient();
   const create = useMutation({
     mutationFn: async (hall: { name: string; address?: string; phone?: string; cover_url?: string | null }) => {
-      const { data, error } = await supabase.from('wedding_halls').insert(hall).select().single();
+      // Build the payload defensively: only send columns we know exist. `cover_url`
+      // is added by a later migration; omit it when absent so a hall can be created
+      // even before that column is deployed (avoids a 400 PGRST204 "unknown column").
+      const payload = {
+        name: hall.name,
+        ...(hall.address != null ? { address: hall.address } : {}),
+        ...(hall.phone != null ? { phone: hall.phone } : {}),
+        ...(hall.cover_url != null ? { cover_url: hall.cover_url } : {}),
+      };
+      const { data, error } = await supabase.from('wedding_halls').insert(payload).select().single();
       if (error) throw error;
       return data;
     },
