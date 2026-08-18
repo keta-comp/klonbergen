@@ -15,6 +15,7 @@ import { formatDate } from '@/i18n/format';
 import { supabase } from '@/integrations/supabase/client';
 import { downloadWeddingArchive } from '@/hooks/useWeddings';
 import type { Wedding } from '@/hooks/useWeddings';
+import type { Locale } from '@/i18n/config';
 
 interface Props { wedding: Wedding; }
 
@@ -26,7 +27,8 @@ function safeImg(src: string | null | undefined, alt: string) {
 
 export default function ArchiveCard({ wedding }: Props) {
   const { t } = useTranslation();
-  const { locale = 'uz' } = useParams();
+  const { locale: rawLocale } = useParams();
+  const locale = (rawLocale ?? 'uz') as Locale;
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);

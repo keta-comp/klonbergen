@@ -223,6 +223,9 @@ export default function HallAdminDashboard() {
 
 /** Home — current wedding + archive list (the exact reference design). */
 function AdminHome({ hallId }: { hallId: string }) {
+  // This is a separate component, so it must pull `t` from the i18n context
+  // itself — it cannot close over `t` from the parent `HallAdminDashboard`.
+  const { t } = useTranslation();
   return (
     <div className="mx-auto max-w-[860px] space-y-6">
       <CurrentWeddingCard hallId={hallId} hallName={t('admin.sidebar.brand')} />

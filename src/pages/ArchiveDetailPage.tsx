@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from '@/i18n/LanguageContext';
 import { formatDate } from '@/i18n/format';
+import type { Locale } from '@/i18n/config';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -49,7 +50,7 @@ export default function ArchiveDetailPage({ hallId }: Props) {
   const { t } = useTranslation();
   const { weddingId, locale: localeParam } = useParams();
   const navigate = useNavigate();
-  const locale = localeParam || location.pathname.split('/')[1] || 'uz';
+  const locale = (localeParam || location.pathname.split('/')[1] || 'uz') as Locale;
   const [busy, setBusy] = useState(false);
 
   // load the wedding

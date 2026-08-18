@@ -233,7 +233,7 @@ export default function SuperAdminDashboard() {
 /* ============================================================================ */
 
 function BoshSahifa({ stats, onGoToHalls, onAdd }: { stats: { total: number; active: number; trial: number; expired: number }; onGoToHalls: () => void; onAdd: () => void }) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   return (
     <section className="space-y-5">
       {/* 4 stat cards */}
@@ -316,7 +316,7 @@ function SectionHeader({ title, subtitle, right }: { title: string; subtitle: st
 }
 
 function ComingSoon({ title, icon: Icon }: { title: string; icon: React.ElementType }) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   return (
     <section>
       <SectionHeader title={title} subtitle={t('superadmin.common.coming_soon')} />
@@ -332,7 +332,7 @@ function ComingSoon({ title, icon: Icon }: { title: string; icon: React.ElementT
 
 /* ----- Adminlar ----- */
 function AdminlarPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { data: allAdmins } = useAdminHalls();
   // Use existing hooks where possible
   // For simplicity, show a minimal list from hall_admins (super admin only).
@@ -346,7 +346,7 @@ function AdminlarPage() {
 }
 
 function AdminlarList() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { data: halls = [] } = useAdminHalls();
   const { data: profiles } = useProfilesData();
   const { data: allAdmins } = useAdminsData();
@@ -406,7 +406,7 @@ function useAdminsData() {
 
 /* ----- To'ylar ----- */
 function ToylarPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { data: halls = [] } = useAdminHalls();
   const { data: weddings } = useQuery({
     queryKey: ['all-weddings'],
@@ -454,7 +454,7 @@ function ToylarPage() {
 
 /* ----- Tariflar (plan manager) ----- */
 function TariflarPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { data: plans = [] } = useAllPlans();
   const seed = useSeedDefaultPlans();
   const del = useDeletePlan();
@@ -578,7 +578,7 @@ function TariflarPage() {
 
 /* ----- To'lovlar ----- */
 function TolovlarPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { data: payments = [] } = usePayments();
   return (
     <section>
@@ -613,7 +613,7 @@ function TolovlarPage() {
 
 /* ----- Bildirishnomalar ----- */
 function BildirishnomalarPage({ markRead }: { markRead: (id: string) => void }) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { data: notifications = [] } = useAdminNotifications(100);
   return (
     <section>
@@ -654,7 +654,7 @@ function BildirishnomalarPage({ markRead }: { markRead: (id: string) => void }) 
 
 /* ----- Activity Log ----- */
 function ActivityPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { data: logs = [] } = useActivityLogs(200);
   return (
     <section>

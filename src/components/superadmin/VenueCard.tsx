@@ -128,7 +128,7 @@ export default function VenueCard({ hall, onManage, onAdmins, onPay, onArchive, 
           {sub ? (
             <div className="mt-1 space-y-1">
               <p className="text-[12px] text-neutral-700">
-                {formatLocaleDate(sub.started_at)} <span className="text-neutral-400">→</span> {formatLocaleDate(sub.expires_at)}
+                {formatLocaleDate(locale, sub.started_at)} <span className="text-neutral-400">→</span> {formatLocaleDate(locale, sub.expires_at)}
               </p>
               {!isExpired ? (
                 <>

@@ -831,6 +831,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: number
       }
+      seed_default_plans: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
     }
     Enums: {
       app_role: "super_admin"
