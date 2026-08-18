@@ -1,15 +1,17 @@
 /**
- * AddHallModal — create a new hall + subscription + admin in one go.
+ * AddHallModal — create a new hall + (optional) admin in one go.
  * Steps:
- *  1) insert into wedding_halls (super admin RLS)
- *  2) insert into subscriptions (active, 30 days from now, chosen plan)
+ *  1) upload cover image (optional)
+ *  2) insert into wedding_halls (super admin RLS)
  *  3) optional: invoke create-hall-admin Edge Function to create auth user
  *  4) log activity
+ *
+ * NOTE: no subscription/plan is created here by design. Plans/subscriptions
+ * are managed separately via the PaymentConfirmModal on the halls list.
  */
 import { useState } from 'react';
 import { X, Plus, RefreshCw, Eye, EyeOff, Upload } from 'lucide-react';
 import { useTranslation } from '@/i18n/LanguageContext';
-import { useConfirmPayment } from '@/hooks/useAdminData';
 import { useMutateHall } from '@/hooks/useHallData';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,7 +32,6 @@ const genPassword = () => {
 export default function AddHallModal({ onClose }: Props) {
   const { t } = useTranslation();
   const { create } = useMutateHall();
-  const confirm = useConfirmPayment();
   const qc = useQueryClient();
 
   const [name, setName] = useState('');
@@ -52,19 +53,6 @@ export default function AddHallModal({ onClose }: Props) {
     }
     setSubmitting(true);
     try {
-      // Resolve the single active plan (code 'venue', 299 000 UZS) and activate it silently.
-      const { data: activePlans } = await supabase
-        .from('plans')
-        .select('id, code, name, price')
-        .eq('is_active', true)
-        .order('price', { ascending: true });
-      const active = activePlans ?? [];
-      const plan = active.find((p) => p.code === 'venue') ?? active[0];
-      if (!plan) {
-        throw new Error(t('superadmin.halls.add_modal.no_plan_title'));
-      }
-      const planId = plan.id;
-
       // 1) cover image upload
       let coverUrl: string | null = null;
       if (coverFile) {
@@ -76,15 +64,8 @@ export default function AddHallModal({ onClose }: Props) {
         coverUrl = data.publicUrl;
       }
 
-      // 2) create hall
+      // 2) create hall — no subscription/plan is created here by design.
       const hall = await create.mutateAsync({ name: name.trim(), address: address.trim() || null, phone: phone.trim() || null, cover_url: coverUrl });
-
-      // 3) create subscription via RPC (auto-generates activity log)
-      await confirm.mutateAsync({
-        hallId: (hall as { id: string }).id,
-        planId,
-        note: t('superadmin.halls.add_modal.payment_note'),
-      });
 
       // log creation (uses a localization key resolved in ActivityPage)
       const { data: u } = await supabase.auth.getUser();
@@ -94,13 +75,12 @@ export default function AddHallModal({ onClose }: Props) {
         hall_id: (hall as { id: string }).id,
         action: 'hall_created',
         description: `hall_created|${(hall as { name: string }).name}`,
-        metadata: { plan_id: planId },
       });
 
       qc.invalidateQueries({ queryKey: ['admin-halls'] });
       qc.invalidateQueries({ queryKey: ['wedding_halls'] });
 
-      // 4) optional admin
+      // 3) optional admin
       if (adminEmail.trim() && adminPassword.length >= 6) {
         setStep('credentials');
         const { data, error } = await supabase.functions.invoke('create-hall-admin', {

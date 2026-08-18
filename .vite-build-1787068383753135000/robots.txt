@@ -1,0 +1,25 @@
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /admin
+Disallow: /super-admin
+
+User-agent: Googlebot
+Allow: /
+Disallow: /login
+Disallow: /admin
+Disallow: /super-admin
+
+User-agent: Bingbot
+Allow: /
+Disallow: /login
+Disallow: /admin
+Disallow: /super-admin
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+Sitemap: https://vowly-hub.lovable.app/sitemap.xml
