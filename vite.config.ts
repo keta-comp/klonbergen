@@ -5,6 +5,11 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  // Inline both prefixes so the app works whether the host (Vercel etc.) injects
+  // the keys as NEXT_PUBLIC_* or we keep the local VITE_* convention. client.ts
+  // already reads both, so this makes the NEXT_PUBLIC_* fallback actually reach
+  // the production bundle.
+  envPrefix: ["VITE_", "NEXT_PUBLIC_"],
   server: {
     host: "::",
     port: 8080,

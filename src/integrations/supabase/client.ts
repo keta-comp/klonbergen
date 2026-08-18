@@ -2,8 +2,12 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+// Accept both VITE_ (Vite default) and NEXT_PUBLIC_ (e.g. when the same
+// variables are pasted into Vercel as NEXT_PUBLIC_*). Vite only inlines the
+// prefixes listed in `envPrefix` (vite.config.ts), so both are configured there.
+const _env = import.meta.env as unknown as Record<string, string | undefined>;
+const SUPABASE_URL = _env.VITE_SUPABASE_URL ?? _env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_PUBLISHABLE_KEY = _env.VITE_SUPABASE_PUBLISHABLE_KEY ?? _env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
