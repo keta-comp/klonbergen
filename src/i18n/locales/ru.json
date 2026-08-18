@@ -691,7 +691,37 @@
     "markAll": "Все",
     "allActions": "Все действия",
     "dateLabel": "Дата свадьбы",
-    "archiveConfirm": "\"{name}\" в архиве. Продолжить?"
+    "archiveConfirm": "\"{name}\" в архиве. Продолжить?",
+    "deleteConfirm": "Удалить зал {name}? Это действие необратимо.",
+    "deleted": "Зал {name} удалён.",
+    "deleteFailed": "Ошибка удаления: {message}",
+    "admins": {
+      "intro": "Системные админы и их залы",
+      "add": "Добавить админа",
+      "empty": "Пока нет админов",
+      "no_halls": "Сначала создайте зал, затем добавьте админа",
+      "add_modal": {
+        "title": "Создать админа",
+        "name": "Полное имя",
+        "name_ph": "Например: Иванов Иван",
+        "email": "Email (логин)",
+        "email_ph": "admin@example.com",
+        "password": "Пароль",
+        "password_ph": "Минимум 6 символов",
+        "hall": "Привязать к залу",
+        "hall_ph": "Выберите зал",
+        "submit": "Создать админа",
+        "submitting": "Создаётся...",
+        "cancel": "Отмена",
+        "success": "Админ создан",
+        "success_with": "Админ создан для {name}",
+        "copy": "Копировать",
+        "copy_success": "Логин и пароль скопированы",
+        "close": "Закрыть",
+        "generate": "Создать пароль",
+        "error": "Ошибка: {message}"
+      }
+    }
   },
   "admin": {
     "nav": {

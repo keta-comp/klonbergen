@@ -691,7 +691,37 @@
     "markAll": "Hammasi",
     "allActions": "Barcha harakatlar",
     "dateLabel": "To'y sanasi",
-    "archiveConfirm": "\"{name}\" arxivlandi. Davom etamizmi?"
+    "archiveConfirm": "\"{name}\" arxivlandi. Davom etamizmi?",
+    "deleteConfirm": "{name} zalini o'chirishni tasdiqlaysizmi? Bu amal qaytarib bo'lmaydi.",
+    "deleted": "{name} zali o'chirildi.",
+    "deleteFailed": "O'chirishda xatolik: {message}",
+    "admins": {
+      "intro": "Tizimga kiruvchi adminlar va ularning zallari",
+      "add": "Admin qo'shish",
+      "empty": "Hozircha adminlar yo'q",
+      "no_halls": "Avval toyxona yarating, keyin admin qo'shing",
+      "add_modal": {
+        "title": "Yangi admin yaratish",
+        "name": "To'liq ism",
+        "name_ph": "Masalan: Aliyev Vali",
+        "email": "Email (login)",
+        "email_ph": "admin@example.com",
+        "password": "Parol",
+        "password_ph": "Kamida 6 ta belgi",
+        "hall": "Zalni biriktirish",
+        "hall_ph": "Zalni tanlang",
+        "submit": "Admin yaratish",
+        "submitting": "Yaratilmoqda...",
+        "cancel": "Bekor qilish",
+        "success": "Admin yaratildi",
+        "success_with": "{name} uchun admin yaratildi",
+        "copy": "Nusxalash",
+        "copy_success": "Login va parol nusxalandi",
+        "close": "Yopish",
+        "generate": "Parol yaratish",
+        "error": "Xatolik: {message}"
+      }
+    }
   },
   "admin": {
     "nav": {

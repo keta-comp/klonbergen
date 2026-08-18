@@ -691,7 +691,37 @@
     "markAll": "Barlıq",
     "allActions": "Barlıq háreketler",
     "dateLabel": "Toy kúni",
-    "archiveConfirm": "\"{name}\" arxivlendi. Dawam etemizbe?"
+    "archiveConfirm": "\"{name}\" arxivlendi. Dawam etemizbe?",
+    "deleteConfirm": "{name} zalın o'shiriwdi tasdiqlaysızba? Bul amal qaytarılmaydı.",
+    "deleted": "{name} zalı o'shirildi.",
+    "deleteFailed": "O'shiriwde xatolıq: {message}",
+    "admins": {
+      "intro": "Sistema adminleri hám olardıń zalı",
+      "add": "Admin qosıw",
+      "empty": "Házirge shekem admin joq",
+      "no_halls": "Aldımen toyxana jaratıń, sońın admin qosıń",
+      "add_modal": {
+        "title": "Jańa admin jaratıw",
+        "name": "Tolıq atı",
+        "name_ph": "Mısalı: Aliyev Vali",
+        "email": "Email (login)",
+        "email_ph": "admin@example.com",
+        "password": "Parol",
+        "password_ph": "Kemi 6 belgi",
+        "hall": "Zalǵa biriktiriw",
+        "hall_ph": "Zaldı tańlań",
+        "submit": "Admin jaratıw",
+        "submitting": "Jaratılmaqta...",
+        "cancel": "Bıykarıw",
+        "success": "Admin jaratıldı",
+        "success_with": "{name} ushın admin jaratıldı",
+        "copy": "Nusxalaw",
+        "copy_success": "Login hám parol nusxalandı",
+        "close": "Jabıw",
+        "generate": "Parol jaratıw",
+        "error": "Xatolıq: {message}"
+      }
+    }
   },
   "admin": {
     "nav": {

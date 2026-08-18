@@ -29,6 +29,7 @@ import { daysRemaining } from '@/lib/subscription';
 import SuperAdminLayout, { SectionId } from '@/components/superadmin/SuperAdminLayout';
 import VenueCard from '@/components/superadmin/VenueCard';
 import AddHallModal from '@/components/superadmin/AddHallModal';
+import AddAdminModal from '@/components/superadmin/AddAdminModal';
 import PaymentConfirmModal from '@/components/superadmin/PaymentConfirmModal';
 import { toast } from 'sonner';
 
@@ -218,7 +219,7 @@ export default function SuperAdminDashboard() {
       )}
 
       {/* Other sections — themed placeholders that route to real data where possible */}
-      {active === 'adminlar' && <AdminlarPage />}
+      {active === 'adminlar' && <AdminlarPage halls={halls} />}
       {active === 'toylar' && <ToylarPage />}
       {active === 'tolovlar' && <TolovlarPage />}
       {active === 'hisobotlar' && <ComingSoon title={t('superadmin.nav.hisobotlar')} icon={BarChart3} />}
@@ -335,26 +336,45 @@ function ComingSoon({ title, icon: Icon }: { title: string; icon: React.ElementT
 }
 
 /* ----- Adminlar ----- */
-function AdminlarPage() {
-  const { t, locale } = useTranslation();
-  const { data: allAdmins } = useAdminHalls();
-  // Use existing hooks where possible
-  // For simplicity, show a minimal list from hall_admins (super admin only).
-  // Reuse the existing useHallAdmins hook.
+function AdminlarPage({ halls }: { halls: Hall[] }) {
+  const { t } = useTranslation();
+  const [addOpen, setAddOpen] = useState(false);
   return (
     <section>
-      <SectionHeader title={t('superadmin.nav.adminlar')} subtitle={t('superadmin.allUsers')} />
-      <AdminlarList />
+      <SectionHeader
+        title={t('superadmin.nav.adminlar')}
+        subtitle={t('superadmin.admins.intro')}
+        right={
+          <Button
+            onClick={() => setAddOpen(true)}
+            disabled={halls.length === 0}
+            className="rounded-lg bg-[#3a4530] px-3 py-2 text-[13px] font-medium text-white shadow-sm hover:bg-[#2f3827] disabled:bg-neutral-300"
+            title={halls.length === 0 ? t('superadmin.admins.no_halls') : undefined}
+          >
+            <Plus className="mr-1 h-4 w-4" />
+            <span className="hidden sm:inline">{t('superadmin.admins.add')}</span>
+            <span className="sm:hidden">+</span>
+          </Button>
+        }
+      />
+      <AdminlarList halls={halls} />
+      {addOpen && <AddAdminModal halls={halls} onClose={() => setAddOpen(false)} />}
     </section>
   );
 }
 
-function AdminlarList() {
-  const { t, locale } = useTranslation();
-  const { data: halls = [] } = useAdminHalls();
+function AdminlarList({ halls }: { halls: Hall[] }) {
+  const { t } = useTranslation();
   const { data: profiles } = useProfilesData();
   const { data: allAdmins } = useAdminsData();
-  if (!profiles) return <div className="rounded-2xl border bg-white p-6 text-center text-[12.5px] text-neutral-500">Yuklanmoqda...</div>;
+  if (!profiles) return <div className="rounded-2xl border bg-white p-6 text-center text-[12.5px] text-neutral-500">{t('superadmin.loading')}</div>;
+  if (profiles.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-10 text-center text-[13px] text-neutral-500">
+        {t('superadmin.admins.empty')}
+      </div>
+    );
+  }
   return (
     <div className="rounded-2xl border border-neutral-200/70 bg-white">
       <ul className="divide-y divide-neutral-100">
