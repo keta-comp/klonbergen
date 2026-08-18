@@ -83,10 +83,22 @@ export default function CurrentWeddingCard({ hallId, hallName, readOnly, coverOv
           <Button
             className="gap-2 bg-[#3a4530] text-white hover:bg-[#2a3422]"
             onClick={async () => {
-              const w = await createNext.mutateAsync(hallId);
+              // Only ONE active wedding is allowed per hall (DB partial unique
+              // index `weddings_one_active_per_hall`). If an active wedding
+              // already exists but has no names yet, seed its bride/groom record
+              // and jump straight to the editor instead of inserting a 2nd one —
+              // a duplicate insert fails with a 23505 constraint error and the
+              // click would appear to "do nothing".
+              if (active && !brideGroom) {
+                await mutation.mutateAsync({
+                  bride_name: active.bride_name || '',
+                  groom_name: active.groom_name || '',
+                  wedding_date: active.wedding_date || todayInTashkent(),
+                });
+              } else if (!active) {
+                await createNext.mutateAsync(hallId);
+              }
               navigate(`/${location.pathname.split('/')[1]}/admin/kelin-kuyov`);
-              // ensure the new wedding id propagates (signaled via mutation cache invalidation)
-              void w;
             }}
           >
             <Plus className="h-4 w-4" /> {t('admin.currentWedding.create')}

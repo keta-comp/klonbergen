@@ -198,6 +198,20 @@ export function useCreateNextActiveWedding() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (hallId: string) => {
+      // At most ONE active wedding per hall (partial unique index
+      // `weddings_one_active_per_hall`). Reuse the existing one rather than
+      // inserting a duplicate that would trip the constraint.
+      const { data: existing } = await supabase
+        .from("weddings")
+        .select("*")
+        .eq("hall_id", hallId)
+        .eq("status", "active")
+        .order("wedding_date", { ascending: false })
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (existing) return existing as Wedding;
+
       const today = todayInTashkent();
       const { data, error } = await supabase
         .from("weddings")
