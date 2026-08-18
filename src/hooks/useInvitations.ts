@@ -150,7 +150,7 @@ const STORED_TEMPLATE = "luxury" as const;
 export function useCreateInvitation() {
   return useMutation({
     mutationFn: async (draft: InvitationDraft) => {
-      const slug = makeSlug(draft.brideName, draft.groomName);
+      const slug = makeSlug(draft.groomName, draft.brideName);
       console.log(`[MUSIC] createInvitation start for slug=${slug}`);
 
       const realPhotos = (draft.galleryImages || []).filter(

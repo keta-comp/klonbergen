@@ -100,7 +100,7 @@ export default function InvitationView({ invitation, shareUrl, preview = false }
     my.set((e.clientY - r.top) / r.height - 0.5);
   };
 
-  const initials = `${(invitation.bride_name || '?')[0]} ${(invitation.groom_name || '?')[0]}`.toUpperCase();
+  const initials = `${(invitation.groom_name || '?')[0]} ${(invitation.bride_name || '?')[0]}`.toUpperCase();
   const shareText = t('invitation.view.shareText', { bride: invitation.bride_name, groom: invitation.groom_name });
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     `${invitation.hall_name} ${invitation.address || ''}`.trim(),
@@ -261,12 +261,12 @@ export default function InvitationView({ invitation, shareUrl, preview = false }
                 >
                   <img
                     src={src}
-                    alt={t('invitation.view.photoAlt', { name: i === 0 ? invitation.bride_name : invitation.groom_name })}
+                    alt={t('invitation.view.photoAlt', { name: i === 0 ? invitation.groom_name : invitation.bride_name })}
                     loading="lazy"
                     className={`h-40 w-28 rounded-t-[7rem] object-cover md:h-56 md:w-40 ${tpl.frame}`}
                   />
                   <span className={`mt-3 block text-[0.6rem] font-semibold uppercase tracking-[0.3em] ${tpl.label_cls}`}>
-                    {i === 0 ? t('invitation.view.bride') : t('invitation.view.groom')}
+                    {i === 0 ? t('invitation.view.groom') : t('invitation.view.bride')}
                   </span>
                 </motion.div>
               ))}
@@ -281,9 +281,9 @@ export default function InvitationView({ invitation, shareUrl, preview = false }
             style={{ transform: 'translateZ(35px)' }}
             className={`font-display mt-9 text-[2.6rem] font-light leading-[1.05] md:text-[4rem] ${tpl.heading}`}
           >
-            {invitation.bride_name}
-            <span className={`mx-3 font-monogram text-[0.55em] align-middle ${tpl.accent}`}>&</span>
             {invitation.groom_name}
+            <span className={`mx-3 font-monogram text-[0.55em] align-middle ${tpl.accent}`}>&</span>
+            {invitation.bride_name}
           </motion.h1>
 
           <motion.div variants={reveal} initial="hidden" animate={opened ? 'show' : 'hidden'} custom={4}>

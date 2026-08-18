@@ -45,7 +45,7 @@ const StoryCard = forwardRef<HTMLDivElement, Props>(({ invitation, shareUrl, sca
   const tpl = getTemplate(invitation.template);
   const d = parts(invitation.wedding_date);
   const photos = (invitation.photos || []).filter(Boolean);
-  const initials = `${(invitation.bride_name || '?')[0]} ${(invitation.groom_name || '?')[0]}`.toUpperCase();
+  const initials = `${(invitation.groom_name || '?')[0]} ${(invitation.bride_name || '?')[0]}`.toUpperCase();
 
   return (
     <div
@@ -79,12 +79,12 @@ const StoryCard = forwardRef<HTMLDivElement, Props>(({ invitation, shareUrl, sca
                 <div key={src} className="flex flex-col items-center">
                   <img
                     src={src}
-                    alt={i === 0 ? invitation.bride_name : invitation.groom_name}
+                    alt={i === 0 ? invitation.groom_name : invitation.bride_name}
                     crossOrigin="anonymous"
                     className={`h-[430px] w-[300px] rounded-t-[150px] object-cover ${tpl.frame}`}
                   />
                   <span className={`mt-6 text-base font-semibold uppercase tracking-[0.35em] ${tpl.label_cls}`}>
-                    {i === 0 ? 'Kelin' : 'Kúyew'}
+                    {i === 0 ? 'Kúyew' : 'Kelin'}
                   </span>
                 </div>
               ))}
@@ -93,9 +93,9 @@ const StoryCard = forwardRef<HTMLDivElement, Props>(({ invitation, shareUrl, sca
 
           <div className="flex flex-col items-center">
             <h1 className={`font-display text-[104px] font-light leading-[1.02] ${tpl.heading}`}>
-              {invitation.bride_name}
-              <span className={`mx-6 font-monogram text-[0.5em] align-middle ${tpl.accent}`}>&</span>
               {invitation.groom_name}
+              <span className={`mx-6 font-monogram text-[0.5em] align-middle ${tpl.accent}`}>&</span>
+              {invitation.bride_name}
             </h1>
             <Divider className={`mt-10 h-8 w-[420px] ${tpl.accent}`} />
 

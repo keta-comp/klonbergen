@@ -85,9 +85,9 @@ export default function InvitationPreview({ state }: Props) {
             <div className="inv-screen-overlay inv-screen-overlay--center">
               <p className="inv-overlay-eyebrow">Sanlı mirátnama</p>
               <h3 className="inv-overlay-names">
-                {bride}
-                <span className="inv-overlay-amp">&</span>
                 {groom}
+                <span className="inv-overlay-amp">&</span>
+                {bride}
               </h3>
               <p className="inv-overlay-date">{dateLabel}</p>
               <p className="inv-overlay-meta" style={{ marginTop: "0.5rem" }}>
@@ -167,11 +167,11 @@ export default function InvitationPreview({ state }: Props) {
                 className="inv-overlay-final"
                 style={{ marginTop: "1.2rem", fontFamily: '"Great Vibes", cursive', fontSize: "1.4rem" }}
               >
-                {bride}
+                {groom}
                 <span className="inv-overlay-amp" style={{ margin: "0 0.2rem" }}>
                   &
                 </span>
-                {groom}
+                {bride}
               </p>
             </div>
           </Screen>

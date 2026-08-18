@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { RotateCw, ZoomIn, Check, X } from 'lucide-react';
+import { useTranslation } from '@/i18n/LanguageContext';
 
 interface Props {
   open: boolean;
@@ -76,6 +77,7 @@ async function getCroppedImg(imageSrc: string, crop: Area, rotation: number): Pr
 }
 
 export default function ImageCropDialog({ open, imageSrc, aspect = 1, onClose, onComplete }: Props) {
+  const { t } = useTranslation();
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
@@ -101,7 +103,7 @@ export default function ImageCropDialog({ open, imageSrc, aspect = 1, onClose, o
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
       <DialogContent className="max-w-lg p-0 overflow-hidden">
         <DialogHeader className="p-4 pb-0">
-          <DialogTitle className="font-serif">Suwretti qırqıw ha'm ózgertiw</DialogTitle>
+          <DialogTitle className="font-serif">{t('common.imageCrop.title')}</DialogTitle>
         </DialogHeader>
 
         <div className="relative h-72 w-full bg-black/90">
@@ -142,9 +144,9 @@ export default function ImageCropDialog({ open, imageSrc, aspect = 1, onClose, o
             />
           </div>
           <div className="flex gap-2 justify-end">
-            <Button variant="outline" onClick={onClose}><X className="mr-1 h-4 w-4" /> Biykar etiw</Button>
+            <Button variant="outline" onClick={onClose}><X className="mr-1 h-4 w-4" /> {t('common.imageCrop.cancel')}</Button>
             <Button onClick={handleConfirm} disabled={processing} className="gold-gradient text-primary-foreground">
-              <Check className="mr-1 h-4 w-4" /> {processing ? 'Tayarlanıwda...' : 'Tastıyıqlaw'}
+              <Check className="mr-1 h-4 w-4" /> {processing ? t('common.imageCrop.processing') : t('common.imageCrop.confirm')}
             </Button>
           </div>
         </div>

@@ -16,7 +16,7 @@ export default function QRCodeGenerator({ hallId }: Props) {
   const [tableCount, setTableCount] = useState(10);
   const [generated, setGenerated] = useState(false);
   const qrRefs = useRef<Map<number, HTMLCanvasElement>>(new Map());
-  const { locale } = useTranslation();
+  const { t, locale } = useTranslation();
 
   // Localized so the guest lands directly on the correct language route
   // (/<locale>/hall/<realId>) and never relies on the legacy redirect.
@@ -54,7 +54,7 @@ export default function QRCodeGenerator({ hallId }: Props) {
     await Promise.all(promises);
     const content = await zip.generateAsync({ type: 'blob' });
     saveAs(content, `qr-kodlar-${hallId.slice(0, 8)}.zip`);
-    toast.success("QR kodlar júklendi!");
+    toast.success(t('admin.qr.downloaded'));
   };
 
   const setQrRef = useCallback((tableNum: number) => (el: HTMLCanvasElement | null) => {
@@ -67,17 +67,17 @@ export default function QRCodeGenerator({ hallId }: Props) {
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
       <Card className="glass mb-6 max-w-md">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 font-serif"><QrCode className="h-5 w-5 text-primary" /> QR kod jaratıw</CardTitle>
+          <CardTitle className="flex items-center gap-2 font-serif"><QrCode className="h-5 w-5 text-primary" /> {t('admin.qr.title')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium">Stollar sanı (1-100)</label>
+            <label className="mb-1 block text-sm font-medium">{t('admin.qr.tableCount')}</label>
             <Input type="number" min={1} max={100} value={tableCount} onChange={e => setTableCount(Math.min(100, Math.max(1, parseInt(e.target.value) || 1)))} />
           </div>
           <div className="flex gap-2">
-            <Button onClick={handleGenerate} className="gold-gradient text-primary-foreground">QR kod jaratıw</Button>
+            <Button onClick={handleGenerate} className="gold-gradient text-primary-foreground">{t('admin.qr.generate')}</Button>
             {generated && (
-              <Button variant="outline" onClick={downloadAll}><Download className="mr-1 h-4 w-4" /> Hámmesin júklew (ZIP)</Button>
+              <Button variant="outline" onClick={downloadAll}><Download className="mr-1 h-4 w-4" /> {t('admin.qr.downloadAll')}</Button>
             )}
           </div>
         </CardContent>
@@ -93,7 +93,7 @@ export default function QRCodeGenerator({ hallId }: Props) {
               transition={{ delay: num * 0.02 }}
               className="glass rounded-lg p-3 text-center"
             >
-              <p className="mb-2 text-sm font-semibold">Stol {num}</p>
+              <p className="mb-2 text-sm font-semibold">{t('admin.qr.table')} {num}</p>
               <QRCodeCanvas
                 value={`${baseUrl}?table=${num}`}
                 size={140}
@@ -103,7 +103,7 @@ export default function QRCodeGenerator({ hallId }: Props) {
                 className="mx-auto"
               />
               <Button variant="ghost" size="sm" className="mt-2 text-xs" onClick={() => downloadSingle(num)}>
-                <Download className="mr-1 h-3 w-3" /> Júklew
+                <Download className="mr-1 h-3 w-3" /> {t('admin.qr.download')}
               </Button>
             </motion.div>
           ))}

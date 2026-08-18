@@ -60,16 +60,20 @@ export function setStoredLocale(locale: Locale) {
 }
 
 /**
- * Initial locale resolution — priority: saved preference -> locale in the URL
- * path (/kaa, /uz, /ru, /en) -> browser language -> default. Reading the URL
- * synchronously avoids a flash of the wrong language on a hard refresh/deep link.
+ * Initial locale resolution — priority: locale in the URL path
+ * (/kaa, /uz, /ru, /en) -> saved preference -> browser language -> default.
+ *
+ * The URL segment is authoritative so that opening /ru/super-admin (deep link or
+ * hard refresh) never flashes another language, even if a previous session stored
+ * a different preference. `LocaleLayout` keeps it in sync on every in-app route
+ * change (and re-persists to storage), so navigation + reload stay consistent.
  */
 export function getInitialLocale(): Locale {
-  const stored = getStoredLocale();
-  if (stored) return stored;
   if (typeof window !== "undefined") {
     const m = window.location.pathname.match(/^\/(kaa|uz|ru|en)(?:\/|$)/);
     if (m && isLocale(m[1])) return m[1];
   }
+  const stored = getStoredLocale();
+  if (stored) return stored;
   return detectBrowserLocale();
 }

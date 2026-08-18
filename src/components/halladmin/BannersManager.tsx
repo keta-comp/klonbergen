@@ -8,6 +8,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, Trash2, Edit2, Image, Upload, Crop, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from '@/i18n/LanguageContext';
+import { formatDate } from '@/i18n/format';
 import ImageCropDialog from '@/components/common/ImageCropDialog';
 
 interface Props { hallId: string; }
@@ -23,6 +25,7 @@ export default function BannersManager({ hallId }: Props) {
   const [uploading, setUploading] = useState(false);
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const { t, locale } = useTranslation();
 
   const resetForm = () => setForm({ title: '', image_url: '' });
 
@@ -42,9 +45,9 @@ export default function BannersManager({ hallId }: Props) {
       const file = new File([blob], `banner_${Date.now()}.jpg`, { type: 'image/jpeg' });
       const url = await uploadHallAsset(file, hallId);
       setForm(f => ({ ...f, image_url: url }));
-      toast.success('Suwret júklendi!');
+      toast.success(t('admin.banners.imgUploaded'));
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Suwret júklewde qátelik');
+      toast.error(err instanceof Error ? err.message : t('admin.banners.imgError'));
     } finally {
       setUploading(false);
     }
@@ -55,10 +58,10 @@ export default function BannersManager({ hallId }: Props) {
     const payload = { title: form.title || undefined, image_url: form.image_url, sort_order: editItem ? editItem.sort_order : nextOrder };
     if (editItem) {
       await update.mutateAsync({ id: editItem.id, ...payload });
-      toast.success('Banner jańalandı!');
+      toast.success(t('admin.banners.updated'));
     } else {
       await create.mutateAsync(payload);
-      toast.success('Banner qosıldı!');
+      toast.success(t('admin.banners.added'));
     }
     resetForm(); setEditItem(null); setOpen(false);
   };
@@ -70,7 +73,7 @@ export default function BannersManager({ hallId }: Props) {
   };
 
   const coupleName = brideGroom
-    ? `${brideGroom.bride_name} & ${brideGroom.groom_name}`
+    ? `${brideGroom.groom_name} & ${brideGroom.bride_name}`
     : null;
 
   const container = { hidden: {}, show: { transition: { staggerChildren: 0.05 } } };
@@ -85,11 +88,11 @@ export default function BannersManager({ hallId }: Props) {
           animate={{ opacity: 1, y: 0 }}
           className="rounded-xl bg-primary/10 border border-primary/20 p-4 text-center"
         >
-          <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Kelin ha'm kuyew</p>
+          <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">{t('admin.banners.coupleLabel')}</p>
           <h3 className="text-xl font-bold font-serif text-primary">{coupleName}</h3>
           {brideGroom?.wedding_date && (
             <p className="text-sm text-muted-foreground mt-1">
-              Toy kúni: {new Date(brideGroom.wedding_date).toLocaleDateString('uz-UZ')}
+              {t('admin.banners.weddingDate')}: {formatDate(locale, brideGroom.wedding_date)}
             </p>
           )}
         </motion.div>
@@ -98,24 +101,24 @@ export default function BannersManager({ hallId }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xl font-bold font-serif">Bannerler</h3>
-          <p className="text-sm text-muted-foreground">Mehmonlar kóretug'ın suwretler</p>
+          <h3 className="text-xl font-bold font-serif">{t('admin.banners.heading')}</h3>
+          <p className="text-sm text-muted-foreground">{t('admin.banners.subtitle')}</p>
         </div>
         <Dialog open={open} onOpenChange={v => { setOpen(v); if (!v) { setEditItem(null); resetForm(); } }}>
           <DialogTrigger asChild>
-            <Button className="gold-gradient text-primary-foreground"><Plus className="mr-1 h-4 w-4" /> Qosıw</Button>
+            <Button className="gold-gradient text-primary-foreground"><Plus className="mr-1 h-4 w-4" /> {t('admin.banners.add')}</Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="font-serif">{editItem ? "Bannerdı o'zgertiw" : "Jańa banner qosıw"}</DialogTitle>
+              <DialogTitle className="font-serif">{editItem ? t('admin.banners.editTitle') : t('admin.banners.newTitle')}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <label className="mb-1.5 block text-sm font-medium">Banner atı (ıqtıyarıy)</label>
-                <Input placeholder="Mısalı: Toy kuni" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
+                <label className="mb-1.5 block text-sm font-medium">{t('admin.banners.titleLabel')}</label>
+                <Input placeholder={t('admin.banners.titlePh')} value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium">Suwret</label>
+                <label className="mb-1.5 block text-sm font-medium">{t('admin.banners.imageLabel')}</label>
                 <div
                   onClick={() => !form.image_url && fileRef.current?.click()}
                   className={`relative flex min-h-[200px] cursor-pointer items-center justify-center overflow-hidden rounded-xl border-2 border-dashed transition-colors ${
@@ -133,7 +136,7 @@ export default function BannersManager({ hallId }: Props) {
                           onClick={e => { e.stopPropagation(); setCropSrc(form.image_url); }}
                           className="h-8 shadow-md"
                         >
-                          <Crop className="mr-1 h-3.5 w-3.5" /> Qırqıw
+                          <Crop className="mr-1 h-3.5 w-3.5" /> {t('admin.banners.crop')}
                         </Button>
                         <Button
                           type="button"
@@ -142,7 +145,7 @@ export default function BannersManager({ hallId }: Props) {
                           onClick={e => { e.stopPropagation(); fileRef.current?.click(); }}
                           className="h-8 shadow-md"
                         >
-                          <Upload className="mr-1 h-3.5 w-3.5" /> Almastırıw
+                          <Upload className="mr-1 h-3.5 w-3.5" /> {t('admin.banners.replace')}
                         </Button>
                       </div>
                     </>
@@ -152,8 +155,8 @@ export default function BannersManager({ hallId }: Props) {
                         <Upload className="h-8 w-8" />
                       </div>
                       <div className="text-center">
-                        <p className="font-medium">{uploading ? 'Júkleniwde...' : 'Suwret júklew'}</p>
-                        <p className="text-xs mt-1">JPG, PNG — 16:7 formatı usınıladı</p>
+                        <p className="font-medium">{uploading ? t('admin.banners.uploading') : t('admin.banners.upload')}</p>
+                        <p className="text-xs mt-1">{t('admin.banners.formatHint')}</p>
                       </div>
                     </div>
                   )}
@@ -161,7 +164,7 @@ export default function BannersManager({ hallId }: Props) {
                 <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} />
               </div>
               <Button onClick={handleSave} disabled={!form.image_url || uploading} className="w-full gold-gradient text-primary-foreground">
-                {editItem ? "O'zgertiw" : 'Qosıw'}
+                {editItem ? t('admin.banners.saveEdit') : t('admin.banners.saveNew')}
               </Button>
             </div>
           </DialogContent>
@@ -180,7 +183,7 @@ export default function BannersManager({ hallId }: Props) {
                   <Button variant="secondary" size="icon" className="h-8 w-8 shadow-md" onClick={() => handleEdit(item)}>
                     <Edit2 className="h-3.5 w-3.5" />
                   </Button>
-                  <Button variant="secondary" size="icon" className="h-8 w-8 shadow-md" onClick={() => { remove.mutateAsync(item.id); toast.success('Banner oshirildi!'); }}>
+                  <Button variant="secondary" size="icon" className="h-8 w-8 shadow-md" onClick={() => { remove.mutateAsync(item.id); toast.success(t('admin.banners.deleted')); }}>
                     <Trash2 className="h-3.5 w-3.5 text-destructive" />
                   </Button>
                 </div>
@@ -205,8 +208,8 @@ export default function BannersManager({ hallId }: Props) {
           <div className="rounded-full bg-muted p-4 mb-4">
             <Image className="h-10 w-10 text-muted-foreground/50" />
           </div>
-          <p className="font-medium text-muted-foreground mb-1">Házirshe bannerler joq</p>
-          <p className="text-sm text-muted-foreground/70">Jańa banner qosıw ushın «Qosıw» tuymesin basıń</p>
+          <p className="font-medium text-muted-foreground mb-1">{t('admin.banners.emptyTitle')}</p>
+          <p className="text-sm text-muted-foreground/70">{t('admin.banners.emptyDesc')}</p>
         </motion.div>
       )}
 

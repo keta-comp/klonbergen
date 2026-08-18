@@ -28,15 +28,15 @@ export default function BrideGroomSection({ data }: { data: BrideGroom }) {
 
       <div className="mx-auto grid max-w-3xl items-center gap-6 sm:grid-cols-[1fr_auto_1fr]">
         <motion.div variants={fadeUp} className="glass rounded-2xl p-6 text-center">
-          {data.bride_photo && (
+          {data.groom_photo && (
             <img
-              src={data.bride_photo}
-              alt={data.bride_name}
+              src={data.groom_photo}
+              alt={data.groom_name}
               className="mx-auto mb-3 h-32 w-32 rounded-full object-cover ring-4 ring-primary/30"
             />
           )}
-          <h3 className="font-serif text-2xl font-bold">{data.bride_name}</h3>
-          <p className="text-sm uppercase tracking-widest text-muted-foreground">Kelin</p>
+          <h3 className="font-serif text-2xl font-bold">{data.groom_name}</h3>
+          <p className="text-sm uppercase tracking-widest text-muted-foreground">Kúyew</p>
         </motion.div>
 
         <motion.div
@@ -49,15 +49,15 @@ export default function BrideGroomSection({ data }: { data: BrideGroom }) {
         </motion.div>
 
         <motion.div variants={fadeUp} className="glass rounded-2xl p-6 text-center">
-          {data.groom_photo && (
+          {data.bride_photo && (
             <img
-              src={data.groom_photo}
-              alt={data.groom_name}
+              src={data.bride_photo}
+              alt={data.bride_name}
               className="mx-auto mb-3 h-32 w-32 rounded-full object-cover ring-4 ring-primary/30"
             />
           )}
-          <h3 className="font-serif text-2xl font-bold">{data.groom_name}</h3>
-          <p className="text-sm uppercase tracking-widest text-muted-foreground">Kúyew</p>
+          <h3 className="font-serif text-2xl font-bold">{data.bride_name}</h3>
+          <p className="text-sm uppercase tracking-widest text-muted-foreground">Kelin</p>
         </motion.div>
       </div>
 

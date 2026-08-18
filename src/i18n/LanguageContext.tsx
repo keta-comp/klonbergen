@@ -130,23 +130,24 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       const val = lookup(dict, key);
       if (val !== undefined) return interpolate(val, params);
 
-      // Fall back to the default (source) locale so nothing ever renders undefined.
+      // Missing key. In DEV we surface the raw dotted key as a diagnostic so gaps
+      // are obvious (never a foreign-language string that looks "fine" but is wrong).
+      // In PROD we fall back to the default (source) locale so nothing renders undefined
+      // and the UI stays coherent.
       const fb = cache.get(DEFAULT_LOCALE);
-      if (fb) {
-        const fv = lookup(fb, key);
-        if (fv !== undefined) {
-          if (import.meta.env.DEV) {
-            console.warn(
-              `[i18n] Missing '${key}' in '${locale}' — fell back to ${DEFAULT_LOCALE}`
-            );
-          }
-          return interpolate(fv, params);
-        }
-      }
+      const fv = fb ? lookup(fb, key) : undefined;
       if (import.meta.env.DEV) {
-        console.warn(`Missing translation: ${locale}.${key}`);
+        if (fv !== undefined) {
+          console.warn(
+            `[i18n] Missing '${key}' in '${locale}' — defined fallback: ${DEFAULT_LOCALE}`
+          );
+        } else {
+          console.warn(`[i18n] Missing translation: ${locale}.${key}`);
+        }
+        return key;
       }
-      return key; // safe fallback: show the key, never undefined
+      if (fv !== undefined) return interpolate(fv, params);
+      return key;
     },
     [dict, locale]
   );

@@ -36,11 +36,18 @@ export function useProfiles() {
   });
 }
 
-export function useFoodItems(hallId: string) {
+/**
+ * Food items. Optionally scoped to a wedding — if `weddingId` is provided,
+ * only that wedding's menu is returned; otherwise legacy hall-wide behavior
+ * is used (a null `wedding_id` row matches so old data stays visible).
+ */
+export function useFoodItems(hallId: string, weddingId?: string | null) {
   return useQuery({
-    queryKey: ['food_items', hallId],
+    queryKey: ['food_items', hallId, weddingId ?? 'all'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('food_items').select('*').eq('hall_id', hallId).order('created_at', { ascending: false });
+      let q = supabase.from('food_items').select('*').eq('hall_id', hallId);
+      if (weddingId) q = q.eq('wedding_id', weddingId);
+      const { data, error } = await q.order('created_at', { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -48,11 +55,13 @@ export function useFoodItems(hallId: string) {
   });
 }
 
-export function useArtists(hallId: string) {
+export function useArtists(hallId: string, weddingId?: string | null) {
   return useQuery({
-    queryKey: ['artists', hallId],
+    queryKey: ['artists', hallId, weddingId ?? 'all'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('artists').select('*').eq('hall_id', hallId).order('created_at', { ascending: false });
+      let q = supabase.from('artists').select('*').eq('hall_id', hallId);
+      if (weddingId) q = q.eq('wedding_id', weddingId);
+      const { data, error } = await q.order('created_at', { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -60,11 +69,13 @@ export function useArtists(hallId: string) {
   });
 }
 
-export function useBrideGroom(hallId: string) {
+export function useBrideGroom(hallId: string, weddingId?: string | null) {
   return useQuery({
-    queryKey: ['bride_groom', hallId],
+    queryKey: ['bride_groom', hallId, weddingId ?? 'all'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('bride_groom').select('*').eq('hall_id', hallId).maybeSingle();
+      let q = supabase.from('bride_groom').select('*').eq('hall_id', hallId);
+      if (weddingId) q = q.eq('wedding_id', weddingId);
+      const { data, error } = await q.maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -72,11 +83,13 @@ export function useBrideGroom(hallId: string) {
   });
 }
 
-export function useBanners(hallId: string) {
+export function useBanners(hallId: string, weddingId?: string | null) {
   return useQuery({
-    queryKey: ['banners', hallId],
+    queryKey: ['banners', hallId, weddingId ?? 'all'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('banners').select('*').eq('hall_id', hallId).order('sort_order', { ascending: true });
+      let q = supabase.from('banners').select('*').eq('hall_id', hallId);
+      if (weddingId) q = q.eq('wedding_id', weddingId);
+      const { data, error } = await q.order('sort_order', { ascending: true });
       if (error) throw error;
       return data;
     },
@@ -87,7 +100,7 @@ export function useBanners(hallId: string) {
 export function useMutateHall() {
   const qc = useQueryClient();
   const create = useMutation({
-    mutationFn: async (hall: { name: string; address?: string; phone?: string }) => {
+    mutationFn: async (hall: { name: string; address?: string; phone?: string; cover_url?: string | null }) => {
       const { data, error } = await supabase.from('wedding_halls').insert(hall).select().single();
       if (error) throw error;
       return data;
@@ -111,17 +124,17 @@ export function useMutateHall() {
   return { create, update, remove };
 }
 
-export function useMutateFood(hallId: string) {
+export function useMutateFood(hallId: string, weddingId?: string | null) {
   const qc = useQueryClient();
   const create = useMutation({
-    mutationFn: async (item: { name: string; price?: number; description?: string; is_today?: boolean }) => {
-      const { error } = await supabase.from('food_items').insert({ ...item, hall_id: hallId });
+    mutationFn: async (item: { name: string; price?: number; description?: string; is_today?: boolean; image_url?: string | null }) => {
+      const { error } = await supabase.from('food_items').insert({ ...item, hall_id: hallId, wedding_id: weddingId ?? null });
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['food_items', hallId] }),
   });
   const update = useMutation({
-    mutationFn: async ({ id, ...rest }: { id: string; name?: string; price?: number; description?: string; is_today?: boolean }) => {
+    mutationFn: async ({ id, ...rest }: { id: string; name?: string; price?: number; description?: string; is_today?: boolean; image_url?: string | null }) => {
       const { error } = await supabase.from('food_items').update(rest).eq('id', id);
       if (error) throw error;
     },
@@ -137,11 +150,54 @@ export function useMutateFood(hallId: string) {
   return { create, update, remove };
 }
 
-export function useMutateArtist(hallId: string) {
+export function useUpdateHallMusic(hallId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: { url: string | null; title?: string | null }) => {
+      const update: Record<string, unknown> = {
+        // url === null means "remove music": clear everything.
+        music_url: payload.url,
+        music_title: payload.url ? (payload.title ?? null) : null,
+        music_created_at: payload.url ? new Date().toISOString() : null,
+      };
+      const { error } = await supabase
+        .from('wedding_halls')
+        .update(update as any)
+        .eq('id', hallId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['wedding_halls'] });
+      qc.invalidateQueries({ queryKey: ['hall', hallId] });
+    },
+  });
+}
+
+/**
+ * Best-effort removal of a hall-assets object referenced by a public URL.
+ * Only deletes paths under `<hallId>/` so one hall can never delete another
+ * hall's files (multi-tenant isolation). Never throws — the DB row is cleared by
+ * the caller regardless of the storage outcome.
+ */
+export async function deleteHallAsset(url: string | null, hallId: string): Promise<void> {
+  if (!url) return;
+  try {
+    const marker = '/hall-assets/';
+    const idx = url.indexOf(marker);
+    if (idx === -1) return;
+    const path = url.slice(idx + marker.length);
+    if (!path.startsWith(`${hallId}/`)) return; // safety: not this hall's file
+    await supabase.storage.from('hall-assets').remove([path]);
+  } catch {
+    /* best effort */
+  }
+}
+
+export function useMutateArtist(hallId: string, weddingId?: string | null) {
   const qc = useQueryClient();
   const create = useMutation({
-    mutationFn: async (item: { name: string; performance_time?: string; description?: string }) => {
-      const { error } = await supabase.from('artists').insert({ ...item, hall_id: hallId });
+    mutationFn: async (item: { name: string; performance_time?: string; description?: string; image_url?: string | null }) => {
+      const { error } = await supabase.from('artists').insert({ ...item, hall_id: hallId, wedding_id: weddingId ?? null });
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['artists', hallId] }),
@@ -163,7 +219,7 @@ export function useMutateArtist(hallId: string) {
   return { create, update, remove };
 }
 
-export function useMutateBrideGroom(hallId: string) {
+export function useMutateBrideGroom(hallId: string, weddingId?: string | null) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (data: { bride_name: string; groom_name: string; bride_photo?: string; groom_photo?: string; love_story?: string; wedding_date?: string; id?: string }) => {
@@ -172,7 +228,7 @@ export function useMutateBrideGroom(hallId: string) {
         const { error } = await supabase.from('bride_groom').update(rest).eq('id', id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from('bride_groom').insert({ ...data, hall_id: hallId });
+        const { error } = await supabase.from('bride_groom').insert({ ...data, hall_id: hallId, wedding_id: weddingId ?? null });
         if (error) throw error;
       }
     },
@@ -180,11 +236,11 @@ export function useMutateBrideGroom(hallId: string) {
   });
 }
 
-export function useMutateBanner(hallId: string) {
+export function useMutateBanner(hallId: string, weddingId?: string | null) {
   const qc = useQueryClient();
   const create = useMutation({
     mutationFn: async (item: { title?: string; image_url: string; sort_order?: number }) => {
-      const { error } = await supabase.from('banners').insert({ ...item, hall_id: hallId });
+      const { error } = await supabase.from('banners').insert({ ...item, hall_id: hallId, wedding_id: weddingId ?? null });
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['banners', hallId] }),
@@ -226,15 +282,13 @@ export interface TimelineEvent {
   sort_order: number;
 }
 
-export function useTimelineEvents(hallId: string) {
+export function useTimelineEvents(hallId: string, weddingId?: string | null) {
   return useQuery({
-    queryKey: ['timeline_events', hallId],
+    queryKey: ['timeline_events', hallId, weddingId ?? 'all'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('timeline_events')
-        .select('*')
-        .eq('hall_id', hallId)
-        .order('start_time', { ascending: true });
+      let q = supabase.from('timeline_events').select('*').eq('hall_id', hallId);
+      if (weddingId) q = q.eq('wedding_id', weddingId);
+      const { data, error } = await q.order('start_time', { ascending: true });
       if (error) throw error;
       return data as TimelineEvent[];
     },
@@ -244,12 +298,12 @@ export function useTimelineEvents(hallId: string) {
 
 type TimelineInput = { title: string; description?: string | null; icon?: string | null; start_time: string; end_time?: string | null; sort_order?: number };
 
-export function useMutateTimeline(hallId: string) {
+export function useMutateTimeline(hallId: string, weddingId?: string | null) {
   const qc = useQueryClient();
   const invalidate = () => qc.invalidateQueries({ queryKey: ['timeline_events', hallId] });
   const create = useMutation({
     mutationFn: async (item: TimelineInput) => {
-      const { error } = await supabase.from('timeline_events').insert({ ...item, hall_id: hallId });
+      const { error } = await supabase.from('timeline_events').insert({ ...item, hall_id: hallId, wedding_id: weddingId ?? null });
       if (error) throw error;
     },
     onSuccess: invalidate,

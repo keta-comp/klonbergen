@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, Trash2, Edit2, Clock } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from '@/i18n/LanguageContext';
 
 interface Props { hallId: string; }
 type Artist = Tables<'artists'>;
@@ -19,6 +20,7 @@ export default function ArtistsManager({ hallId }: Props) {
   const [open, setOpen] = useState(false);
   const [editItem, setEditItem] = useState<Artist | null>(null);
   const [form, setForm] = useState({ name: '', performance_time: '', description: '' });
+  const { t } = useTranslation();
 
   const resetForm = () => setForm({ name: '', performance_time: '', description: '' });
 
@@ -26,10 +28,10 @@ export default function ArtistsManager({ hallId }: Props) {
     const payload = { name: form.name, performance_time: form.performance_time || undefined, description: form.description || undefined };
     if (editItem) {
       await update.mutateAsync({ id: editItem.id, ...payload });
-      toast.success("Artist jańalandı!");
+      toast.success(t('admin.artists.updated'));
     } else {
       await create.mutateAsync(payload);
-      toast.success("Artist qosıldı!");
+      toast.success(t('admin.artists.added'));
     }
     resetForm(); setEditItem(null); setOpen(false);
   };
@@ -46,18 +48,18 @@ export default function ArtistsManager({ hallId }: Props) {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-xl font-bold font-serif">Artistler</h3>
+        <h3 className="text-xl font-bold font-serif">{t('admin.artists.heading')}</h3>
         <Dialog open={open} onOpenChange={v => { setOpen(v); if (!v) { setEditItem(null); resetForm(); } }}>
           <DialogTrigger asChild>
-            <Button className="gold-gradient text-primary-foreground"><Plus className="mr-1 h-4 w-4" /> Qosıw</Button>
+            <Button className="gold-gradient text-primary-foreground"><Plus className="mr-1 h-4 w-4" /> {t('admin.artists.add')}</Button>
           </DialogTrigger>
           <DialogContent>
-            <DialogHeader><DialogTitle className="font-serif">{editItem ? "Artist o'zgertiw" : "Jańa artist qosıw"}</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle className="font-serif">{editItem ? t('admin.artists.editTitle') : t('admin.artists.newTitle')}</DialogTitle></DialogHeader>
             <div className="space-y-3">
-              <Input placeholder="Artist atı" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-              <Input placeholder="Oynaw waqtı (msl: 20:00 - 21:00)" value={form.performance_time} onChange={e => setForm(f => ({ ...f, performance_time: e.target.value }))} />
-              <Textarea placeholder="Táriyipleme" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
-              <Button onClick={handleSave} disabled={!form.name} className="w-full gold-gradient text-primary-foreground">Saqlaw</Button>
+              <Input placeholder={t('admin.artists.namePh')} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+              <Input placeholder={t('admin.artists.timePh')} value={form.performance_time} onChange={e => setForm(f => ({ ...f, performance_time: e.target.value }))} />
+              <Textarea placeholder={t('admin.artists.descPh')} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+              <Button onClick={handleSave} disabled={!form.name} className="w-full gold-gradient text-primary-foreground">{t('admin.artists.save')}</Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -75,7 +77,7 @@ export default function ArtistsManager({ hallId }: Props) {
                   </div>
                   <div className="flex gap-1">
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEdit(item)}><Edit2 className="h-3 w-3" /></Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { remove.mutateAsync(item.id); toast.success("Artist oshirildi!"); }}><Trash2 className="h-3 w-3 text-destructive" /></Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { remove.mutateAsync(item.id); toast.success(t('admin.artists.deleted')); }}><Trash2 className="h-3 w-3 text-destructive" /></Button>
                   </div>
                 </div>
               </CardContent>

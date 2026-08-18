@@ -1,424 +1,692 @@
-import { useState } from 'react';
+/**
+ * Vowly Super Admin — redesigned dashboard.
+ * Sections: Bosh sahifa, Toyxonalar, Adminlar, To'ylar, Tariflar, To'lovlar, Hisobotlar, Sozlamalar, Bildirishnomalar, Activity Log.
+ * Layout: SuperAdminLayout (sidebar + header + right column). Active section is internal state.
+ */
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import Navbar from '@/components/common/Navbar';
-import { useAuth } from '@/hooks/useAuth';
-import { useWeddingHalls, useHallAdmins, useMutateHall, useProfiles } from '@/hooks/useHallData';
-import type { Tables } from '@/integrations/supabase/types';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Trash2, Edit2, Users, MapPin, Phone, UserPlus, Building2, CheckCircle2, XCircle, KeyRound, Copy, RefreshCw } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { Search, Plus, Building2, ShieldCheck, Clock, AlertCircle, Heart, Users, CreditCard, Receipt, BarChart3, Settings as SettingsIcon, Bell as BellIcon, Activity } from 'lucide-react';
+
+import { useTranslation } from '@/i18n/LanguageContext';
+import { formatNumber, formatDate, formatDateTime } from '@/i18n/format';
+import { useAuth } from '@/auth/AuthProvider';
 import { supabase } from '@/integrations/supabase/client';
-import { useQueryClient } from '@tanstack/react-query';
+import {
+  useAdminHalls,
+  useAllSubscriptions,
+  usePlans,
+  usePayments,
+  useAdminNotifications,
+  useActivityLogs,
+  useArchiveHall,
+  useRestoreHall,
+  useMarkNotificationRead,
+  useAllPlans,
+  useSeedDefaultPlans,
+  useDeletePlan,
+  type Plan,
+} from '@/hooks/useAdminData';
+import { daysRemaining } from '@/lib/subscription';
+
+import SuperAdminLayout, { SectionId } from '@/components/superadmin/SuperAdminLayout';
+import VenueCard from '@/components/superadmin/VenueCard';
+import AddHallModal from '@/components/superadmin/AddHallModal';
+import PaymentConfirmModal from '@/components/superadmin/PaymentConfirmModal';
+import PlanFormModal from '@/components/superadmin/PlanFormModal';
 import { toast } from 'sonner';
 
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import type { Tables } from '@/integrations/supabase/types';
+
+type Hall = Tables<'wedding_halls'>;
+
+const FILTERS = ['all', 'active', 'trial', 'expired', 'blocked', 'archived'] as const;
+type Filter = (typeof FILTERS)[number];
+
 export default function SuperAdminDashboard() {
-  const { user, signOut } = useAuth();
-  const { data: halls, isLoading } = useWeddingHalls();
-  const { data: allAdmins } = useHallAdmins();
-  const { data: profiles } = useProfiles();
-  const { create, update, remove } = useMutateHall();
-  const qc = useQueryClient();
-
+  const { t, locale } = useTranslation();
+  const navigate = useNavigate();
+  const [active, setActive] = useState<SectionId>('bosh_sahifa');
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState<Filter>('all');
   const [addOpen, setAddOpen] = useState(false);
-  const [editHall, setEditHall] = useState<Tables<'wedding_halls'> | null>(null);
-  const [form, setForm] = useState({ name: '', address: '', phone: '' });
-  const [adminOpen, setAdminOpen] = useState<string | null>(null);
-  const [selectedUserId, setSelectedUserId] = useState('');
-  const [credOpen, setCredOpen] = useState<string | null>(null);
-  const [credForm, setCredForm] = useState({ email: '', password: '', full_name: '' });
-  const [credLoading, setCredLoading] = useState(false);
-  const [credResult, setCredResult] = useState<{ email: string; password: string } | null>(null);
+  const [payHall, setPayHall] = useState<Hall | null>(null);
 
+  // For now we use the same halls list (active or archived) for the page.
+  const { data: halls = [] } = useAdminHalls({ includeArchived: true });
+  const { data: allSubs = [] } = useAllSubscriptions();
+  const { data: plans = [] } = usePlans();
+  const archive = useArchiveHall();
+  const restore = useRestoreHall();
+  const markRead = useMarkNotificationRead();
 
-  // Get users who are NOT already hall admins
-  const assignedUserIds = new Set(allAdmins?.map(a => a.user_id) ?? []);
-  const availableUsers = profiles?.filter(p => !assignedUserIds.has(p.user_id) && p.user_id !== user?.id && p.approved) ?? [];
-  const pendingProfiles = profiles?.filter(p => !p.approved) ?? [];
+  // ---- Stat computation (real data) -----------------------------------------
+  const stats = useMemo(() => {
+    let active = 0;
+    let trial = 0;
+    let expired = 0;
+    const byHall: Record<string, (typeof allSubs)[number] | undefined> = {};
+    for (const s of allSubs) {
+      byHall[s.hall_id] = s;
+    }
+    for (const h of halls) {
+      if (h.archived) continue;
+      const s = byHall[h.id];
+      if (!s) { trial++; continue; }
+      const days = daysRemaining(s.expires_at);
+      if (s.status === 'trial' || (s.status === 'active' && days > 30)) trial++;
+      else if (s.status === 'active' && days > 0) active++;
+      else expired++;
+    }
+    return { total: halls.length, active, trial, expired };
+  }, [halls, allSubs]);
 
-
-  const handleCreate = async () => {
-    await create.mutateAsync(form);
-    setForm({ name: '', address: '', phone: '' });
-    setAddOpen(false);
-    toast.success('Toyxana qosıldı!');
-  };
-
-  const handleUpdate = async () => {
-    if (!editHall) return;
-    await update.mutateAsync({ id: editHall.id, ...form });
-    setEditHall(null);
-    setForm({ name: '', address: '', phone: '' });
-    toast.success('Toyxana jańalandı!');
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm('Oshiriwdi tastıyqlaysızba?')) return;
-    await remove.mutateAsync(id);
-    toast.success('Toyxana óshirildi!');
-  };
-
-  const genPassword = () => {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
-    const bytes = crypto.getRandomValues(new Uint32Array(10));
-    return Array.from(bytes, b => chars[b % chars.length]).join('') + '!7';
-  };
-
-  const handleCreateCredentials = async (hallId: string) => {
-    setCredLoading(true);
-    const { data, error } = await supabase.functions.invoke('create-hall-admin', {
-      body: { ...credForm, email: credForm.email.trim(), hall_id: hallId },
+  // ---- Filtered halls -------------------------------------------------------
+  const visibleHalls = useMemo(() => {
+    return halls.filter((h) => {
+      // search
+      if (search.trim()) {
+        const q = search.toLowerCase();
+        if (
+          !h.name.toLowerCase().includes(q) &&
+          !(h.address ?? '').toLowerCase().includes(q) &&
+          !(h.phone ?? '').toLowerCase().includes(q)
+        ) return false;
+      }
+      if (filter === 'archived') {
+        if (!h.archived) return false;
+      } else if (filter !== 'all') {
+        if (h.archived) return false;
+        const s = allSubs.find((x) => x.hall_id === h.id);
+        if (filter === 'active') {
+          if (!s || s.status !== 'active' || daysRemaining(s.expires_at) <= 0) return false;
+        } else if (filter === 'trial') {
+          if (!s || s.status !== 'trial') return false;
+        } else if (filter === 'expired') {
+          if (!s || s.status === 'active' || daysRemaining(s.expires_at) > 0) return false;
+        }
+      }
+      return true;
     });
-    setCredLoading(false);
-    const errMsg = error?.message ?? (data as { error?: string } | null)?.error;
-    if (errMsg) {
-      toast.error(errMsg);
-      return;
-    }
-    toast.success('Toyxana admini ushın login jaratıldı!');
-    setCredResult({ email: credForm.email.trim(), password: credForm.password });
-    setCredForm({ email: '', password: '', full_name: '' });
-    qc.invalidateQueries({ queryKey: ['hall_admins'] });
-    qc.invalidateQueries({ queryKey: ['profiles'] });
+  }, [halls, search, filter, allSubs]);
+
+  const onManage = (hallId: string) => {
+    // jump to that hall's admin panel (locale-prefixed route)
+    navigate(`/${locale}/admin/bosh-sahifa?hall=${hallId}`);
   };
 
-
-  const handleAddAdmin = async (hallId: string) => {
-    const profile = profiles?.find(p => p.user_id === selectedUserId);
-    if (!profile) return;
-
-    const { error } = await supabase.from('hall_admins').insert({
-      hall_id: hallId,
-      email: profile.email || '',
-      user_id: profile.user_id,
-      full_name: profile.full_name || profile.email || '',
-      avatar_url: profile.avatar_url || '',
-    });
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success('Admin qılındı!');
-      qc.invalidateQueries({ queryKey: ['hall_admins'] });
-      setSelectedUserId('');
-      setAdminOpen(null);
-    }
+  const onAdmins = (hall: Hall) => {
+    // TODO: open admins panel for that hall
+    setActive('adminlar');
   };
 
-  const handleRemoveAdmin = async (id: string) => {
-    const { error } = await supabase.from('hall_admins').delete().eq('id', id);
-    if (error) toast.error(error.message);
-    else {
-      toast.success('Admin óshirildi!');
-      qc.invalidateQueries({ queryKey: ['hall_admins'] });
-    }
+  const onArchive = async (hall: Hall) => {
+    if (!confirm(t('superadmin.archiveConfirm', { name: hall.name }))) return;
+    await archive.mutateAsync(hall.id);
   };
-
-  const handleApproval = async (userId: string, approved: boolean) => {
-    const { error } = await supabase
-      .from('profiles')
-      .update({ approved, approved_at: approved ? new Date().toISOString() : null })
-      .eq('user_id', userId);
-    if (error) toast.error(error.message);
-    else {
-      toast.success(approved ? 'Paydalanıwshı tastıyıqlandı!' : 'Tastıyıqlaw biykar etildi');
-      qc.invalidateQueries({ queryKey: ['profiles'] });
-    }
+  const onRestore = async (hall: Hall) => {
+    await restore.mutateAsync(hall.id);
   };
-
-
-  const container = { hidden: {}, show: { transition: { staggerChildren: 0.1 } } };
-  const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar title="Vowly — Super Admin" onLogout={signOut} userName={user?.email ?? ''} />
-      <main className="container py-8">
-        <Tabs defaultValue="halls">
-          <TabsList className="glass mb-6">
-            <TabsTrigger value="halls" className="flex items-center gap-1"><Building2 className="h-4 w-4" /> Toyxanalar</TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-1"><Users className="h-4 w-4" /> Dizimnen ótkenler</TabsTrigger>
-          </TabsList>
+    <SuperAdminLayout active={active} onChange={setActive}>
+      {active === 'bosh_sahifa' && (
+        <BoshSahifa
+          stats={stats}
+          onGoToHalls={() => setActive('toyxonalar')}
+          onAdd={() => setAddOpen(true)}
+        />
+      )}
 
-          <TabsContent value="halls">
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-2xl font-bold font-serif">Bárshe toyxanalar</h2>
-              <Dialog open={addOpen} onOpenChange={setAddOpen}>
-                <DialogTrigger asChild>
-                  <Button className="gold-gradient text-primary-foreground"><Plus className="mr-1 h-4 w-4" /> Qosıw</Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader><DialogTitle className="font-serif">Jańadan toyxana qosıw</DialogTitle></DialogHeader>
-                  <div className="space-y-3">
-                    <Input placeholder="Toyxana atı" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-                    <Input placeholder="Mánzil" value={form.address} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} />
-                    <Input placeholder="Telefon" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
-                    <Button onClick={handleCreate} disabled={!form.name || create.isPending} className="w-full gold-gradient text-primary-foreground">
-                      {create.isPending ? 'Saqlanıwda...' : 'Saqlaw'}
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-
-            {/* Toyxana admini ushın login/parol jaratıw */}
-            <Dialog open={!!credOpen} onOpenChange={v => { if (!v) { setCredOpen(null); setCredResult(null); } }}>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle className="font-serif">Admin ushın login hám parol jaratıw</DialogTitle>
-                </DialogHeader>
-                {credResult ? (
-                  <div className="space-y-3">
-                    <p className="text-sm text-muted-foreground">
-                      Bul maǵlıwmatlardı toyxana adminine beriń. Ol usı login menen tuwrıdan-tuwrı kire aladı.
-                    </p>
-                    <div className="rounded-md bg-secondary/60 p-3 text-sm">
-                      <p><span className="text-muted-foreground">Login:</span> <b>{credResult.email}</b></p>
-                      <p><span className="text-muted-foreground">Parol:</span> <b>{credResult.password}</b></p>
-                    </div>
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => {
-                        navigator.clipboard.writeText(`Login: ${credResult.email}\nParol: ${credResult.password}`);
-                        toast.success('Kóshirildi');
-                      }}
-                    >
-                      <Copy className="mr-1 h-4 w-4" /> Kóshirip alıw
-                    </Button>
-                    <Button className="w-full gold-gradient text-primary-foreground" onClick={() => { setCredOpen(null); setCredResult(null); }}>
-                      Jabıw
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <Input
-                      placeholder="Admin atı (májbúriy emes)"
-                      value={credForm.full_name}
-                      onChange={e => setCredForm(f => ({ ...f, full_name: e.target.value }))}
-                    />
-                    <Input
-                      type="email"
-                      placeholder="Login (email)"
-                      value={credForm.email}
-                      onChange={e => setCredForm(f => ({ ...f, email: e.target.value }))}
-                    />
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Parol"
-                        value={credForm.password}
-                        onChange={e => setCredForm(f => ({ ...f, password: e.target.value }))}
-                      />
-                      <Button variant="outline" size="icon" onClick={() => setCredForm(f => ({ ...f, password: genPassword() }))}>
-                        <RefreshCw className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <Button
-                      className="w-full gold-gradient text-primary-foreground"
-                      disabled={!credForm.email || credForm.password.length < 6 || credLoading}
-                      onClick={() => credOpen && handleCreateCredentials(credOpen)}
-                    >
-                      {credLoading ? 'Jaratılmaqta...' : 'Jaratıw hám toyxanaǵa biriktiriw'}
-                    </Button>
-                  </div>
-                )}
-              </DialogContent>
-            </Dialog>
-
-
-            <Dialog open={!!editHall} onOpenChange={v => { if (!v) setEditHall(null); }}>
-              <DialogContent>
-                <DialogHeader><DialogTitle className="font-serif">Toyxana o'zgertiw</DialogTitle></DialogHeader>
-                <div className="space-y-3">
-                  <Input placeholder="Toyxona atı" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-                  <Input placeholder="Manzil" value={form.address} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} />
-                  <Input placeholder="Telefon" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
-                  <Button onClick={handleUpdate} disabled={!form.name || update.isPending} className="w-full gold-gradient text-primary-foreground">
-                    {update.isPending ? 'Saqlanıwda...' : 'Saqlaw'}
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-
-            <motion.div variants={container} initial="hidden" animate="show" className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {halls?.map(hall => (
-                <motion.div key={hall.id} variants={item}>
-                  <Card className="glass overflow-hidden">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="flex items-center justify-between font-serif text-lg">
-                        {hall.name}
-                        <div className="flex gap-1">
-                          <Button variant="ghost" size="icon" onClick={() => { setEditHall(hall); setForm({ name: hall.name, address: hall.address ?? '', phone: hall.phone ?? '' }); }}>
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDelete(hall.id)}>
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </div>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      {hall.address && <p className="flex items-center gap-1 text-sm text-muted-foreground"><MapPin className="h-3 w-3" />{hall.address}</p>}
-                      {hall.phone && <p className="flex items-center gap-1 text-sm text-muted-foreground"><Phone className="h-3 w-3" />{hall.phone}</p>}
-                      <div className="mt-3 border-t pt-3">
-                        <div className="mb-2 flex items-center justify-between gap-2">
-                          <span className="text-sm font-medium flex items-center gap-1"><Users className="h-3 w-3" />Adminler</span>
-                          <div className="flex gap-1">
-                            <Button
-                              size="sm"
-                              className="gold-gradient text-primary-foreground"
-                              onClick={() => { setCredResult(null); setCredForm({ email: '', password: genPassword(), full_name: '' }); setCredOpen(hall.id); }}
-                            >
-                              <KeyRound className="mr-1 h-3 w-3" /> Login jaratıw
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => setAdminOpen(hall.id)}>
-                              <UserPlus className="mr-1 h-3 w-3" /> Tayınlaw
-                            </Button>
-                          </div>
-                        </div>
-
-                        {allAdmins?.filter(a => a.hall_id === hall.id).map(admin => (
-                          <div key={admin.id} className="flex items-center justify-between rounded-md bg-secondary/50 px-2 py-1.5 text-sm mb-1">
-                            <div className="flex items-center gap-2">
-                              {admin.avatar_url && <img src={admin.avatar_url} alt="" className="h-6 w-6 rounded-full" />}
-                              <div>
-                                <p className="font-medium text-xs">{admin.full_name || admin.email}</p>
-                                <p className="text-xs text-muted-foreground">{admin.email}</p>
-                              </div>
-                            </div>
-                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleRemoveAdmin(admin.id)}>
-                              <Trash2 className="h-3 w-3 text-destructive" />
-                            </Button>
-                          </div>
-                        ))}
-                        {(!allAdmins || allAdmins.filter(a => a.hall_id === hall.id).length === 0) && (
-                          <p className="text-xs text-muted-foreground italic">Házirshe admin joq</p>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </motion.div>
-          </TabsContent>
-
-          <TabsContent value="users">
-            <h2 className="mb-1 text-2xl font-bold font-serif">Google orqalı ro'yxattan ótkenler</h2>
-            <p className="mb-4 text-sm text-muted-foreground">
-              Jańa paydalanıwshı tek siz tastıyıqlaǵannan keyin sistemaǵa kire aladı.
-            </p>
-            {pendingProfiles.length > 0 && (
-              <div className="mb-4 rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
-                {pendingProfiles.length} paydalanıwshı tastıyıqlawdı kútpekte
-              </div>
-            )}
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {profiles?.map(profile => {
-                const isAdmin = assignedUserIds.has(profile.user_id);
-                const adminHall = allAdmins?.find(a => a.user_id === profile.user_id);
-                const hallName = adminHall ? halls?.find(h => h.id === adminHall.hall_id)?.name : null;
-                const isSelf = profile.user_id === user?.id;
-                return (
-                  <Card key={profile.id} className="glass">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        {profile.avatar_url && <img src={profile.avatar_url} alt="" className="h-10 w-10 rounded-full" />}
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-sm truncate">{profile.full_name || 'Atı joq'}</p>
-                          <p className="text-xs text-muted-foreground truncate">{profile.email}</p>
-                        </div>
-                      </div>
-
-                      <div className="mt-2 flex items-center gap-2">
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                            profile.approved ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
-                          }`}
-                        >
-                          {profile.approved ? '✓ Tastıyıqlanǵan' : '⏳ Kútpekte'}
-                        </span>
-                      </div>
-
-                      {isAdmin ? (
-                        <div className="mt-2 rounded-md bg-primary/10 px-2 py-1 text-xs text-primary font-medium">
-                          ✓ Admin: {hallName || 'Toyxana'}
-                        </div>
-                      ) : (
-                        <p className="mt-2 text-xs text-muted-foreground italic">Házirshe tayınlanbag'an</p>
-                      )}
-
-                      {!isSelf && (
-                        <div className="mt-3">
-                          {profile.approved ? (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="w-full"
-                              onClick={() => handleApproval(profile.user_id, false)}
-                            >
-                              <XCircle className="mr-1 h-3 w-3" /> Ruqsattı biykar etiw
-                            </Button>
-                          ) : (
-                            <Button
-                              size="sm"
-                              className="w-full gold-gradient text-primary-foreground"
-                              onClick={() => handleApproval(profile.user_id, true)}
-                            >
-                              <CheckCircle2 className="mr-1 h-3 w-3" /> Tastıyıqlaw
-                            </Button>
-                          )}
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                );
-              })}
-
-              {(!profiles || profiles.length === 0) && (
-                <p className="text-muted-foreground col-span-full text-center py-8">Házirshe hesh kim dizimnen ótpegen</p>
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
-
-        {/* Assign Admin Dialog */}
-        <Dialog open={!!adminOpen} onOpenChange={v => { if (!v) { setAdminOpen(null); setSelectedUserId(''); } }}>
-          <DialogContent>
-            <DialogHeader><DialogTitle className="font-serif">Admin tayınlaw</DialogTitle></DialogHeader>
-            <div className="space-y-3">
-              <p className="text-sm text-muted-foreground">Google orqalı kirgen paydalanıwshılar diziminen tańlań:</p>
-              <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Paydalanıwshı tańlań" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableUsers.map(p => (
-                    <SelectItem key={p.user_id} value={p.user_id}>
-                      <div className="flex items-center gap-2">
-                        {p.avatar_url && <img src={p.avatar_url} alt="" className="h-5 w-5 rounded-full" />}
-                        <span>{p.full_name || p.email}</span>
-                        <span className="text-muted-foreground text-xs">({p.email})</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {availableUsers.length === 0 && (
-                <p className="text-sm text-muted-foreground italic">Tayınlaw ushın paydalanıwshı joq. Aldın Google menen kiriw kerek.</p>
-              )}
+      {active === 'toyxonalar' && (
+        <section>
+          <SectionHeader
+            title={t('superadmin.halls.title')}
+            subtitle={t('superadmin.halls.subtitle')}
+            right={
               <Button
-                onClick={() => adminOpen && handleAddAdmin(adminOpen)}
-                disabled={!selectedUserId}
-                className="w-full gold-gradient text-primary-foreground"
+                onClick={() => setAddOpen(true)}
+                className="rounded-lg bg-[#3a4530] px-3 py-2 text-[13px] font-medium text-white shadow-sm hover:bg-[#2f3827]"
               >
-                Tayınlaw
+                <Plus className="mr-1 h-4 w-4" />
+                <span className="hidden sm:inline">{t('superadmin.halls.add')}</span>
+                <span className="sm:hidden">+</span>
               </Button>
+            }
+          />
+
+          {/* Search + filter bar */}
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="relative flex-1 max-w-md">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t('superadmin.halls.search')}
+                className="pl-9"
+              />
             </div>
-          </DialogContent>
-        </Dialog>
-      </main>
+            <div className="flex flex-wrap gap-1.5">
+              {FILTERS.map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => setFilter(f)}
+                  className={cn(
+                    'rounded-full px-3 py-1 text-[12px] font-medium transition-colors',
+                    filter === f
+                      ? 'bg-[#3a4530] text-white'
+                      : 'border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50',
+                  )}
+                >
+                  {t(`superadmin.halls.filter.${f}`)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Cards */}
+          {visibleHalls.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-10 text-center text-[13px] text-neutral-500">
+              {halls.length === 0 ? t('superadmin.halls.empty') : t('superadmin.halls.no_results')}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {visibleHalls.map((hall) => (
+                <VenueCard
+                  key={hall.id}
+                  hall={hall}
+                  onManage={onManage}
+                  onAdmins={onAdmins}
+                  onPay={(h) => setPayHall(h)}
+                  onArchive={onArchive}
+                  onRestore={onRestore}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* Other sections — themed placeholders that route to real data where possible */}
+      {active === 'adminlar' && <AdminlarPage />}
+      {active === 'toylar' && <ToylarPage />}
+      {active === 'tariflar' && <TariflarPage />}
+      {active === 'tolovlar' && <TolovlarPage />}
+      {active === 'hisobotlar' && <ComingSoon title={t('superadmin.nav.hisobotlar')} icon={BarChart3} />}
+      {active === 'sozlamalar' && <ComingSoon title={t('superadmin.nav.sozlamalar')} icon={SettingsIcon} />}
+      {active === 'bildirishnomalar' && <BildirishnomalarPage markRead={markRead.mutate} />}
+      {active === 'activity' && <ActivityPage />}
+
+      {addOpen && <AddHallModal onClose={() => setAddOpen(false)} />}
+      {payHall && <PaymentConfirmModal hall={payHall} onClose={() => setPayHall(null)} />}
+    </SuperAdminLayout>
+  );
+}
+
+/* ============================================================================ */
+/* Sub-pages                                                                     */
+/* ============================================================================ */
+
+function BoshSahifa({ stats, onGoToHalls, onAdd }: { stats: { total: number; active: number; trial: number; expired: number }; onGoToHalls: () => void; onAdd: () => void }) {
+  const { t } = useTranslation();
+  return (
+    <section className="space-y-5">
+      {/* 4 stat cards */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <StatCard
+          icon={Building2}
+          color="bg-[#3a4530]/10 text-[#3a4530]"
+          value={stats.total}
+          label={t('superadmin.stats.total')}
+          sub={t('superadmin.stats.totalSub')}
+        />
+        <StatCard
+          icon={ShieldCheck}
+          color="bg-emerald-50 text-emerald-700"
+          value={stats.active}
+          label={t('superadmin.stats.active')}
+          sub={t('superadmin.stats.activeSub')}
+        />
+        <StatCard
+          icon={Clock}
+          color="bg-amber-50 text-amber-700"
+          value={stats.trial}
+          label={t('superadmin.stats.trial')}
+          sub={t('superadmin.stats.trialSub')}
+        />
+        <StatCard
+          icon={AlertCircle}
+          color="bg-rose-50 text-rose-700"
+          value={stats.expired}
+          label={t('superadmin.stats.expired')}
+          sub={t('superadmin.stats.expiredSub')}
+        />
+      </div>
+
+      <div className="rounded-2xl border border-neutral-200/70 bg-white p-5">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-[16px] font-semibold text-neutral-900">{t('superadmin.halls.title')}</h2>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={onGoToHalls}>
+              {t('superadmin.all')}
+            </Button>
+            <Button size="sm" onClick={onAdd} className="bg-[#3a4530] text-white hover:bg-[#2f3827]">
+              <Plus className="mr-1 h-3.5 w-3.5" /> {t('superadmin.halls.add')}
+            </Button>
+          </div>
+        </div>
+        <p className="text-[12.5px] text-neutral-500">
+          {t('superadmin.halls.subtitle')}
+        </p>
+      </div>
+    </section>
+  );
+}
+
+function StatCard({ icon: Icon, color, value, label, sub }: { icon: React.ElementType; color: string; value: number; label: string; sub: string }) {
+  return (
+    <div className="flex items-center gap-3 rounded-2xl border border-neutral-200/70 bg-white p-4 shadow-sm">
+      <div className={cn('grid h-11 w-11 flex-shrink-0 place-items-center rounded-full', color)}>
+        <Icon className="h-5 w-5" />
+      </div>
+      <div className="min-w-0">
+        <p className="text-[22px] font-semibold leading-none text-neutral-900">{value}</p>
+        <p className="mt-0.5 truncate text-[12.5px] font-medium text-neutral-700">{label}</p>
+        <p className="truncate text-[10.5px] text-neutral-500">{sub}</p>
+      </div>
     </div>
+  );
+}
+
+function SectionHeader({ title, subtitle, right }: { title: string; subtitle: string; right?: React.ReactNode }) {
+  return (
+    <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <h2 className="text-[20px] font-semibold text-neutral-900 md:text-[22px]">{title}</h2>
+        <p className="mt-0.5 text-[12.5px] text-neutral-500">{subtitle}</p>
+      </div>
+      {right && <div className="flex-shrink-0">{right}</div>}
+    </div>
+  );
+}
+
+function ComingSoon({ title, icon: Icon }: { title: string; icon: React.ElementType }) {
+  const { t } = useTranslation();
+  return (
+    <section>
+      <SectionHeader title={title} subtitle={t('superadmin.common.coming_soon')} />
+      <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-10 text-center">
+        <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-full bg-neutral-100 text-neutral-500">
+          <Icon className="h-5 w-5" />
+        </div>
+        <p className="text-[13px] text-neutral-500">{t('superadmin.common.coming_soon')}</p>
+      </div>
+    </section>
+  );
+}
+
+/* ----- Adminlar ----- */
+function AdminlarPage() {
+  const { t } = useTranslation();
+  const { data: allAdmins } = useAdminHalls();
+  // Use existing hooks where possible
+  // For simplicity, show a minimal list from hall_admins (super admin only).
+  // Reuse the existing useHallAdmins hook.
+  return (
+    <section>
+      <SectionHeader title={t('superadmin.nav.adminlar')} subtitle={t('superadmin.allUsers')} />
+      <AdminlarList />
+    </section>
+  );
+}
+
+function AdminlarList() {
+  const { t } = useTranslation();
+  const { data: halls = [] } = useAdminHalls();
+  const { data: profiles } = useProfilesData();
+  const { data: allAdmins } = useAdminsData();
+  if (!profiles) return <div className="rounded-2xl border bg-white p-6 text-center text-[12.5px] text-neutral-500">Yuklanmoqda...</div>;
+  return (
+    <div className="rounded-2xl border border-neutral-200/70 bg-white">
+      <ul className="divide-y divide-neutral-100">
+        {profiles.map((p) => {
+          const isAdmin = allAdmins?.find((a) => a.user_id === p.user_id);
+          const hall = isAdmin ? halls.find((h) => h.id === isAdmin.hall_id) : null;
+          return (
+            <li key={p.id} className="flex items-center gap-3 px-4 py-3">
+              <span className="grid h-9 w-9 place-items-center rounded-full bg-neutral-200 text-[12px] font-semibold text-neutral-600">
+                {(p.full_name || p.email || '?').slice(0, 2).toUpperCase()}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[13.5px] font-medium text-neutral-800">{p.full_name || p.email}</p>
+                <p className="truncate text-[11.5px] text-neutral-500">{p.email}</p>
+              </div>
+              <div className="text-right">
+                {p.approved ? (
+                  <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10.5px] font-semibold text-emerald-700">{t('superadmin.approved')}</span>
+                ) : (
+                  <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10.5px] font-semibold text-amber-700">{t('superadmin.pending')}</span>
+                )}
+                {hall && <p className="mt-1 text-[10.5px] text-neutral-500">{hall.name}</p>}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+function useProfilesData() {
+  return useQuery({
+    queryKey: ['profiles'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as Array<{ id: string; user_id: string; full_name: string | null; email: string | null; avatar_url: string | null; approved: boolean | null; approved_at: string | null; created_at: string | null }>;
+    },
+  });
+}
+
+function useAdminsData() {
+  return useQuery({
+    queryKey: ['hall_admins'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('hall_admins').select('*');
+      if (error) throw error;
+      return (data ?? []) as Array<{ id: string; hall_id: string; user_id: string; email: string; full_name: string | null }>;
+    },
+  });
+}
+
+/* ----- To'ylar ----- */
+function ToylarPage() {
+  const { t } = useTranslation();
+  const { data: halls = [] } = useAdminHalls();
+  const { data: weddings } = useQuery({
+    queryKey: ['all-weddings'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('weddings').select('*').order('wedding_date', { ascending: false }).limit(200);
+      if (error) throw error;
+      return (data ?? []) as Array<{ id: string; hall_id: string; bride_name: string; groom_name: string; wedding_date: string | null; status: string | null }>;
+    },
+  });
+
+  return (
+    <section>
+      <SectionHeader title={t('superadmin.nav.toylar')} subtitle={t('superadmin.allWeddings')} />
+      <div className="rounded-2xl border border-neutral-200/70 bg-white">
+        {!weddings ? (
+          <p className="p-6 text-center text-[12.5px] text-neutral-500">{t('superadmin.loading')}</p>
+        ) : weddings.length === 0 ? (
+          <p className="p-6 text-center text-[12.5px] text-neutral-500">{t('superadmin.noWeddings')}</p>
+        ) : (
+          <ul className="divide-y divide-neutral-100">
+            {weddings.map((w) => {
+              const hall = halls.find((h) => h.id === w.hall_id);
+              return (
+                <li key={w.id} className="flex items-center gap-3 px-4 py-3">
+                  <Heart className="h-4 w-4 text-rose-500" />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[13.5px] font-medium text-neutral-800">
+                      {w.groom_name} &amp; {w.bride_name}
+                    </p>
+                    <p className="truncate text-[11.5px] text-neutral-500">{hall?.name ?? '—'}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[12px] text-neutral-700">{w.wedding_date ?? '—'}</p>
+                    <p className="text-[10.5px] text-neutral-500">{w.status}</p>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+    </section>
+  );
+}
+
+/* ----- Tariflar (plan manager) ----- */
+function TariflarPage() {
+  const { t } = useTranslation();
+  const { data: plans = [] } = useAllPlans();
+  const seed = useSeedDefaultPlans();
+  const del = useDeletePlan();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editing, setEditing] = useState<Plan | null>(null);
+
+  const openCreate = () => {
+    setEditing(null);
+    setModalOpen(true);
+  };
+  const openEdit = (p: Plan) => {
+    setEditing(p);
+    setModalOpen(true);
+  };
+  const handleDelete = async (p: Plan) => {
+    if (!confirm(t('superadmin.plans.confirm_delete'))) return;
+    try {
+      await del.mutateAsync(p.id);
+      toast.success(t('superadmin.planDeleted'));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t('superadmin.errorGeneric'));
+    }
+  };
+  const handleSeed = async () => {
+    try {
+      await seed.mutateAsync();
+      toast.success(t('superadmin.plans.seed_done'));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t('superadmin.errorGeneric'));
+    }
+  };
+
+  return (
+    <section>
+      <SectionHeader
+        title={t('superadmin.nav.tariflar')}
+        subtitle={t('superadmin.managePlans')}
+        right={
+          <div className="flex gap-2">
+            {plans.length === 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSeed}
+                disabled={seed.isPending}
+              >
+                {t('superadmin.plans.seed')}
+              </Button>
+            )}
+            <Button
+              size="sm"
+              onClick={openCreate}
+              className="rounded-lg bg-[#3a4530] px-3 py-2 text-[13px] font-medium text-white shadow-sm hover:bg-[#2f3827]"
+            >
+              <Plus className="mr-1 h-4 w-4" />
+              {t('superadmin.plans.add')}
+            </Button>
+          </div>
+        }
+      />
+
+      {plans.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-10 text-center">
+          <p className="text-[13.5px] font-medium text-neutral-800">{t('superadmin.plans.empty_title')}</p>
+          <p className="mx-auto mt-1 max-w-sm text-[12.5px] text-neutral-500">{t('superadmin.plans.empty_desc')}</p>
+          <Button
+            size="sm"
+            onClick={handleSeed}
+            disabled={seed.isPending}
+            className="mt-4 rounded-lg bg-[#3a4530] px-3 py-2 text-[13px] font-medium text-white shadow-sm hover:bg-[#2f3827]"
+          >
+            {t('superadmin.plans.seed')}
+          </Button>
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-3">
+          {plans.map((p) => (
+            <div key={p.id} className="flex flex-col rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-sm">
+              <div className="flex items-start justify-between gap-2">
+                <p className="text-[10.5px] font-semibold uppercase tracking-wider text-neutral-400">{p.code}</p>
+                <span
+                  className={cn(
+                    'rounded-full px-2 py-0.5 text-[10px] font-semibold',
+                    p.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-neutral-100 text-neutral-500',
+                  )}
+                >
+                  {p.is_active ? t('superadmin.planActive') : t('superadmin.planInactive')}
+                </span>
+              </div>
+              <p className="mt-1 text-[16px] font-semibold text-neutral-900">{p.name}</p>
+              <p className="mt-2 text-[24px] font-semibold text-[#3a4530]">
+                {formatNumber(locale, Number(p.price))}{' '}
+                <span className="text-[12px] font-normal text-neutral-500">{t('superadmin.plans.per_month')}</span>
+              </p>
+              {p.description && <p className="mt-2 text-[12.5px] text-neutral-500">{p.description}</p>}
+              <div className="mt-4 flex gap-2 border-t border-neutral-100 pt-3">
+                <button
+                  type="button"
+                  onClick={() => openEdit(p)}
+                  className="flex-1 rounded-lg border border-neutral-200 px-3 py-1.5 text-[12.5px] font-medium text-neutral-700 hover:bg-neutral-50"
+                >
+                  {t('superadmin.plans.edit')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(p)}
+                  className="flex-1 rounded-lg border border-rose-200 px-3 py-1.5 text-[12.5px] font-medium text-rose-600 hover:bg-rose-50"
+                >
+                  {t('superadmin.plans.delete')}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {modalOpen && <PlanFormModal plan={editing} onClose={() => setModalOpen(false)} />}
+    </section>
+  );
+}
+
+/* ----- To'lovlar ----- */
+function TolovlarPage() {
+  const { t } = useTranslation();
+  const { data: payments = [] } = usePayments();
+  return (
+    <section>
+      <SectionHeader title={t('superadmin.nav.tolovlar')} subtitle={t('superadmin.paymentsHistory')} />
+      <div className="rounded-2xl border border-neutral-200/70 bg-white">
+        {payments.length === 0 ? (
+          <p className="p-6 text-center text-[12.5px] text-neutral-500">{t('superadmin.noPayments')}</p>
+        ) : (
+          <ul className="divide-y divide-neutral-100">
+            {payments.map((p) => (
+              <li key={p.id} className="flex items-center gap-3 px-4 py-3">
+                <Receipt className="h-4 w-4 text-emerald-600" />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[13.5px] font-medium text-neutral-800">
+                    {p.hall?.name ?? '—'} — {p.plan?.name ?? '—'}
+                  </p>
+                  <p className="truncate text-[11.5px] text-neutral-500">
+                    {formatDate(locale, p.paid_at)}
+                  </p>
+                </div>
+                <p className="text-[13.5px] font-semibold text-neutral-800">
+                  {formatNumber(locale, Number(p.amount))} {t('common.currency')}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
+  );
+}
+
+/* ----- Bildirishnomalar ----- */
+function BildirishnomalarPage({ markRead }: { markRead: (id: string) => void }) {
+  const { t } = useTranslation();
+  const { data: notifications = [] } = useAdminNotifications(100);
+  return (
+    <section>
+      <SectionHeader title={t('superadmin.nav.bildirishnomalar')} subtitle={t('superadmin.allNotifications')} />
+      <div className="rounded-2xl border border-neutral-200/70 bg-white">
+        {notifications.length === 0 ? (
+          <p className="p-6 text-center text-[12.5px] text-neutral-500">{t('superadmin.notifications.empty')}</p>
+        ) : (
+          <ul className="divide-y divide-neutral-100">
+            {notifications.map((n) => (
+              <li
+                key={n.id}
+                className={cn('flex items-start gap-3 px-4 py-3', !n.read_at && 'bg-[#3a4530]/5')}
+              >
+                <span className={cn('mt-1.5 h-2 w-2 flex-shrink-0 rounded-full', n.read_at ? 'bg-neutral-300' : 'bg-[#3a4530]')} />
+                <div className="min-w-0 flex-1">
+                  <p className="text-[13.5px] font-semibold text-neutral-800">{n.title}</p>
+                  <p className="text-[12.5px] text-neutral-500">{n.message}</p>
+                  <p className="mt-0.5 text-[10.5px] text-neutral-400">{formatDateTime(locale, n.created_at)}</p>
+                </div>
+                {!n.read_at && (
+                  <button
+                    type="button"
+                    onClick={() => markRead(n.id)}
+                    className="text-[11.5px] font-medium text-[#3a4530] hover:underline"
+                  >
+                    {t('superadmin.markRead')}
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
+  );
+}
+
+/* ----- Activity Log ----- */
+function ActivityPage() {
+  const { t } = useTranslation();
+  const { data: logs = [] } = useActivityLogs(200);
+  return (
+    <section>
+      <SectionHeader title={t('superadmin.nav.activity')} subtitle={t('superadmin.allActions')} />
+      <div className="rounded-2xl border border-neutral-200/70 bg-white">
+        {logs.length === 0 ? (
+          <p className="p-6 text-center text-[12.5px] text-neutral-500">{t('superadmin.activity.empty')}</p>
+        ) : (
+          <ul className="divide-y divide-neutral-100">
+            {logs.map((a) => (
+              <li key={a.id} className="flex items-start gap-3 px-4 py-3">
+                <Activity className="mt-0.5 h-4 w-4 flex-shrink-0 text-neutral-400" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-[13px] text-neutral-800">
+                  {(() => {
+                    const sep = a.description.indexOf('|');
+                    if (sep <= 0) return a.description;
+                    const key = `superadmin.activity.${a.description.slice(0, sep)}`;
+                    const name = a.description.slice(sep + 1);
+                    const out = t(key, { name });
+                    return out === key ? a.description : out;
+                  })()}
+                </p>
+                  <p className="text-[10.5px] text-neutral-400">
+                    {a.actor_email ?? '—'} · {formatDateTime(locale, a.created_at)}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
   );
 }

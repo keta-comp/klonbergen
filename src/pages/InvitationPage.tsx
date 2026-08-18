@@ -292,7 +292,7 @@ export default function InvitationPage() {
   return (
     <div className="inv-final">
       <Seo
-        title={`${data.bride_name} & ${data.groom_name} — ${t("invitation.seo.titleSuffix")}`}
+        title={`${data.groom_name} & ${data.bride_name} — ${t("invitation.seo.titleSuffix")}`}
         description={t("invitation.seo.desc", { bride: data.bride_name, groom: data.groom_name, hall: data.hall_name })}
         path={`/taklifnoma/${data.slug}`}
         image={data.photos?.[0] || `${SITE_URL}/1.png`}
@@ -348,9 +348,9 @@ export default function InvitationPage() {
           <div className="inv-screen-overlay inv-screen-overlay--cover">
             <p className="inv-overlay-eyebrow">{t("invitation.cover.eyebrow")}</p>
             <h3 className="inv-overlay-names inv-cover-names">
-              {data.bride_name}
-              <span className="inv-overlay-amp">&</span>
               {data.groom_name}
+              <span className="inv-overlay-amp">&</span>
+              {data.bride_name}
             </h3>
             <p className="inv-overlay-date inv-cover-date">{dateLabel}</p>
             <p className="inv-overlay-meta" style={{ marginTop: "0.5rem" }}>
@@ -438,11 +438,11 @@ export default function InvitationPage() {
                 fontSize: "clamp(1.6rem, 4.5vw, 2.2rem)",
               }}
             >
-              {data.bride_name}
+              {data.groom_name}
               <span className="inv-overlay-amp" style={{ margin: "0 0.3rem" }}>
                 &
               </span>
-              {data.groom_name}
+              {data.bride_name}
             </p>
           </div>
         </Screen>

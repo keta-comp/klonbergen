@@ -105,7 +105,7 @@ const App = () => (
                 }
               />
               <Route
-                path="admin"
+                path="admin/*"
                 element={
                   <ProtectedRoute allow={["owner", "super_admin"]}>
                     <LocalizedSeo page="admin" noindex />
@@ -146,7 +146,7 @@ const App = () => (
             {/* Legacy unprefixed routes → locale-prefixed equivalents (no breakage) */}
             <Route path="/login" element={<LegacyRedirect to="/login" />} />
             <Route path="/super-admin" element={<LegacyRedirect to="/super-admin" />} />
-            <Route path="/admin" element={<LegacyRedirect to="/admin" />} />
+            <Route path="/admin/*" element={<LegacyRedirect to="/admin" />} />
             <Route path="/hall/:hallId" element={<LegacyRedirect to="/hall/:hallId" />} />
             <Route path="/taklifnoma/yangi" element={<LegacyRedirect to="/taklifnoma/yangi" />} />
             <Route path="/taklifnoma/:slug" element={<LegacyRedirect to="/taklifnoma/:slug" />} />

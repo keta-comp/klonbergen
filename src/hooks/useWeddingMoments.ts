@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 export interface WeddingMoment {
   id: string;
   hall_id: string;
+  wedding_id: string | null;
   image_url: string;
   storage_path: string | null;
   guest_name: string | null;
@@ -15,17 +16,15 @@ export interface WeddingMoment {
 }
 
 /** Photos of one wedding album, kept live via realtime. */
-export function useWeddingMoments(hallId?: string) {
+export function useWeddingMoments(hallId?: string, weddingId?: string | null) {
   const qc = useQueryClient();
 
   const query = useQuery({
-    queryKey: ['wedding_moments', hallId],
+    queryKey: ['wedding_moments', hallId, weddingId ?? 'all'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('wedding_moments')
-        .select('*')
-        .eq('hall_id', hallId!)
-        .order('created_at', { ascending: false });
+      let q = supabase.from('wedding_moments').select('*').eq('hall_id', hallId!);
+      if (weddingId) q = q.eq('wedding_id', weddingId);
+      const { data, error } = await q.order('created_at', { ascending: false });
       if (error) throw error;
       return data as WeddingMoment[];
     },
@@ -35,7 +34,7 @@ export function useWeddingMoments(hallId?: string) {
   useEffect(() => {
     if (!hallId) return;
     const channel = supabase
-      .channel(`moments-${hallId}`)
+      .channel(`moments-${hallId}-${weddingId ?? 'all'}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'wedding_moments', filter: `hall_id=eq.${hallId}` },
@@ -45,12 +44,12 @@ export function useWeddingMoments(hallId?: string) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [hallId, qc]);
+  }, [hallId, qc, weddingId]);
 
   return query;
 }
 
-export function useUploadMoment(hallId: string) {
+export function useUploadMoment(hallId: string, weddingId?: string | null) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({
@@ -60,8 +59,8 @@ export function useUploadMoment(hallId: string) {
       caption,
     }: { file: File; guestName?: string; tableNumber?: string | null; caption?: string }) => {
       const ext = file.name.split('.').pop() || 'jpg';
-      // Each wedding album lives in its own folder: weddings/{wedding_id}/
-      const path = `weddings/${hallId}/${crypto.randomUUID()}.${ext}`;
+      // Each wedding album lives in its own folder: weddings/{hall_id}/{wedding_id}/
+      const path = `weddings/${hallId}/${weddingId ?? 'current'}/${crypto.randomUUID()}.${ext}`;
 
       const { error: upErr } = await supabase.storage
         .from('hall-assets')
@@ -72,6 +71,7 @@ export function useUploadMoment(hallId: string) {
 
       const { error } = await supabase.from('wedding_moments').insert({
         hall_id: hallId,
+        wedding_id: weddingId ?? null,
         image_url: pub.publicUrl,
         storage_path: path,
         guest_name: guestName || null,
@@ -109,15 +109,13 @@ export function useToggleMomentApproval(hallId: string) {
   });
 }
 
-export function useRsvps(hallId?: string) {
+export function useRsvps(hallId?: string, weddingId?: string | null) {
   return useQuery({
-    queryKey: ['rsvps', hallId],
+    queryKey: ['rsvps', hallId, weddingId ?? 'all'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('rsvps')
-        .select('*')
-        .eq('hall_id', hallId!)
-        .order('created_at', { ascending: false });
+      let q = supabase.from('rsvps').select('*').eq('hall_id', hallId!);
+      if (weddingId) q = q.eq('wedding_id', weddingId);
+      const { data, error } = await q.order('created_at', { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -125,7 +123,8 @@ export function useRsvps(hallId?: string) {
   });
 }
 
-export function useSendRsvp(hallId: string) {
+export function useSendRsvp(hallId: string, weddingId?: string | null) {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: async (payload: {
       guest_name: string;
@@ -135,8 +134,10 @@ export function useSendRsvp(hallId: string) {
       message?: string;
       table_number?: string | null;
     }) => {
-      const { error } = await supabase.from('rsvps').insert({ ...payload, hall_id: hallId });
+      const { error } = await supabase.from('rsvps').insert({ ...payload, hall_id: hallId, wedding_id: weddingId ?? null });
       if (error) throw error;
     },
+    // keep the admin RSVP list (keyed by ['rsvps', hallId, ...]) fresh after a guest submits
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['rsvps', hallId] }),
   });
 }
