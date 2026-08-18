@@ -305,6 +305,49 @@ export function useRestoreHall() {
   });
 }
 
+/**
+ * Permanently delete a hall (super_admin only).
+ *
+ * Cascade: PostgREST only succeeds if the FK constraints allow it. If the hall
+ * has related rows that block deletion (e.g. weddings without ON DELETE CASCADE),
+ * the error from `.delete()` will surface — caller should show the message.
+ * `hall_admins` rows are removed first to give a clean delete even without a
+ * DB-level CASCADE on that FK.
+ */
+export function useDeleteHall() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (hallId: string) => {
+      // Best-effort cleanup of hall_admins first so the wedding_halls DELETE
+      // doesn't fail on FK. Errors are ignored — if no rows exist or RLS blocks,
+      // the wedding_halls DELETE will still report the real failure.
+      await supabase.from('hall_admins').delete().eq('hall_id', hallId);
+
+      const { error } = await supabase.from('wedding_halls').delete().eq('id', hallId);
+      if (error) throw error;
+
+      // Log after a successful delete (use a sentinel hall_id='00000000-0000-0000-0000-000000000000'
+      // only if the column is nullable; here we leave hall_id as the deleted id so the log is
+      // traceable in audit trails).
+      const { data: u } = await supabase.auth.getUser();
+      await supabase.from('activity_logs').insert({
+        actor_id: u.user?.id ?? null,
+        actor_email: u.user?.email ?? null,
+        hall_id: hallId,
+        action: 'hall_deleted',
+        description: 'hall_deleted|',
+      });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-halls'] });
+      qc.invalidateQueries({ queryKey: ['wedding_halls'] });
+      qc.invalidateQueries({ queryKey: ['activity-logs'] });
+      qc.invalidateQueries({ queryKey: ['hall-admin-counts'] });
+      qc.invalidateQueries({ queryKey: ['hall-wedding-counts'] });
+    },
+  });
+}
+
 /** Trigger the auto-notification sync RPC (idempotent). */
 export function useSyncSubscriptionNotifications() {
   const qc = useQueryClient();

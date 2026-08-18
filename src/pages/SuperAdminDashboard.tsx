@@ -21,6 +21,7 @@ import {
   useActivityLogs,
   useArchiveHall,
   useRestoreHall,
+  useDeleteHall,
   useMarkNotificationRead,
 } from '@/hooks/useAdminData';
 import { daysRemaining } from '@/lib/subscription';
@@ -55,6 +56,7 @@ export default function SuperAdminDashboard() {
   const { data: allSubs = [] } = useAllSubscriptions();
   const archive = useArchiveHall();
   const restore = useRestoreHall();
+  const remove = useDeleteHall();
   const markRead = useMarkNotificationRead();
 
   // ---- Stat computation (real data) -----------------------------------------
@@ -123,6 +125,15 @@ export default function SuperAdminDashboard() {
   };
   const onRestore = async (hall: Hall) => {
     await restore.mutateAsync(hall.id);
+  };
+  const onDelete = async (hall: Hall) => {
+    if (!confirm(t('superadmin.deleteConfirm', { name: hall.name }))) return;
+    try {
+      await remove.mutateAsync(hall.id);
+      toast.success(t('superadmin.deleted', { name: hall.name }));
+    } catch (e) {
+      toast.error(t('superadmin.deleteFailed', { message: (e as Error).message }));
+    }
   };
 
   return (
@@ -198,6 +209,7 @@ export default function SuperAdminDashboard() {
                   onPay={(h) => setPayHall(h)}
                   onArchive={onArchive}
                   onRestore={onRestore}
+                  onDelete={onDelete}
                 />
               ))}
             </div>

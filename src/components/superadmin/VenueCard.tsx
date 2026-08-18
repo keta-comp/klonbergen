@@ -9,7 +9,7 @@
  * Action buttons never shrink (flex-shrink-0) so labels can't be clipped/overlapped.
  */
 import { useState } from 'react';
-import { Building2, MapPin, Phone, Users, Heart, MoreVertical, Settings, Archive, ArchiveRestore, CreditCard } from 'lucide-react';
+import { Building2, MapPin, Phone, Users, Heart, MoreVertical, Settings, Archive, ArchiveRestore, CreditCard, Trash2 } from 'lucide-react';
 import { useTranslation } from '@/i18n/LanguageContext';
 import { formatNumber, formatDate as formatLocaleDate } from '@/i18n/format';
 import { useHallSubscription, useHallWeddingCounts, useHallAdminCounts } from '@/hooks/useAdminData';
@@ -26,9 +26,10 @@ interface Props {
   onPay: (hall: Hall) => void;
   onArchive: (hall: Hall) => void;
   onRestore: (hall: Hall) => void;
+  onDelete: (hall: Hall) => void;
 }
 
-export default function VenueCard({ hall, onManage, onAdmins, onPay, onArchive, onRestore }: Props) {
+export default function VenueCard({ hall, onManage, onAdmins, onPay, onArchive, onRestore, onDelete }: Props) {
   const { t, locale } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const { data: sub } = useHallSubscription(hall.id);
@@ -217,6 +218,13 @@ export default function VenueCard({ hall, onManage, onAdmins, onPay, onArchive, 
                     <Archive className="h-3.5 w-3.5" /> {t('superadmin.halls.actions.archive')}
                   </button>
                 )}
+                <button
+                  type="button"
+                  onClick={() => { setMenuOpen(false); onDelete(hall); }}
+                  className="flex w-full items-center gap-2 border-t border-neutral-100 px-3 py-1.5 text-left text-[12.5px] text-rose-600 hover:bg-rose-50"
+                >
+                  <Trash2 className="h-3.5 w-3.5" /> {t('superadmin.halls.actions.delete')}
+                </button>
               </div>
             )}
           </div>
