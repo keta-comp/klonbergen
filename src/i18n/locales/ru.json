@@ -721,6 +721,34 @@
         "generate": "Создать пароль",
         "error": "Ошибка: {message}"
       }
+    },
+    "sozlamalar": {
+      "title": "Настройки",
+      "subtitle": "Управление параметрами платформы",
+      "plans_title": "Тарифные планы",
+      "plans_sub": "Создание, редактирование и удаление тарифных пакетов для залов",
+      "plans_empty_title": "Тарифов ещё нет",
+      "plans_empty_desc": "Создайте первый тариф или нажмите кнопку ниже, чтобы добавить стандартные тарифы одним кликом.",
+      "plans_seed": "Добавить стандартные тарифы",
+      "plans_seed_done": "Стандартные тарифы добавлены",
+      "plans_seed_failed": "Не удалось добавить тарифы",
+      "plans_active": "Активен",
+      "plans_inactive": "Отключён",
+      "plans_edit": "Изменить",
+      "plans_delete": "Удалить",
+      "plans_period": "{days} дн.",
+      "plans_price": "{price} сум",
+      "plans_confirm_delete": "Этот тариф будет удалён. Продолжить?",
+      "platform_title": "Параметры платформы",
+      "platform_sub": "Глобальные настройки платформы",
+      "platform_trial_days": "Пробный период (дней)",
+      "platform_trial_days_hint": "Выдаётся автоматически при добавлении нового зала",
+      "platform_support_email": "Email поддержки",
+      "platform_support_phone": "Телефон поддержки",
+      "platform_default_currency": "Символ валюты",
+      "platform_save": "Сохранить",
+      "platform_saved": "Параметры платформы сохранены",
+      "platform_save_failed": "Не удалось сохранить"
     }
   },
   "admin": {

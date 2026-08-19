@@ -23,6 +23,11 @@ import {
   useRestoreHall,
   useDeleteHall,
   useMarkNotificationRead,
+  useAllPlans,
+  useUpsertPlan,
+  useDeletePlan,
+  useSeedDefaultPlans,
+  type Plan,
 } from '@/hooks/useAdminData';
 import { daysRemaining } from '@/lib/subscription';
 
@@ -31,6 +36,8 @@ import VenueCard from '@/components/superadmin/VenueCard';
 import AddHallModal from '@/components/superadmin/AddHallModal';
 import AddAdminModal from '@/components/superadmin/AddAdminModal';
 import PaymentConfirmModal from '@/components/superadmin/PaymentConfirmModal';
+import PlanFormModal from '@/components/superadmin/PlanFormModal';
+import { Pencil, Trash2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -223,7 +230,7 @@ export default function SuperAdminDashboard() {
       {active === 'toylar' && <ToylarPage />}
       {active === 'tolovlar' && <TolovlarPage />}
       {active === 'hisobotlar' && <ComingSoon title={t('superadmin.nav.hisobotlar')} icon={BarChart3} />}
-      {active === 'sozlamalar' && <ComingSoon title={t('superadmin.nav.sozlamalar')} icon={SettingsIcon} />}
+      {active === 'sozlamalar' && <SozlamalarPage />}
       {active === 'bildirishnomalar' && <BildirishnomalarPage markRead={markRead.mutate} />}
       {active === 'activity' && <ActivityPage />}
 
@@ -588,5 +595,317 @@ function ActivityPage() {
         )}
       </div>
     </section>
+  );
+}
+
+/* ----- Sazlawlar ----- */
+/**
+ * Platform-wide settings: subscription plans CRUD + lightweight platform config
+ * (trial period, support contacts, currency symbol) persisted to localStorage.
+ * The plans table is real (Supabase); the platform config is intentionally
+ * local-first because it has no DB schema yet — easy to migrate later when the
+ * platform_settings table exists.
+ */
+function SozlamalarPage() {
+  const { t } = useTranslation();
+  const { data: plans = [], isLoading: plansLoading } = useAllPlans();
+  const deletePlan = useDeletePlan();
+  const seedPlans = useSeedDefaultPlans();
+  const [planForm, setPlanForm] = useState<Plan | 'new' | null>(null);
+
+  return (
+    <section className="space-y-5">
+      <SectionHeader
+        title={t('superadmin.sozlamalar.title')}
+        subtitle={t('superadmin.sozlamalar.subtitle')}
+      />
+
+      {/* Plans card */}
+      <div className="rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-sm">
+        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="text-[15px] font-semibold text-neutral-900">
+              {t('superadmin.sozlamalar.plans_title')}
+            </h3>
+            <p className="mt-0.5 text-[12.5px] text-neutral-500">
+              {t('superadmin.sozlamalar.plans_sub')}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {plans.length === 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  try {
+                    await seedPlans.mutateAsync();
+                    toast.success(t('superadmin.sozlamalar.plans_seed_done'));
+                  } catch (e) {
+                    toast.error(
+                      t('superadmin.sozlamalar.plans_seed_failed') +
+                        ': ' +
+                        (e as Error).message,
+                    );
+                  }
+                }}
+                disabled={seedPlans.isPending}
+                className="border-neutral-200"
+              >
+                <Sparkles className="mr-1 h-3.5 w-3.5" />
+                {t('superadmin.sozlamalar.plans_seed')}
+              </Button>
+            )}
+            <Button
+              size="sm"
+              onClick={() => setPlanForm('new')}
+              className="bg-[#3a4530] text-white hover:bg-[#2f3827]"
+            >
+              <Plus className="mr-1 h-3.5 w-3.5" />
+              {t('superadmin.plans.add')}
+            </Button>
+          </div>
+        </div>
+
+        {plansLoading ? (
+          <p className="p-6 text-center text-[12.5px] text-neutral-500">
+            {t('superadmin.loading')}
+          </p>
+        ) : plans.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-neutral-300 bg-neutral-50/50 p-8 text-center">
+            <p className="text-[13px] font-medium text-neutral-700">
+              {t('superadmin.sozlamalar.plans_empty_title')}
+            </p>
+            <p className="mt-1 text-[12px] text-neutral-500">
+              {t('superadmin.sozlamalar.plans_empty_desc')}
+            </p>
+          </div>
+        ) : (
+          <ul className="divide-y divide-neutral-100">
+            {plans.map((p) => (
+              <li
+                key={p.id}
+                className="flex items-center gap-3 py-3 first:pt-0 last:pb-0"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-[13.5px] font-semibold text-neutral-900">
+                      {p.name}
+                    </p>
+                    {p.is_active ? (
+                      <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10.5px] font-semibold text-emerald-700">
+                        {t('superadmin.sozlamalar.plans_active')}
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10.5px] font-semibold text-neutral-600">
+                        {t('superadmin.sozlamalar.plans_inactive')}
+                      </span>
+                    )}
+                    <span className="rounded-full bg-[#3a4530]/10 px-2 py-0.5 text-[10px] font-mono text-[#3a4530]">
+                      {p.code}
+                    </span>
+                  </div>
+                  <p className="mt-0.5 text-[11.5px] text-neutral-500">
+                    {formatNumber(undefined, Number(p.price))} {t('common.currency')}
+                    {' · '}
+                    {t('superadmin.sozlamalar.plans_period', { days: p.period_days })}
+                    {p.description ? ` · ${p.description}` : ''}
+                  </p>
+                </div>
+                <div className="flex flex-shrink-0 gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setPlanForm(p)}
+                    className="grid h-8 w-8 place-items-center rounded-md border border-neutral-200 bg-white text-neutral-600 transition-colors hover:bg-neutral-50"
+                    title={t('superadmin.sozlamalar.plans_edit')}
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (
+                        !confirm(t('superadmin.sozlamalar.plans_confirm_delete'))
+                      )
+                        return;
+                      try {
+                        await deletePlan.mutateAsync(p.id);
+                        toast.success(t('superadmin.planDeleted'));
+                      } catch (e) {
+                        toast.error(
+                          t('superadmin.errorGeneric') +
+                            ': ' +
+                            (e as Error).message,
+                        );
+                      }
+                    }}
+                    disabled={deletePlan.isPending}
+                    className="grid h-8 w-8 place-items-center rounded-md border border-neutral-200 bg-white text-rose-600 transition-colors hover:bg-rose-50 disabled:opacity-50"
+                    title={t('superadmin.sozlamalar.plans_delete')}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {/* Platform settings card (localStorage) */}
+      <PlatformSettingsCard />
+
+      {planForm && (
+        <PlanFormModal
+          plan={planForm === 'new' ? null : planForm}
+          onClose={() => setPlanForm(null)}
+        />
+      )}
+    </section>
+  );
+}
+
+interface PlatformSettings {
+  trial_days: number;
+  support_email: string;
+  support_phone: string;
+  default_currency: string;
+}
+
+const PLATFORM_SETTINGS_KEY = 'vowly_platform_settings_v1';
+
+function loadPlatformSettings(): PlatformSettings {
+  if (typeof window === 'undefined') return defaults();
+  try {
+    const raw = window.localStorage.getItem(PLATFORM_SETTINGS_KEY);
+    if (!raw) return defaults();
+    const parsed = JSON.parse(raw) as Partial<PlatformSettings>;
+    return {
+      trial_days:
+        typeof parsed.trial_days === 'number' && parsed.trial_days >= 0
+          ? parsed.trial_days
+          : 7,
+      support_email: parsed.support_email ?? '',
+      support_phone: parsed.support_phone ?? '',
+      default_currency: parsed.default_currency ?? "so'm",
+    };
+  } catch {
+    return defaults();
+  }
+}
+
+function defaults(): PlatformSettings {
+  return { trial_days: 7, support_email: '', support_phone: '', default_currency: "so'm" };
+}
+
+function PlatformSettingsCard() {
+  const { t } = useTranslation();
+  const [settings, setSettings] = useState<PlatformSettings>(() => loadPlatformSettings());
+  const [saving, setSaving] = useState(false);
+
+  const onSave = async () => {
+    setSaving(true);
+    try {
+      // Simulated persist — replace with a Supabase mutation when the
+      // platform_settings table is provisioned.
+      await new Promise((r) => setTimeout(r, 250));
+      window.localStorage.setItem(PLATFORM_SETTINGS_KEY, JSON.stringify(settings));
+      toast.success(t('superadmin.sozlamalar.platform_saved'));
+    } catch (e) {
+      toast.error(
+        t('superadmin.sozlamalar.platform_save_failed') +
+          ': ' +
+          (e as Error).message,
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-sm">
+      <div className="mb-4">
+        <h3 className="text-[15px] font-semibold text-neutral-900">
+          {t('superadmin.sozlamalar.platform_title')}
+        </h3>
+        <p className="mt-0.5 text-[12.5px] text-neutral-500">
+          {t('superadmin.sozlamalar.platform_sub')}
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label className="mb-1.5 block text-[12px] font-medium text-neutral-700">
+            {t('superadmin.sozlamalar.platform_trial_days')}
+          </label>
+          <Input
+            type="number"
+            min={0}
+            max={365}
+            value={settings.trial_days}
+            onChange={(e) =>
+              setSettings((s) => ({
+                ...s,
+                trial_days: Math.max(0, Number(e.target.value) || 0),
+              }))
+            }
+          />
+          <p className="mt-1 text-[11px] text-neutral-500">
+            {t('superadmin.sozlamalar.platform_trial_days_hint')}
+          </p>
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-[12px] font-medium text-neutral-700">
+            {t('superadmin.sozlamalar.platform_default_currency')}
+          </label>
+          <Input
+            type="text"
+            maxLength={8}
+            value={settings.default_currency}
+            onChange={(e) =>
+              setSettings((s) => ({ ...s, default_currency: e.target.value }))
+            }
+          />
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-[12px] font-medium text-neutral-700">
+            {t('superadmin.sozlamalar.platform_support_email')}
+          </label>
+          <Input
+            type="email"
+            value={settings.support_email}
+            placeholder="support@vowly.uz"
+            onChange={(e) =>
+              setSettings((s) => ({ ...s, support_email: e.target.value }))
+            }
+          />
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-[12px] font-medium text-neutral-700">
+            {t('superadmin.sozlamalar.platform_support_phone')}
+          </label>
+          <Input
+            type="tel"
+            value={settings.support_phone}
+            placeholder="+998 ..."
+            onChange={(e) =>
+              setSettings((s) => ({ ...s, support_phone: e.target.value }))
+            }
+          />
+        </div>
+      </div>
+
+      <div className="mt-4 flex justify-end">
+        <Button
+          onClick={onSave}
+          disabled={saving}
+          className="bg-[#3a4530] text-white hover:bg-[#2f3827] disabled:bg-neutral-300"
+        >
+          {saving ? t('superadmin.plans.saving') : t('superadmin.sozlamalar.platform_save')}
+        </Button>
+      </div>
+    </div>
   );
 }

@@ -721,6 +721,34 @@
         "generate": "Parol yaratish",
         "error": "Xatolik: {message}"
       }
+    },
+    "sozlamalar": {
+      "title": "Sozlamalar",
+      "subtitle": "Platforma va tariflarni boshqarish",
+      "plans_title": "Abonement tariflari",
+      "plans_sub": "To'yxonalar uchun tarif paketlarini yaratish, tahrirlash va o'chirish",
+      "plans_empty_title": "Tariflar yo'q",
+      "plans_empty_desc": "Birinchi tarifni yarating yoki quyidagi tugmani bosib standart tariflarni qo'shing.",
+      "plans_seed": "Standart tariflarni qo'shish",
+      "plans_seed_done": "Standart tariflar qo'shildi",
+      "plans_seed_failed": "Tarif qo'shishda xatolik",
+      "plans_active": "Faol",
+      "plans_inactive": "O'chirilgan",
+      "plans_edit": "Tahrirlash",
+      "plans_delete": "O'chirish",
+      "plans_period": "{days} kun",
+      "plans_price": "{price} so'm",
+      "plans_confirm_delete": "Bu tarif o'chiriladi. Davom etamizmi?",
+      "platform_title": "Platforma sozlamalari",
+      "platform_sub": "Umumiy platforma ko'rsatkichlari",
+      "platform_trial_days": "Sinov muddati (kun)",
+      "platform_trial_days_hint": "Yangi to'yxana qo'shilganda avtomatik beriladi",
+      "platform_support_email": "Qo'llab-quvvatlash emaili",
+      "platform_support_phone": "Qo'llab-quvvatlash telefoni",
+      "platform_default_currency": "Valyuta belgisi",
+      "platform_save": "Saqlash",
+      "platform_saved": "Platforma sozlamalari saqlandi",
+      "platform_save_failed": "Saqlashda xatolik"
     }
   },
   "admin": {

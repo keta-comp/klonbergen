@@ -721,6 +721,34 @@
         "generate": "Parol jaratıw",
         "error": "Xatolıq: {message}"
       }
+    },
+    "sozlamalar": {
+      "title": "Sazlawlar",
+      "subtitle": "Platforma hám tarifferdi basqarıw",
+      "plans_title": "Abunalıq tarifleri",
+      "plans_sub": "Toyxanalar ushın tarif paketlerin jaratıw, tahrirlaw hám óshiriw",
+      "plans_empty_title": "Tariffer joq",
+      "plans_empty_desc": "Birinshi tarifińizdi jaratıń yaki tómendegi túymeni basıp standart tarifferdi qosıń.",
+      "plans_seed": "Standart tarifferdi qosıw",
+      "plans_seed_done": "Standart tariffer qosıldı",
+      "plans_seed_failed": "Tarifferdi qosıwda qátelik",
+      "plans_active": "Aktiv",
+      "plans_inactive": "Óshirilgen",
+      "plans_edit": "Tahrirlaw",
+      "plans_delete": "Óshiriw",
+      "plans_period": "{days} kún",
+      "plans_price": "{price} som",
+      "plans_confirm_delete": "Bul tarif óshiriledi. Dawam etemizbe?",
+      "platform_title": "Platforma sazlawları",
+      "platform_sub": "Umumiy platforma kórsetkishleri",
+      "platform_trial_days": "Sınaw múddeti (kún)",
+      "platform_trial_days_hint": "Jańa toyxana qosılǵanda avtomatik beriledi",
+      "platform_support_email": "Qollap-quwatlaw emaili",
+      "platform_support_phone": "Qollap-quwatlaw telefoni",
+      "platform_default_currency": "Valyuta belgisi",
+      "platform_save": "Saqlaw",
+      "platform_saved": "Platforma sazlawları saqlandı",
+      "platform_save_failed": "Saqlawda qátelik"
     }
   },
   "admin": {

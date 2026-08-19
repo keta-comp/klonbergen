@@ -721,6 +721,34 @@
         "generate": "Generate password",
         "error": "Error: {message}"
       }
+    },
+    "sozlamalar": {
+      "title": "Settings",
+      "subtitle": "Manage platform-wide settings",
+      "plans_title": "Subscription plans",
+      "plans_sub": "Create, edit and delete venue subscription packages",
+      "plans_empty_title": "No plans yet",
+      "plans_empty_desc": "Create your first plan or click the button below to add the standard plans in one click.",
+      "plans_seed": "Add standard plans",
+      "plans_seed_done": "Standard plans added",
+      "plans_seed_failed": "Failed to seed plans",
+      "plans_active": "Active",
+      "plans_inactive": "Inactive",
+      "plans_edit": "Edit",
+      "plans_delete": "Delete",
+      "plans_period": "{days} days",
+      "plans_price": "{price} UZS",
+      "plans_confirm_delete": "This plan will be deleted. Continue?",
+      "platform_title": "Platform settings",
+      "platform_sub": "Global platform configuration",
+      "platform_trial_days": "Trial period (days)",
+      "platform_trial_days_hint": "Granted automatically when a new venue is added",
+      "platform_support_email": "Support email",
+      "platform_support_phone": "Support phone",
+      "platform_default_currency": "Currency symbol",
+      "platform_save": "Save",
+      "platform_saved": "Platform settings saved",
+      "platform_save_failed": "Failed to save"
     }
   },
   "admin": {
