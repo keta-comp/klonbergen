@@ -219,19 +219,11 @@
       "message": {
         "label": "Invitation text",
         "sub": "A word to guests"
-      },
-      "gallery": {
-        "label": "Photos",
-        "sub": "Cover and gallery"
-      },
-      "template": {
-        "label": "Template",
-        "sub": "Final style"
       }
     },
     "couple": {
-      "t1": "Bride",
-      "t2": "Groom",
+      "t1": "Groom",
+      "t2": "Bride",
       "sub": "Both names appear on every page of the invitation. Letters are written instantly and reflected live in the preview.",
       "bride": "Bride name",
       "bridePh": "Aygúl",
@@ -749,6 +741,31 @@
       "platform_save": "Save",
       "platform_saved": "Platform settings saved",
       "platform_save_failed": "Failed to save"
+    },
+    "hisobotlar": {
+      "title": "Reports",
+      "subtitle": "Platform financial and operational metrics",
+      "revenue_total": "Total revenue",
+      "revenue_sub": "Across all payments",
+      "active_halls": "Active venues",
+      "active_halls_sub": "Currently subscribed",
+      "mrr": "Monthly recurring revenue",
+      "mrr_sub": "From active subscriptions",
+      "churn": "Churn rate",
+      "churn_sub": "Expired / inactive",
+      "no_payments": "No payments yet",
+      "no_subscriptions": "No subscriptions found",
+      "revenue_timeline": "Payment timeline",
+      "plan_distribution": "Plan distribution",
+      "plan_name": "Plan",
+      "plan_count": "Subscriptions",
+      "plan_revenue": "Revenue",
+      "top_halls": "Top venues",
+      "hall_name": "Venue",
+      "hall_revenue": "Revenue",
+      "hall_weddings": "Weddings",
+      "no_data": "Not enough data for reports",
+      "loading_data": "Loading data..."
     }
   },
   "admin": {
@@ -958,7 +975,17 @@
       "save": "Save",
       "updated": "Artist updated!",
       "added": "Artist added!",
-      "deleted": "Artist deleted!"
+      "deleted": "Artist deleted!",
+      "imageLabel": "Artist image",
+      "selectImage": "Select image",
+      "replaceImage": "Replace image",
+      "removeImage": "Remove image",
+      "uploading": "Uploading...",
+      "fileTooLarge": "File is too large",
+      "unsupportedFormat": "Unsupported format",
+      "formatHint": "JPG, JPEG, PNG, WEBP",
+      "imgError": "Image upload failed",
+      "saveError": "Save failed"
     },
     "banners": {
       "coupleLabel": "Bride & groom",

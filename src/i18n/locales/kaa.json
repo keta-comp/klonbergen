@@ -219,19 +219,11 @@
       "message": {
         "label": "Taklif mátni",
         "sub": "Meymanlarǵa sóz"
-      },
-      "gallery": {
-        "label": "Súwretler",
-        "sub": "Cover hám galereya"
-      },
-      "template": {
-        "label": "Shablon",
-        "sub": "Axırǵı usıl"
       }
     },
     "couple": {
-      "t1": "Kelin",
-      "t2": "Kúyew",
+      "t1": "Kúyew",
+      "t2": "Kelin",
       "sub": "Eki at ta taklifnamanıń hárbir betinde kórinedi. Xáripler derrew jazıladı hám previewde jonli aks etedi.",
       "bride": "Kelin atı",
       "bridePh": "Aygúl",
@@ -749,6 +741,31 @@
       "platform_save": "Saqlaw",
       "platform_saved": "Platforma sazlawları saqlandı",
       "platform_save_failed": "Saqlawda qátelik"
+    },
+    "hisobotlar": {
+      "title": "Esabatlar",
+      "subtitle": "Platforma finansalıq hám operacion kórsetkishleri",
+      "revenue_total": "Umumiy tabıs",
+      "revenue_sub": "Barlıq tólemler boyınsha",
+      "active_halls": "Aktiv toyxonalar",
+      "active_halls_sub": "Xizmet kórsetilmekte",
+      "mrr": "Aylıq dárim (MRR)",
+      "mrr_sub": "Aktiv abonementlerden",
+      "churn": "Shıǵıw darajası",
+      "churn_sub": "Múddeti pitken/aktiv emes",
+      "no_payments": "Házirshe tólemler joq",
+      "no_subscriptions": "Abonementler tabılmadı",
+      "revenue_timeline": "Tólemler zamaniy tártibi",
+      "plan_distribution": "Tarifler boyınsha bólistiriw",
+      "plan_name": "Tarif",
+      "plan_count": "Abonementler",
+      "plan_revenue": "Tabıs",
+      "top_halls": "Jetekshi toyxonalar",
+      "hall_name": "Toyxana",
+      "hall_revenue": "Tabıs",
+      "hall_weddings": "Toylar",
+      "no_data": "Esabat ushın maǵliwmat jetkiliksiz",
+      "loading_data": "Maǵliwmat juklenbekte..."
     }
   },
   "admin": {
@@ -958,7 +975,17 @@
       "save": "Saqlaw",
       "updated": "Artist jańalandı!",
       "added": "Artist qosıldı!",
-      "deleted": "Artist oshirildi!"
+      "deleted": "Artist oshirildi!",
+      "imageLabel": "Artist súwreti",
+      "selectImage": "Súwret saylań",
+      "replaceImage": "Súwreti almastırıw",
+      "removeImage": "Súwreti oshiriw",
+      "uploading": "Júklendi...",
+      "fileTooLarge": "Fayl ólşemi óte úlken",
+      "unsupportedFormat": "Qollanbaytuǵın format",
+      "formatHint": "JPG, JPEG, PNG, WEBP",
+      "imgError": "Súwret júklenbegi",
+      "saveError": "Saqlawda qátelik"
     },
     "banners": {
       "coupleLabel": "Kelin ha'm kuyew",

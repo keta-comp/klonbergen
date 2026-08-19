@@ -76,7 +76,7 @@ export default function TimelineManager({ hallId }: Props) {
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-xl font-serif font-semibold">{t('admin.timeline.heading')}</h3>
+        <h3 className="text-lg font-serif font-semibold sm:text-xl">{t('admin.timeline.heading')}</h3>
         <div className="flex gap-2">
           {!isLoading && (items?.length ?? 0) === 0 && (
             <Button variant="outline" onClick={loadPreset}>{t('admin.timeline.presetBtn')}</Button>
@@ -128,8 +128,10 @@ export default function TimelineManager({ hallId }: Props) {
                       {item.description ? ` · ${item.description}` : ''}
                     </p>
                   </div>
-                  <Button size="icon" variant="ghost" onClick={() => handleEdit(item)}><Edit2 className="h-4 w-4" /></Button>
-                  <Button size="icon" variant="ghost" onClick={() => remove.mutate(item.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                  <div className="flex items-center gap-1">
+                    <Button size="icon" variant="ghost" className="h-11 w-11 sm:h-9 sm:w-9" onClick={() => handleEdit(item)}><Edit2 className="h-4 w-4" /></Button>
+                    <Button size="icon" variant="ghost" className="h-11 w-11 sm:h-9 sm:w-9" onClick={() => remove.mutate(item.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>

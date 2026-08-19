@@ -102,7 +102,7 @@ export default function MusicManager({ hallId }: Props) {
   return (
     <div className="max-w-md space-y-5">
       <div>
-        <h3 className="text-xl font-bold font-serif mb-1">{t('message.musicHeading')}</h3>
+        <h3 className="text-lg font-bold font-serif mb-1 sm:text-xl">{t('message.musicHeading')}</h3>
         <p className="text-sm text-muted-foreground">{t('message.musicDesc')}</p>
       </div>
 

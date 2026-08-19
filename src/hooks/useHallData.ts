@@ -212,7 +212,7 @@ export function useMutateArtist(hallId: string, weddingId?: string | null) {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['artists', hallId] }),
   });
   const update = useMutation({
-    mutationFn: async ({ id, ...rest }: { id: string; name?: string; performance_time?: string; description?: string }) => {
+    mutationFn: async ({ id, ...rest }: { id: string; name?: string; performance_time?: string; description?: string; image_url?: string | null }) => {
       const { error } = await supabase.from('artists').update(rest).eq('id', id);
       if (error) throw error;
     },

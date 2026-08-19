@@ -54,7 +54,7 @@ export default function MomentsManager({ hallId }: { hallId: string }) {
                   <Button
                     size="sm"
                     variant={m.approved ? 'secondary' : 'default'}
-                    className="h-7 flex-1 text-[11px]"
+                    className="h-9 flex-1 text-[11px] sm:h-8"
                     onClick={() => toggle.mutate({ id: m.id, approved: !m.approved })}
                   >
                     {m.approved ? <><X className="mr-1 h-3 w-3" /> {t('admin.moments.hide')}</> : <><Check className="mr-1 h-3 w-3" /> {t('admin.moments.show')}</>}
@@ -62,7 +62,7 @@ export default function MomentsManager({ hallId }: { hallId: string }) {
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="h-7 w-7"
+                    className="h-11 w-11 sm:h-9 sm:w-9"
                     onClick={async () => {
                       if (!confirm(t('admin.moments.confirmDelete'))) return;
                       await remove.mutateAsync(m);

@@ -219,19 +219,11 @@
       "message": {
         "label": "Taklif matni",
         "sub": "Mehmonlarga so'z"
-      },
-      "gallery": {
-        "label": "Rasmlar",
-        "sub": "Muqova va galereya"
-      },
-      "template": {
-        "label": "Shablon",
-        "sub": "Yakuniy uslub"
       }
     },
     "couple": {
-      "t1": "Kelin",
-      "t2": "Kuyov",
+      "t1": "Kuyov",
+      "t2": "Kelin",
       "sub": "Ikkala ism taklifnomaning har bir sahifasida ko'rinadi. Harflar darhol yoziladi va prevyuda jonli aks etadi.",
       "bride": "Kelin ismi",
       "bridePh": "Aygúl",
@@ -749,6 +741,31 @@
       "platform_save": "Saqlash",
       "platform_saved": "Platforma sozlamalari saqlandi",
       "platform_save_failed": "Saqlashda xatolik"
+    },
+    "hisobotlar": {
+      "title": "Hisobotlar",
+      "subtitle": "Platforma moliyaviy va operatsion ko'rsatkichlari",
+      "revenue_total": "Umumiy daromad",
+      "revenue_sub": "Barcha to'lovlar bo'yicha",
+      "active_halls": "Faol to'yxonalar",
+      "active_halls_sub": "Xizmat ko'rsatilmoqda",
+      "mrr": "Oylik takrorlanuvchi daromad",
+      "mrr_sub": "Faol abonementlardan",
+      "churn": "Chiqish darajasi",
+      "churn_sub": "Muddati o'tgan / nofaol",
+      "no_payments": "Hozircha to'lovlar yo'q",
+      "no_subscriptions": "Abonementlar topilmadi",
+      "revenue_timeline": "To'lovlar tarixi",
+      "plan_distribution": "Tariflar bo'yicha taqsimot",
+      "plan_name": "Tarif",
+      "plan_count": "Abonementlar",
+      "plan_revenue": "Daromad",
+      "top_halls": "Yetakchi to'yxonalar",
+      "hall_name": "To'yxona",
+      "hall_revenue": "Daromad",
+      "hall_weddings": "Toylar",
+      "no_data": "Hisobot uchun ma'lumot yetarli emas",
+      "loading_data": "Ma'lumot yuklanmoqda..."
     }
   },
   "admin": {
@@ -958,7 +975,17 @@
       "save": "Saqlash",
       "updated": "Artist yangilandi!",
       "added": "Artist qo'shildi!",
-      "deleted": "Artist o'chirildi!"
+      "deleted": "Artist o'chirildi!",
+      "imageLabel": "Artist rasmi",
+      "selectImage": "Rasmni tanlash",
+      "replaceImage": "Rasmni almashtirish",
+      "removeImage": "Rasmni o'chirish",
+      "uploading": "Yuklanmoqda...",
+      "fileTooLarge": "Fayl hajmi juda katta",
+      "unsupportedFormat": "Qo'llab-quvvatlanmaydigan format",
+      "formatHint": "JPG, JPEG, PNG, WEBP",
+      "imgError": "Rasm yuklanmadi",
+      "saveError": "Saqlashda xatolik"
     },
     "banners": {
       "coupleLabel": "Kelin va kuyov",

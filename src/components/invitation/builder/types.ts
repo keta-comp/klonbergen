@@ -2,8 +2,6 @@
 // hook remains the source of truth for persistence; this module only types
 // the in-memory builder state.
 
-export type InvitationTemplateId = "t1" | "t2" | "t3" | "t4";
-
 export interface BuilderState {
   brideName: string;
   groomName: string;
@@ -16,14 +14,11 @@ export interface BuilderState {
   welcomeText: string;
   invitationText: string;
   finalText: string;
-  coverImage: string | null;
-  galleryImages: string[];
-  templateId: InvitationTemplateId;
   music: File | null;
 }
 
 export interface BuilderStepMeta {
-  id: "couple" | "date" | "venue" | "message" | "gallery" | "template";
+  id: "couple" | "date" | "venue" | "message";
   label: string;
   sub: string;
 }

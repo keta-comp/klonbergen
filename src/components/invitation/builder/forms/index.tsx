@@ -1,11 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { ImagePlus, MapPin, Music, Phone, RotateCw, X } from "lucide-react";
+import { MapPin, Music, Phone, RotateCw, X } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import type {
-  BuilderState,
-  InvitationTemplateId,
-} from "../types";
+import type { BuilderState } from "../types";
 import { useTranslation } from "@/i18n/LanguageContext";
 
 type UpdateFn = <K extends keyof BuilderState>(
@@ -19,13 +16,6 @@ function formatBytes(bytes: number): string {
   const i = Math.min(units.length - 1, Math.floor(Math.log(bytes) / Math.log(1024)));
   return `${(bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
 }
-
-const TEMPLATES: { id: InvitationTemplateId; label: string; asset: string }[] = [
-  { id: "t1", label: "Template 01", asset: "/1.png" },
-  { id: "t2", label: "Template 02", asset: "/2.png" },
-  { id: "t3", label: "Template 03", asset: "/3.png" },
-  { id: "t4", label: "Template 04", asset: "/4.png" },
-];
 
 // ------------------ STEP 01 — COUPLE ------------------
 export function CoupleForm({
@@ -49,26 +39,26 @@ export function CoupleForm({
 
       <div className="inv-field-row">
         <div className="inv-field">
-          <label className="inv-label" htmlFor="bride">{t("builder.couple.bride")}</label>
-          <input
-            id="bride"
-            className="inv-input"
-            type="text"
-            placeholder="Aygúl"
-            value={state.brideName}
-            onChange={(e) => update("brideName", e.target.value)}
-            autoFocus
-          />
-        </div>
-        <div className="inv-field">
           <label className="inv-label" htmlFor="groom">{t("builder.couple.groom")}</label>
           <input
             id="groom"
             className="inv-input"
             type="text"
-            placeholder="Marat"
+            placeholder={t("builder.couple.groomPh")}
             value={state.groomName}
             onChange={(e) => update("groomName", e.target.value)}
+            autoFocus
+          />
+        </div>
+        <div className="inv-field">
+          <label className="inv-label" htmlFor="bride">{t("builder.couple.bride")}</label>
+          <input
+            id="bride"
+            className="inv-input"
+            type="text"
+            placeholder={t("builder.couple.bridePh")}
+            value={state.brideName}
+            onChange={(e) => update("brideName", e.target.value)}
           />
         </div>
       </div>
@@ -397,174 +387,6 @@ export function MessageForm({
             ? t("builder.message.musicStatus")
             : t("builder.message.musicHint")}
         </p>
-      </div>
-    </div>
-  );
-}
-
-// ------------------ STEP 05 — GALLERY ------------------
-export function GalleryForm({
-  state,
-  update,
-}: {
-  state: BuilderState;
-  update: UpdateFn;
-}) {
-  const { t } = useTranslation();
-  const coverRef = useRef<HTMLInputElement>(null);
-  const galleryRef = useRef<HTMLInputElement>(null);
-
-  const readFiles = (files: FileList | null) =>
-    Array.from(files ?? [])
-      .filter((f) => f.type.startsWith("image/"))
-      .slice(0, 6);
-
-  const onCoverPick = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 8 * 1024 * 1024) return;
-    const url = URL.createObjectURL(file);
-    update("coverImage", url);
-  };
-
-  const onGalleryPick = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = readFiles(e.target.files);
-    if (files.length === 0) return;
-    files.forEach((f) => {
-      if (f.size > 8 * 1024 * 1024) return;
-      const url = URL.createObjectURL(f);
-      update("galleryImages", [...state.galleryImages, url]);
-    });
-  };
-
-  return (
-    <div>
-      <h1 className="inv-step-title">
-        {t("builder.gallery.t1")} <em>{t("builder.gallery.t2")}</em>
-      </h1>
-      <p className="inv-step-sub">
-        {t("builder.gallery.sub")}
-      </p>
-
-      <p className="inv-label" style={{ marginBottom: "0.6rem" }}>
-        {t("builder.gallery.cover")}
-      </p>
-      <div className="inv-uploader" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))" }}>
-        {state.coverImage ? (
-          <div className="inv-uploader-tile">
-            <img src={state.coverImage} alt="Cover" />
-            <button
-              type="button"
-              className="inv-uploader-tile-remove"
-              onClick={() => update("coverImage", null)}
-              aria-label={t("builder.gallery.remove")}
-            >
-              <X className="h-3 w-3" />
-            </button>
-          </div>
-        ) : (
-          <button
-            type="button"
-            className="inv-uploader-add"
-            onClick={() => coverRef.current?.click()}
-          >
-            <ImagePlus className="h-5 w-5" />
-            <span>{t("builder.gallery.coverAdd")}</span>
-          </button>
-        )}
-        <input
-          ref={coverRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={onCoverPick}
-          style={{ display: "none" }}
-        />
-      </div>
-
-      <div className="inv-divider" />
-
-      <p className="inv-label" style={{ marginBottom: "0.6rem" }}>
-        {t("builder.gallery.gallery")}
-      </p>
-      <div className="inv-uploader">
-        {state.galleryImages.map((src, i) => (
-          <div key={i} className="inv-uploader-tile">
-            <img src={src} alt={t("builder.gallery.alt", { n: i + 1 })} />
-            <button
-              type="button"
-              className="inv-uploader-tile-remove"
-              onClick={() =>
-                update(
-                  "galleryImages",
-                  state.galleryImages.filter((_, idx) => idx !== i)
-                )
-              }
-              aria-label={t("builder.gallery.remove")}
-            >
-              <X className="h-3 w-3" />
-            </button>
-          </div>
-        ))}
-        {state.galleryImages.length < 6 && (
-          <button
-            type="button"
-            className="inv-uploader-add"
-            onClick={() => galleryRef.current?.click()}
-          >
-            <ImagePlus className="h-5 w-5" />
-            <span>{t("builder.gallery.add")}</span>
-          </button>
-        )}
-        <input
-          ref={galleryRef}
-          type="file"
-          accept="image/*"
-          multiple
-          className="hidden"
-          onChange={onGalleryPick}
-          style={{ display: "none" }}
-        />
-      </div>
-    </div>
-  );
-}
-
-// ------------------ STEP 06 — TEMPLATE ------------------
-export function TemplateSelector({
-  state,
-  update,
-}: {
-  state: BuilderState;
-  update: UpdateFn;
-}) {
-  const { t } = useTranslation();
-  return (
-    <div>
-      <h1 className="inv-step-title">
-        {t("builder.template.t1")} <em>{t("builder.template.t2")}</em>
-      </h1>
-      <p className="inv-step-sub">
-        {t("builder.template.sub")}
-      </p>
-
-      <div className="inv-templates">
-        {TEMPLATES.map((tpl) => (
-          <button
-            key={tpl.id}
-            type="button"
-            onClick={() => update("templateId", tpl.id)}
-            className={`inv-template ${state.templateId === tpl.id ? "is-active" : ""}`}
-          >
-            <img src={tpl.asset} alt={tpl.label} className="inv-template-img" />
-            <div className="inv-template-label">
-              <span>{t("builder.template.label", { n: tpl.id.replace("t", "") })}</span>
-              {state.templateId === tpl.id && (
-                <span style={{ color: "var(--vi-gold)" }}>{t("builder.template.selected")}</span>
-              )}
-            </div>
-          </button>
-        ))}
       </div>
     </div>
   );

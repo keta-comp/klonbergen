@@ -48,8 +48,8 @@ export default function LanguageSwitcher({ compact = false }: { compact?: boolea
         title={LOCALE_LABELS[locale]}
         onClick={() => setOpen((o) => !o)}
         className={cn(
-          "flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300",
-          compact ? "h-8 px-2 text-[11px]" : "h-9 px-2.5 text-[12px]",
+          "flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white text-neutral-700 transition-colors hover:border-neutral-300",
+          compact ? "h-8 px-2 text-[11px]" : "h-8 px-2 text-[11px] sm:h-9 sm:px-2.5 sm:text-[12px]",
         )}
       >
         <Globe className="h-3.5 w-3.5 text-neutral-500" />

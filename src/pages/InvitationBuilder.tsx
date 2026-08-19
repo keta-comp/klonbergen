@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowRight, Check, ImagePlus, MapPin, Phone, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, MapPin, Phone, X } from "lucide-react";
 import InvitationPreview from "@/components/invitation/builder/InvitationPreview";
 import StepIndicator from "@/components/invitation/builder/StepIndicator";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -12,13 +12,11 @@ import {
   DateForm,
   VenueForm,
   MessageForm,
-  GalleryForm,
-  TemplateSelector,
 } from "@/components/invitation/builder/forms";
 import Seo from "@/components/seo/Seo";
 import { useCreateInvitation } from "@/hooks/useInvitations";
 import { idbGet, idbSet, idbDel } from "@/lib/idb";
-import type { BuilderState, InvitationTemplateId } from "@/components/invitation/builder/types";
+import type { BuilderState } from "@/components/invitation/builder/types";
 
 /** Persisted builder draft — `vowly_` namespaced, stored in IndexedDB. */
 const DRAFT_KEY = "vowly_builder_draft_v1";
@@ -37,13 +35,10 @@ const DEFAULT_STATE: BuilderState = {
   invitationText:
     "Sizlarning ishtirokingiz biz uchun alohida ahamiyatga ega. Quyidagi tafsilotlar orqali marosimga javob berishingiz mumkin.",
   finalText: "Sizni intizorlik bilan kutamiz.",
-  coverImage: null,
-  galleryImages: [],
-  templateId: "t1",
   music: null,
 };
 
-type StepId = "couple" | "date" | "venue" | "message" | "gallery" | "template";
+type StepId = "couple" | "date" | "venue" | "message";
 
 const stepEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -58,8 +53,6 @@ export default function InvitationBuilder() {
     { id: "date", label: t("builder.steps.date.label"), sub: t("builder.steps.date.sub") },
     { id: "venue", label: t("builder.steps.venue.label"), sub: t("builder.steps.venue.sub") },
     { id: "message", label: t("builder.steps.message.label"), sub: t("builder.steps.message.sub") },
-    { id: "gallery", label: t("builder.steps.gallery.label"), sub: t("builder.steps.gallery.sub") },
-    { id: "template", label: t("builder.steps.template.label"), sub: t("builder.steps.template.sub") },
   ] as const;
 
   // The active step is derived from the URL (?step=<id>) — the single source of
@@ -83,6 +76,16 @@ export default function InvitationBuilder() {
   stateRef.current = state;
   const stepRef = useRef(stepIdx);
   stepRef.current = stepIdx;
+
+  // Old deep links (?step=gallery / ?step=template) — or any unknown step id
+  // left over after the gallery & template steps were removed — must bounce
+  // to the last valid step so the wizard never lands on a screen that no
+  // longer exists.
+  useEffect(() => {
+    if (stepParam && stepParamIdx < 0) {
+      setSearchParams({ step: STEPS[STEPS.length - 1].id }, { replace: true });
+    }
+  }, [stepParam, stepParamIdx, setSearchParams]);
 
   const create = useCreateInvitation();
 
@@ -201,9 +204,6 @@ export default function InvitationBuilder() {
         welcomeText: state.welcomeText,
         invitationText: state.invitationText,
         finalText: state.finalText,
-        coverImage: state.coverImage,
-        galleryImages: state.galleryImages,
-        templateId: state.templateId as InvitationTemplateId,
         music: state.music,
       });
       setDone(inv.slug);
@@ -301,12 +301,6 @@ export default function InvitationBuilder() {
               {current.id === "message" && (
                 <MessageForm state={state} update={update} />
               )}
-              {current.id === "gallery" && (
-                <GalleryForm state={state} update={update} />
-              )}
-              {current.id === "template" && (
-                <TemplateSelector state={state} update={update} />
-              )}
             </motion.div>
           </AnimatePresence>
 
@@ -353,8 +347,6 @@ function validate(state: BuilderState, t: (k: string) => string): Record<StepId,
     date: [],
     venue: [],
     message: [],
-    gallery: [],
-    template: [],
   };
   if (!state.brideName.trim()) e.couple.push(t("builder.couple.errBride"));
   if (!state.groomName.trim()) e.couple.push(t("builder.couple.errGroom"));
@@ -366,4 +358,4 @@ function validate(state: BuilderState, t: (k: string) => string): Record<StepId,
 
 // Re-export the form components so other places (preview) can import them if
 // needed. These are placeholders to keep the build pipeline small.
-export { MapPin, Phone, ImagePlus, X };
+export { MapPin, Phone, X };

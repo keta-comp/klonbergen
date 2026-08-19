@@ -37,7 +37,7 @@ export default function GuestPerformers({ artists }: Props) {
               src={a.image_url}
               alt={a.name}
               loading="lazy"
-              className="h-14 w-14 flex-shrink-0 rounded-full object-cover ring-1 ring-[#1a1714]/10"
+              className="h-auto w-auto max-h-20 max-w-20 flex-shrink-0 rounded-xl object-contain ring-1 ring-[#1a1714]/10"
             />
           ) : (
             <span className="grid h-14 w-14 flex-shrink-0 place-items-center rounded-full border border-[#1a1714]/10 bg-[#1a1714]/[0.03] text-[10px] uppercase tracking-wider text-[#1a1714]/40">

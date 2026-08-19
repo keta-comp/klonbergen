@@ -84,7 +84,7 @@ export default function QRCodeGenerator({ hallId }: Props) {
       </Card>
 
       {generated && (
-        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {Array.from({ length: tableCount }, (_, i) => i + 1).map(num => (
             <motion.div
               key={num}
@@ -96,11 +96,11 @@ export default function QRCodeGenerator({ hallId }: Props) {
               <p className="mb-2 text-sm font-semibold">{t('admin.qr.table')} {num}</p>
               <QRCodeCanvas
                 value={`${baseUrl}?table=${num}`}
-                size={140}
+                size={112}
                 level="H"
                 includeMargin
                 ref={setQrRef(num)}
-                className="mx-auto"
+                className="mx-auto h-auto w-full max-w-[112px]"
               />
               <Button variant="ghost" size="sm" className="mt-2 text-xs" onClick={() => downloadSingle(num)}>
                 <Download className="mr-1 h-3 w-3" /> {t('admin.qr.download')}

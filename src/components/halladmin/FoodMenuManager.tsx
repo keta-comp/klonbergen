@@ -87,7 +87,7 @@ export default function FoodMenuManager({ hallId }: Props) {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-xl font-bold font-serif">{t('admin.menu.heading')}</h3>
+        <h3 className="text-lg font-bold font-serif sm:text-xl">{t('admin.menu.heading')}</h3>
         <Dialog open={open} onOpenChange={v => { setOpen(v); if (!v) { setEditItem(null); resetForm(); } }}>
           <DialogTrigger asChild>
             <Button className="gold-gradient text-primary-foreground"><Plus className="mr-1 h-4 w-4" /> {t('admin.menu.add')}</Button>
@@ -156,8 +156,8 @@ export default function FoodMenuManager({ hallId }: Props) {
                         </span>
                       </div>
                       <div className="flex gap-1 flex-shrink-0">
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEdit(item)}><Edit2 className="h-3 w-3" /></Button>
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleDelete(item.id)}><Trash2 className="h-3 w-3 text-destructive" /></Button>
+                        <Button variant="ghost" size="icon" className="h-11 w-11 sm:h-9 sm:w-9" onClick={() => handleEdit(item)}><Edit2 className="h-3 w-3" /></Button>
+                        <Button variant="ghost" size="icon" className="h-11 w-11 sm:h-9 sm:w-9" onClick={() => handleDelete(item.id)}><Trash2 className="h-3 w-3 text-destructive" /></Button>
                       </div>
                     </div>
                   </div>

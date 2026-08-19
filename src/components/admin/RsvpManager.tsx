@@ -40,10 +40,10 @@ export default function RsvpManager({ hallId }: Props) {
 
   return (
     <div className="mx-auto max-w-[860px] space-y-4">
-      <div className="flex items-end justify-between gap-4">
-        <div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
           <h2
-            className="font-display text-[26px] text-neutral-900"
+            className="font-display text-[22px] leading-tight text-neutral-900 sm:text-[26px]"
             style={{ fontFamily: '"Cormorant Garamond","Playfair Display",serif', fontWeight: 500 }}
           >
             {t('admin.rsvp.title')}
@@ -68,7 +68,8 @@ export default function RsvpManager({ hallId }: Props) {
         ) : !rsvps || rsvps.length === 0 ? (
           <div className="p-10 text-center text-[13px] text-neutral-500">{t('admin.rsvp.empty')}</div>
         ) : (
-          <table className="w-full text-left text-[13px]">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] text-left text-[13px]">
             <thead className="border-b border-neutral-200 bg-neutral-50 text-[11px] uppercase tracking-[0.14em] text-neutral-400">
               <tr>
                 <th className="px-4 py-3">{t('admin.rsvp.colGuest')}</th>
@@ -111,7 +112,7 @@ export default function RsvpManager({ hallId }: Props) {
                         type="button"
                         onClick={() => remove(row.id)}
                         aria-label="O'chirish"
-                        className="grid h-8 w-8 place-items-center rounded-md border border-neutral-200 text-neutral-500 transition hover:bg-neutral-50 hover:text-red-600"
+                        className="grid h-11 w-11 place-items-center rounded-md border border-neutral-200 text-neutral-500 transition hover:bg-neutral-50 hover:text-red-600 sm:h-9 sm:w-9"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -121,6 +122,7 @@ export default function RsvpManager({ hallId }: Props) {
               })}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

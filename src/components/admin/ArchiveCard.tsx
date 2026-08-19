@@ -104,7 +104,7 @@ export default function ArchiveCard({ wedding }: Props) {
             type="button"
             aria-label={t('admin.archive.more')}
             onClick={() => setMenuOpen((o) => !o)}
-            className="grid h-9 w-9 place-items-center rounded-md border border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50"
+            className="grid h-11 w-11 place-items-center rounded-md border border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50"
           >
             <MoreVertical className="h-4 w-4" />
           </button>

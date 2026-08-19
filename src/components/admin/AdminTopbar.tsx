@@ -108,34 +108,34 @@ export default function AdminTopbar({ hallId, userName, userEmail, avatarUrl, on
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-neutral-200/60 bg-[#f9f6ee]/90 px-5 py-4 backdrop-blur md:px-8">
-        <div className="flex items-center gap-3">
+      <header className="sticky top-0 z-30 flex items-center justify-between gap-2 border-b border-neutral-200/60 bg-[#f9f6ee]/90 px-3 py-2.5 backdrop-blur sm:gap-3 sm:px-5 sm:py-3 md:px-8 md:py-4">
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
           <button
             type="button"
             aria-label={t('admin.topbar.menuOpen')}
-            className="grid h-9 w-9 place-items-center rounded-md border border-neutral-200 bg-white text-neutral-700 md:hidden"
+            className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-md border border-neutral-200 bg-white text-neutral-700 transition-colors hover:border-neutral-300 md:hidden"
             onClick={onOpenSidebar}
           >
-            <Menu className="h-4 w-4" />
+            <Menu className="h-5 w-5" />
           </button>
-          <div>
-            <h1 className="font-display text-[22px] leading-tight text-neutral-900 md:text-[26px]" style={{ fontFamily: '"Cormorant Garamond","Playfair Display",serif', fontWeight: 500 }}>
+          <div className="min-w-0">
+            <h1 className="line-clamp-2 break-words font-display text-[16px] leading-tight text-neutral-900 sm:text-[20px] md:text-[26px]" style={{ fontFamily: '"Cormorant Garamond","Playfair Display",serif', fontWeight: 500 }}>
               {t('admin.topbar.welcome', { name: firstName })}
             </h1>
-            <p className="mt-0.5 text-[12.5px] text-neutral-500 md:text-[13px]">
+            <p className="mt-0.5 hidden text-[12px] text-neutral-500 sm:block md:text-[13px]">
               {t('admin.topbar.subtitle')}
             </p>
           </div>
         </div>
 
-        <div className="flex flex-shrink-0 items-center gap-3">
+        <div className="flex flex-shrink-0 items-center gap-2 sm:gap-3">
           <LanguageSwitcher />
           {/* notifications */}
           <div className="relative" ref={notifRef}>
             <button
               type="button"
               aria-label={t('admin.topbar.notifications')}
-              className="relative grid h-9 w-9 place-items-center rounded-full border border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300"
+              className="relative grid h-10 w-10 flex-shrink-0 place-items-center rounded-full border border-neutral-200 bg-white text-neutral-700 transition-colors hover:border-neutral-300 sm:h-9 sm:w-9"
               onClick={() => setNotifOpen((o) => !o)}
             >
               <Bell className="h-[16px] w-[16px]" />
@@ -196,13 +196,13 @@ export default function AdminTopbar({ hallId, userName, userEmail, avatarUrl, on
           <div className="relative" ref={menuRef}>
             <button
               type="button"
-              className="flex items-center gap-2 rounded-full border border-neutral-200 bg-white py-1.5 pl-1.5 pr-3 hover:border-neutral-300"
+              className="flex h-10 flex-shrink-0 items-center gap-2 rounded-full border border-neutral-200 bg-white py-1 pl-1.5 pr-2.5 transition-colors hover:border-neutral-300 sm:h-9"
               onClick={() => setMenuOpen((o) => !o)}
             >
               {avatarUrl ? (
-                <img src={avatarUrl} alt={userName} className="h-7 w-7 rounded-full object-cover" />
+                <img src={avatarUrl} alt={userName} className="h-8 w-8 rounded-full object-cover sm:h-7 sm:w-7" />
               ) : (
-                <span className="grid h-7 w-7 place-items-center rounded-full bg-neutral-200 text-[11px] font-semibold uppercase text-neutral-700">
+                <span className="grid h-8 w-8 place-items-center rounded-full bg-neutral-200 text-[11px] font-semibold uppercase text-neutral-700 sm:h-7 sm:w-7">
                   {(userName || 'AD').slice(0, 2)}
                 </span>
               )}

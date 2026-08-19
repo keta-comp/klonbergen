@@ -130,7 +130,7 @@ export default function CurrentWeddingCard({ hallId, hallName, readOnly, coverOv
             {t('admin.currentWedding.eyebrow')}
           </p>
           <h2
-            className="font-display text-[34px] leading-tight text-neutral-900 md:text-[44px]"
+            className="font-display text-[28px] leading-tight text-neutral-900 sm:text-[34px] md:text-[44px]"
             style={{ fontFamily: '"Cormorant Garamond","Playfair Display",serif', fontWeight: 400 }}
           >
             {names || t('admin.currentWedding.nameFallback')}

@@ -89,7 +89,7 @@ export default function BannersManager({ hallId }: Props) {
           className="rounded-xl bg-primary/10 border border-primary/20 p-4 text-center"
         >
           <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">{t('admin.banners.coupleLabel')}</p>
-          <h3 className="text-xl font-bold font-serif text-primary">{coupleName}</h3>
+          <h3 className="text-lg font-bold font-serif text-primary sm:text-xl">{coupleName}</h3>
           {brideGroom?.wedding_date && (
             <p className="text-sm text-muted-foreground mt-1">
               {t('admin.banners.weddingDate')}: {formatDate(locale, brideGroom.wedding_date)}
@@ -101,7 +101,7 @@ export default function BannersManager({ hallId }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xl font-bold font-serif">{t('admin.banners.heading')}</h3>
+          <h3 className="text-lg font-bold font-serif sm:text-xl">{t('admin.banners.heading')}</h3>
           <p className="text-sm text-muted-foreground">{t('admin.banners.subtitle')}</p>
         </div>
         <Dialog open={open} onOpenChange={v => { setOpen(v); if (!v) { setEditItem(null); resetForm(); } }}>
@@ -179,12 +179,12 @@ export default function BannersManager({ hallId }: Props) {
               <div className="relative aspect-video">
                 <img src={item.image_url} alt={item.title || 'Banner'} className="h-full w-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute bottom-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button variant="secondary" size="icon" className="h-8 w-8 shadow-md" onClick={() => handleEdit(item)}>
-                    <Edit2 className="h-3.5 w-3.5" />
+                <div className="absolute bottom-2 right-2 flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                  <Button variant="secondary" size="icon" className="h-11 w-11 shadow-md sm:h-8 sm:w-8" onClick={() => handleEdit(item)}>
+                    <Edit2 className="h-4 w-4" />
                   </Button>
-                  <Button variant="secondary" size="icon" className="h-8 w-8 shadow-md" onClick={() => { remove.mutateAsync(item.id); toast.success(t('admin.banners.deleted')); }}>
-                    <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                  <Button variant="secondary" size="icon" className="h-11 w-11 shadow-md sm:h-8 sm:w-8" onClick={() => { remove.mutateAsync(item.id); toast.success(t('admin.banners.deleted')); }}>
+                    <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 </div>
               </div>

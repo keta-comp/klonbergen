@@ -5,13 +5,6 @@ import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase
 
 export type Invitation = Tables<"invitations">;
 
-/**
- * Template IDs used by the new editorial builder. Each ID maps to a /public
- * PNG asset (1.png..4.png) that the preview and final page render as the
- * visual base of the invitation.
- */
-export type InvitationTemplateId = "t1" | "t2" | "t3" | "t4";
-
 export interface InvitationDraft {
   brideName: string;
   groomName: string;
@@ -24,9 +17,6 @@ export interface InvitationDraft {
   welcomeText: string;
   invitationText: string;
   finalText: string;
-  coverImage: string | null;
-  galleryImages: string[];
-  templateId: InvitationTemplateId;
   music: File | null;
 }
 
@@ -56,7 +46,6 @@ interface InvitationExtras {
   finalText?: string;
   phone?: string;
   mapsUrl?: string;
-  templateId?: InvitationTemplateId;
   musicUrl?: string;
 }
 
@@ -89,21 +78,6 @@ function makeSlug(bride: string, groom: string) {
     ALPHABET[Math.floor(Math.random() * ALPHABET.length)]
   ).join("");
   return base ? `${base}-${rand}` : `toy-${rand}`;
-}
-
-async function uploadPhotos(slug: string, files: File[]) {
-  const urls: string[] = [];
-  for (const [i, file] of files.entries()) {
-    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-    const path = `invitations/${slug}-${Date.now()}-${i}.${ext}`;
-    const { error } = await supabase.storage
-      .from("hall-assets")
-      .upload(path, file, { cacheControl: "3600", upsert: false });
-    if (error) throw error;
-    const { data } = supabase.storage.from("hall-assets").getPublicUrl(path);
-    urls.push(data.publicUrl);
-  }
-  return urls;
 }
 
 async function uploadMusicFile(slug: string, file: File) {
@@ -141,10 +115,10 @@ async function deleteMusicFile(url: string | null | undefined) {
   await supabase.storage.from("hall-assets").remove([path]);
 }
 
-// The remote policy currently only allows these `template` values. The
-// builder's t1..t4 ids are mapped to "luxury" so inserts pass the RLS
-// WITH CHECK; the visual rendering does not depend on the template column
-// (it uses /1.png..4.png directly), so the mapping is invisible.
+// The remote policy currently only allows the "luxury" `template` value, so
+// every created invitation is stored as luxury. The premium Vowly design is
+// applied automatically — the wizard no longer asks the creator to pick a
+// template — and the visual rendering does not depend on this column.
 const STORED_TEMPLATE = "luxury" as const;
 
 export function useCreateInvitation() {
@@ -153,14 +127,7 @@ export function useCreateInvitation() {
       const slug = makeSlug(draft.groomName, draft.brideName);
       console.log(`[MUSIC] createInvitation start for slug=${slug}`);
 
-      const realPhotos = (draft.galleryImages || []).filter(
-        (u) => u && !u.startsWith("blob:")
-      );
-      const cover = draft.coverImage && !draft.coverImage.startsWith("blob:")
-        ? draft.coverImage
-        : null;
-
-      const photos = cover ? [cover, ...realPhotos] : realPhotos;
+      const photos: string[] = [];
 
       // Upload the optional background music FIRST so we can persist its URL
       // on the invitation row. A failure must not sink the whole invitation.
@@ -225,7 +192,6 @@ export function useCreateInvitation() {
         finalText: draft.finalText,
         phone: draft.phone,
         mapsUrl: draft.mapsUrl,
-        templateId: draft.templateId,
         musicUrl,
       });
 
