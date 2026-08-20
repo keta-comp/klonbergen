@@ -116,6 +116,13 @@ function installConsoleCapture() {
 export function musicDebugEnabled(): boolean {
   try {
     if (new URLSearchParams(window.location.search).get("debug") === "1") {
+      // Latch the flag so a client-side redirect that strips the query param
+      // (e.g. the wizard rewriting ?step) can't silently turn debug off.
+      try {
+        localStorage.setItem("vowly:music-debug", "1");
+      } catch {
+        /* noop */
+      }
       installConsoleCapture();
       return true;
     }

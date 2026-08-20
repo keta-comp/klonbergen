@@ -49,6 +49,16 @@ export default function InvitationBuilder() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
+  // Update the wizard step in the URL WITHOUT clobbering other query params
+  // (e.g. ?debug=1). A bare `setSearchParams({ step })` replaces the WHOLE
+  // search string, which wiped ?debug=1 on mount and made the mobile debug
+  // overlay vanish. Merge instead so deep links + debug survive.
+  const setStepParam = (id: string, opts?: { replace?: boolean }) => {
+    const p = new URLSearchParams(window.location.search);
+    p.set("step", id);
+    setSearchParams(p, opts);
+  };
+
   const STEPS = [
     { id: "couple", label: t("builder.steps.couple.label"), sub: t("builder.steps.couple.sub") },
     { id: "date", label: t("builder.steps.date.label"), sub: t("builder.steps.date.sub") },
@@ -84,7 +94,7 @@ export default function InvitationBuilder() {
   // longer exists.
   useEffect(() => {
     if (stepParam && stepParamIdx < 0) {
-      setSearchParams({ step: STEPS[STEPS.length - 1].id }, { replace: true });
+      setStepParam(STEPS[STEPS.length - 1].id, { replace: true });
     }
   }, [stepParam, stepParamIdx, setSearchParams]);
 
@@ -105,7 +115,7 @@ export default function InvitationBuilder() {
           setState({ ...DEFAULT_STATE, ...saved.state });
           if (stepParamIdx < 0 && typeof saved.stepIdx === "number") {
             const clamped = Math.max(0, Math.min(STEPS.length - 1, saved.stepIdx));
-            setSearchParams({ step: STEPS[clamped].id }, { replace: true });
+            setStepParam(STEPS[clamped].id, { replace: true });
           }
         }
       } catch {
@@ -181,7 +191,7 @@ export default function InvitationBuilder() {
   // full-page reload. A new history entry is pushed so Back/Forward works.
   const goToStep = (i: number) => {
     const clamped = Math.max(0, Math.min(STEPS.length - 1, i));
-    setSearchParams({ step: STEPS[clamped].id }, { replace: false });
+    setStepParam(STEPS[clamped].id, { replace: false });
   };
   const next = () => {
     if (!canAdvance) return;
