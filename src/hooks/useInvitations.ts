@@ -1,6 +1,8 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { idbSet } from "@/lib/idb";
+import { toast } from "sonner";
+import { musicDebug, musicDebugLog, musicDebugEnabled } from "@/lib/musicDebug";
 import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 
 export type Invitation = Tables<"invitations">;
@@ -91,13 +93,20 @@ const EXT_TO_MIME: Record<string, string> = {
   ogg: "audio/ogg",
 };
 
-async function uploadMusicFile(slug: string, file: File) {
+async function uploadMusicFile(slug: string, file: File): Promise<string> {
   const ext = file.name.split(".").pop()?.toLowerCase() || "mp3";
   // Derive the content type from the extension (never trust the empty/wrong
   // `file.type` Android may report), then fall back to the reported type.
   const contentType = EXT_TO_MIME[ext] || file.type || "audio/mpeg";
   const path = `invitations/${slug}-music-${Date.now()}.${ext}`;
   console.log(`[MUSIC] uploading music for slug=${slug} -> ${path} (type=${file.type || "unknown"}, ext=${ext}, ${file.size} bytes)`);
+  if (musicDebugEnabled()) {
+    musicDebug.uploadStatus = "uploading";
+    musicDebug.uploadPath = path;
+    musicDebug.uploadContentType = contentType;
+    musicDebug.fileSize = file.size;
+    musicDebugLog(`upload: path=${path} contentType=${contentType} size=${file.size} instanceof File=${file instanceof File}`);
+  }
   const { error } = await supabase.storage
     .from("hall-assets")
     .upload(path, file, {
@@ -105,8 +114,15 @@ async function uploadMusicFile(slug: string, file: File) {
       upsert: false,
       contentType,
     });
-  if (error) throw error;
+  if (error) {
+    const detail = (error as { message?: string })?.message || JSON.stringify(error);
+    if (musicDebugEnabled()) { musicDebug.uploadStatus = "ERROR"; musicDebug.uploadError = detail; musicDebugLog(`upload ERROR: ${detail}`); }
+    console.error(`[MUSIC] upload failed:`, error);
+    // Surface the REAL error (not the picker's "wrong format" message).
+    throw new Error(`Music upload failed: ${detail}`);
+  }
   const { data } = supabase.storage.from("hall-assets").getPublicUrl(path);
+  if (musicDebugEnabled()) { musicDebug.uploadStatus = "OK"; musicDebug.uploadUrl = data.publicUrl; musicDebugLog(`upload OK: ${data.publicUrl}`); }
   console.log(`[MUSIC] uploaded OK, publicUrl=${data.publicUrl}`);
   return data.publicUrl;
 }
@@ -150,7 +166,14 @@ export function useCreateInvitation() {
         try {
           musicUrl = await uploadMusicFile(slug, draft.music);
         } catch (e) {
+          const msg =
+            (e as { message?: string })?.message ||
+            (e instanceof Error ? e.message : null) ||
+            "unknown error";
           console.warn(`[MUSIC] upload failed, continuing without music:`, e);
+          // Surface the REAL upload error to the user (never the picker's
+          // "wrong format" message) so Android failures are diagnosable.
+          toast.error(msg);
           musicUrl = undefined;
         }
         // Keep a per-device copy in IndexedDB as a last-resort fallback for

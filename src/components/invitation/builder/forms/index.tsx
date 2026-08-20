@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import type { BuilderState } from "../types";
 import { useTranslation } from "@/i18n/LanguageContext";
+import { musicDebug, musicDebugEnabled, musicDebugLog, musicDebugReset } from "@/lib/musicDebug";
 
 type UpdateFn = <K extends keyof BuilderState>(
   key: K,
@@ -279,47 +280,77 @@ export function MessageForm({
     const file = e.target.files?.[0];
     e.target.value = ""; // reset so the same file can be re-picked
     if (!file) return;
-    // Filename extension (lowercased, without the leading dot).
+
+    // ---- debug capture (real-device diagnostics) ----
     const ext = file.name.split(".").pop()?.toLowerCase() || "";
-    // 1) A genuine audio MIME (desktop & modern mobile browsers) → ACCEPT.
-    //    Android / older browsers frequently report an EMPTY type or
-    //    "application/octet-stream" for files shared from another app
-    //    (e.g. a track picked from Telegram) — those are NOT a valid audio
-    //    MIME, so we fall through to the extension / magic-byte checks below.
+    const isFile = file instanceof File;
+    const isBlob = file instanceof Blob;
+    const ctor = (file as { constructor?: { name?: string } }).constructor?.name ?? "unknown";
     const isAudioMime =
       !!file.type &&
       file.type !== "application/octet-stream" &&
       file.type.startsWith("audio/");
-    // 2) Known filename extension (.mp3/.wav/.m4a/.aac/.ogg) → ACCEPT.
-    if (isAudioMime || ALLOWED_EXT.includes(ext)) {
-      if (file.size > 12 * 1024 * 1024) {
-        toast.error(t("builder.message.musicTooLarge"));
-        return;
-      }
-      console.log(`[MUSIC] picked ${file.name} (type=${file.type || "unknown"}, ext=${ext || "n/a"}, ${file.size} bytes)`);
+
+    if (musicDebugEnabled()) {
+      musicDebugReset();
+      Object.assign(musicDebug, {
+        fileName: file.name,
+        fileType: file.type || "(empty)",
+        fileSize: file.size,
+        fileLastModified: (file as { lastModified?: number }).lastModified ?? null,
+        isFile,
+        isBlob,
+        ctor,
+        ext: ext || "(none)",
+        detectedMime: file.type || "(empty)",
+        magic: "pending",
+        validation: "pending",
+      });
+      musicDebugLog(
+        `picker: name=${file.name} type=${file.type || "(empty)"} size=${file.size} ` +
+        `lastModified=${file.lastModified ?? "?"} instanceof File=${isFile} ctor=${ctor} ext=${ext || "(none)"}`
+      );
+    }
+
+    // 1) Genuine audio MIME (desktop / modern mobile) → ACCEPT.
+    if (isAudioMime) {
+      if (musicDebugEnabled()) { musicDebug.validation = "ACCEPT (audio MIME)"; musicDebugLog(`validation: ACCEPT via audio MIME ${file.type}`); }
+      if (file.size > 12 * 1024 * 1024) { toast.error(t("builder.message.musicTooLarge")); if (musicDebugEnabled()) musicDebug.validation = "REJECT (too large)"; return; }
+      console.log(`[MUSIC] picked ${file.name} (type=${file.type}, ${file.size} bytes)`);
       update("music", file);
       return;
     }
-    // 3) Last resort: sniff the file's magic bytes. This covers the case where
-    //    Android delivers a REAL audio file with BOTH an empty type AND no
-    //    extension. If the bytes prove it is genuinely one of our formats we
-    //    accept it; otherwise we reject (it is genuinely another format).
+    // 2) Known filename extension (.mp3/.wav/.m4a/.aac/.ogg) → ACCEPT.
+    if (ALLOWED_EXT.includes(ext)) {
+      if (musicDebugEnabled()) { musicDebug.validation = `ACCEPT (extension .${ext})`; musicDebugLog(`validation: ACCEPT via extension .${ext}`); }
+      if (file.size > 12 * 1024 * 1024) { toast.error(t("builder.message.musicTooLarge")); if (musicDebugEnabled()) musicDebug.validation = "REJECT (too large)"; return; }
+      console.log(`[MUSIC] picked ${file.name} (type=${file.type || "unknown"}, ext=${ext}, ${file.size} bytes)`);
+      update("music", file);
+      return;
+    }
+    // 3) Last resort: sniff magic bytes (Android file with empty type + no ext).
     try {
       const head = await file.slice(0, 64).arrayBuffer();
       const sniffed = sniffAudioExt(head);
+      if (musicDebugEnabled()) { musicDebug.magic = sniffed ?? "NONE"; musicDebugLog(`magic-byte: ${sniffed ?? "NONE (not an audio format)"}`); }
       if (!sniffed) {
+        if (musicDebugEnabled()) musicDebug.validation = "REJECT (magic-byte NONE)";
         toast.error(t("builder.message.musicType"));
         return;
       }
-      if (file.size > 12 * 1024 * 1024) {
-        toast.error(t("builder.message.musicTooLarge"));
-        return;
-      }
+      if (file.size > 12 * 1024 * 1024) { toast.error(t("builder.message.musicTooLarge")); if (musicDebugEnabled()) musicDebug.validation = "REJECT (too large)"; return; }
       console.log(`[MUSIC] picked ${file.name} (type=${file.type || "unknown"}, sniffed=${sniffed}, ${file.size} bytes)`);
       update("music", file);
       return;
-    } catch {
-      toast.error(t("builder.message.musicType"));
+    } catch (err) {
+      // The byte read itself failed (can happen on some Android content-URI
+      // backed files). Do NOT mislabel this as "wrong format" — accept the
+      // file so the upload can run and surface the REAL error there.
+      const msg = err instanceof Error ? err.message : String(err);
+      if (musicDebugEnabled()) { musicDebug.magic = "READ ERROR"; musicDebug.validation = "ACCEPT (magic read failed)"; musicDebugLog(`magic-byte READ ERROR: ${msg} -> accepting file (upload shows real error if any)`); }
+      console.warn(`[MUSIC] magic-byte read failed, accepting file anyway:`, err);
+      if (file.size > 12 * 1024 * 1024) { toast.error(t("builder.message.musicTooLarge")); return; }
+      update("music", file);
       return;
     }
   };
@@ -438,7 +469,69 @@ export function MessageForm({
             ? t("builder.message.musicStatus")
             : t("builder.message.musicHint")}
         </p>
+        <MusicDebugPanel />
       </div>
+    </div>
+  );
+}
+
+// ------------------ MUSIC DEBUG PANEL (dev / ?debug only) ------------------
+// Renders the captured real-device file + upload diagnostics as a fixed,
+// non-interactive overlay. Visibility is gated by `musicDebugEnabled()`.
+function MusicDebugPanel() {
+  // Gate is evaluated INSIDE the component (not via `musicDebugEnabled() &&`)
+  // so production minification cannot dead-code-eliminate the check. Normal
+  // users never see it (returns null); `?debug` / dev / localStorage flag show it.
+  if (!musicDebugEnabled()) return null;
+  const rows: [string, string][] = [
+    ["File name", musicDebug.fileName || "-"],
+    ["File type", musicDebug.fileType || "-"],
+    ["File size", musicDebug.fileSize != null ? `${musicDebug.fileSize} B` : "-"],
+    ["Last modified", musicDebug.fileLastModified != null ? String(musicDebug.fileLastModified) : "-"],
+    ["instanceof File", String(musicDebug.isFile)],
+    ["instanceof Blob", String(musicDebug.isBlob)],
+    ["constructor.name", musicDebug.ctor || "-"],
+    ["Extension", musicDebug.ext || "-"],
+    ["Detected MIME", musicDebug.detectedMime || "-"],
+    ["Magic bytes", musicDebug.magic || "-"],
+    ["Validation", musicDebug.validation || "-"],
+    ["Upload status", musicDebug.uploadStatus || "-"],
+    ["Upload error", musicDebug.uploadError || "-"],
+    ["Upload path", musicDebug.uploadPath || "-"],
+    ["Upload URL", musicDebug.uploadUrl || "-"],
+    ["Content-Type", musicDebug.uploadContentType || "-"],
+  ];
+  return (
+    <div
+      style={{
+        position: "fixed",
+        right: 8,
+        bottom: 8,
+        zIndex: 99999,
+        maxWidth: "92vw",
+        maxHeight: "70vh",
+        overflow: "auto",
+        background: "#0b0b0b",
+        color: "#0f0",
+        fontFamily: "monospace",
+        fontSize: 11,
+        padding: 10,
+        borderRadius: 8,
+        border: "1px solid #0f0",
+        whiteSpace: "pre-wrap",
+        pointerEvents: "none",
+      }}
+    >
+      <div style={{ fontWeight: "bold", marginBottom: 4 }}>MUSIC DEBUG (?debug)</div>
+      {rows.map(([k, v]) => (
+        <div key={k}>
+          <span style={{ color: "#6cf" }}>{k}:</span> {v}
+        </div>
+      ))}
+      <div style={{ marginTop: 6, borderTop: "1px solid #060", paddingTop: 4 }}>LOG:</div>
+      {musicDebug.log.slice(-14).map((l, i) => (
+        <div key={i}>{l}</div>
+      ))}
     </div>
   );
 }
