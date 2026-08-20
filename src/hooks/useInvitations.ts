@@ -108,7 +108,8 @@ async function uploadMusicFile(slug: string, file: File | string): Promise<strin
     musicDebug.uploadStatus = "uploading";
     musicDebug.uploadPath = path;
     musicDebug.uploadContentType = contentType;
-    musicDebug.fileSize = file.size;
+    musicDebug.size = file.size;
+    musicDebug.mime = contentType;
     musicDebugLog(`upload: path=${path} contentType=${contentType} size=${file.size} instanceof File=${file instanceof File}`);
   }
   const { error } = await supabase.storage

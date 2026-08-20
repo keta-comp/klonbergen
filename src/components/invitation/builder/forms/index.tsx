@@ -312,7 +312,7 @@ export function MessageForm({
     // any "selected" chip would be empty and unplayable). Reject it explicitly
     // with a clear instruction instead of silently accepting an unusable file.
     if (file.size === 0) {
-      if (musicDebugEnabled()) { musicDebug.fileSize = 0; musicDebug.validation = "REJECT (0 bytes)"; musicDebugLog("REJECT: file.size is 0 — Telegram WebView delivers an empty file. Open in Chrome to fix."); }
+      if (musicDebugEnabled()) { musicDebug.size = 0; musicDebug.validation = "REJECT (0 bytes)"; musicDebugLog("REJECT: file.size is 0 — Telegram WebView delivers an empty file. Open in Chrome to fix."); }
       toast.error(
         "Fayl bo'sh (0 bayt). Bu Telegram ichidagi brauzer muammosi — sahifani Chrome brauzerida ochib qayta urinib ko'ring.",
         { duration: 8000 }
@@ -332,17 +332,18 @@ export function MessageForm({
     if (musicDebugEnabled()) {
       musicDebugReset();
       Object.assign(musicDebug, {
-        fileName: file.name,
-        fileType: file.type || "(empty)",
-        fileSize: file.size,
-        fileLastModified: (file as { lastModified?: number }).lastModified ?? null,
+        name: file.name,
+        type: file.type || "(empty)",
+        size: file.size,
+        lastModified: (file as { lastModified?: number }).lastModified ?? null,
         isFile,
         isBlob,
         ctor,
-        ext: rawExt || "(none)",
-        detectedMime: file.type || "(empty)",
-        magic: "pending",
+        extension: rawExt || "(none)",
+        mime: file.type || "(empty)",
+        detectedFormat: "pending",
         validation: "pending",
+        bytesRead: "pending",
       });
       musicDebugLog(
         `picker RAW: name=${file.name} type=${file.type || "(empty)"} size=${file.size} ` +
@@ -360,7 +361,7 @@ export function MessageForm({
     // Fast path: a genuinely healthy audio file (real audio MIME + known
     // extension) — the desktop / modern-mobile case. No re-read needed.
     if (audioMime && ALLOWED_EXT.includes(rawExt)) {
-      if (musicDebugEnabled()) { musicDebug.magic = "skip (healthy)"; musicDebug.validation = "ACCEPT (audio MIME + ext)"; musicDebugLog(`validation: ACCEPT via healthy audio MIME ${file.type}`); }
+      if (musicDebugEnabled()) { musicDebug.detectedFormat = "skip (healthy)"; musicDebug.mime = file.type; musicDebug.extension = rawExt || musicDebug.extension; musicDebug.validation = "ACCEPT (audio MIME + ext)"; musicDebugLog(`validation: ACCEPT via healthy audio MIME ${file.type}`); }
       console.log(`[MUSIC] picked ${file.name} (type=${file.type}, ${file.size} bytes)`);
       update("music", file);
       return;
@@ -373,7 +374,7 @@ export function MessageForm({
     // cannot be read (locked content-URI) we still accept the raw object so the
     // upload surfaces the REAL error instead of a false "wrong format".
     const bytes = await readFileBytes(file);
-    if (musicDebugEnabled()) { musicDebug.magic = bytes ? `READ OK (${bytes.byteLength}B)` : "READ FAIL"; musicDebugLog(`bytes: ${bytes ? "READ OK " + bytes.byteLength + "B" : "READ FAIL (content-URI locked?)"}`); }
+    if (musicDebugEnabled()) { musicDebug.bytesRead = bytes ? `READ OK (${bytes.byteLength}B)` : "READ FAIL"; musicDebugLog(`bytes: ${bytes ? "READ OK " + bytes.byteLength + "B" : "READ FAIL (content-URI locked?)"}`); }
 
     if (!bytes) {
       if (musicDebugEnabled()) { musicDebug.validation = "ACCEPT (raw, bytes unreadable)"; musicDebugLog("bytes unreadable -> accepting raw file; upload will surface real error if any"); }
@@ -383,7 +384,7 @@ export function MessageForm({
     }
 
     const sniffed = sniffAudioExt(bytes);
-    if (musicDebugEnabled()) { musicDebug.magic = sniffed ?? "NONE"; musicDebugLog(`magic-byte: ${sniffed ?? "NONE (not an audio format)"}`); }
+    if (musicDebugEnabled()) { musicDebug.detectedFormat = sniffed ?? "NONE"; if (sniffed) { musicDebug.extension = sniffed; musicDebug.mime = EXT_TO_MIME[sniffed] || "audio/mpeg"; } musicDebugLog(`magic-byte: ${sniffed ?? "NONE (not an audio format)"}`); }
     if (!sniffed) {
       if (musicDebugEnabled()) musicDebug.validation = "REJECT (magic NONE)";
       toast.error(t("builder.message.musicType"));
@@ -399,7 +400,7 @@ export function MessageForm({
       type: finalMime,
       lastModified: (file as { lastModified?: number }).lastModified ?? Date.now(),
     });
-    if (musicDebugEnabled()) { musicDebug.validation = `ACCEPT (normalized .${finalExt} ${finalMime})`; musicDebugLog(`validation: ACCEPT normalized -> ${finalName} (${finalMime})`); }
+    if (musicDebugEnabled()) { musicDebug.validation = `ACCEPT (normalized .${finalExt} ${finalMime})`; musicDebug.mime = finalMime; musicDebug.extension = finalExt; musicDebugLog(`validation: ACCEPT normalized -> ${finalName} (${finalMime})`); }
     console.log(`[MUSIC] picked+normalized ${finalName} (type=${finalMime}, ${normalized.size} bytes)`);
     update("music", normalized);
   };
@@ -578,69 +579,7 @@ export function MessageForm({
             ? t("builder.message.musicStatus")
             : t("builder.message.musicHint")}
         </p>
-        <MusicDebugPanel />
       </div>
-    </div>
-  );
-}
-
-// ------------------ MUSIC DEBUG PANEL (dev / ?debug only) ------------------
-// Renders the captured real-device file + upload diagnostics as a fixed,
-// non-interactive overlay. Visibility is gated by `musicDebugEnabled()`.
-function MusicDebugPanel() {
-  // Gate is evaluated INSIDE the component (not via `musicDebugEnabled() &&`)
-  // so production minification cannot dead-code-eliminate the check. Normal
-  // users never see it (returns null); `?debug` / dev / localStorage flag show it.
-  if (!musicDebugEnabled()) return null;
-  const rows: [string, string][] = [
-    ["File name", musicDebug.fileName || "-"],
-    ["File type", musicDebug.fileType || "-"],
-    ["File size", musicDebug.fileSize != null ? `${musicDebug.fileSize} B` : "-"],
-    ["Last modified", musicDebug.fileLastModified != null ? String(musicDebug.fileLastModified) : "-"],
-    ["instanceof File", String(musicDebug.isFile)],
-    ["instanceof Blob", String(musicDebug.isBlob)],
-    ["constructor.name", musicDebug.ctor || "-"],
-    ["Extension", musicDebug.ext || "-"],
-    ["Detected MIME", musicDebug.detectedMime || "-"],
-    ["Magic bytes", musicDebug.magic || "-"],
-    ["Validation", musicDebug.validation || "-"],
-    ["Upload status", musicDebug.uploadStatus || "-"],
-    ["Upload error", musicDebug.uploadError || "-"],
-    ["Upload path", musicDebug.uploadPath || "-"],
-    ["Upload URL", musicDebug.uploadUrl || "-"],
-    ["Content-Type", musicDebug.uploadContentType || "-"],
-  ];
-  return (
-    <div
-      style={{
-        position: "fixed",
-        right: 8,
-        bottom: 8,
-        zIndex: 99999,
-        maxWidth: "92vw",
-        maxHeight: "70vh",
-        overflow: "auto",
-        background: "#0b0b0b",
-        color: "#0f0",
-        fontFamily: "monospace",
-        fontSize: 11,
-        padding: 10,
-        borderRadius: 8,
-        border: "1px solid #0f0",
-        whiteSpace: "pre-wrap",
-        pointerEvents: "none",
-      }}
-    >
-      <div style={{ fontWeight: "bold", marginBottom: 4 }}>MUSIC DEBUG (?debug)</div>
-      {rows.map(([k, v]) => (
-        <div key={k}>
-          <span style={{ color: "#6cf" }}>{k}:</span> {v}
-        </div>
-      ))}
-      <div style={{ marginTop: 6, borderTop: "1px solid #060", paddingTop: 4 }}>LOG:</div>
-      {musicDebug.log.slice(-14).map((l, i) => (
-        <div key={i}>{l}</div>
-      ))}
     </div>
   );
 }

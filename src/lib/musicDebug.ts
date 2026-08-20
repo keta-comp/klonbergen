@@ -1,65 +1,132 @@
-// Temporary diagnostic store for the Vowly music upload flow.
+// Temporary mobile debugging mode for Vowly.
 //
-// This exists ONLY to capture what a REAL Android (Telegram) file picker
-// actually delivers, so we can stop guessing. It is a plain module-level
-// singleton (not React state) so both the picker (forms/index.tsx) and the
-// uploader (useInvitations.ts) can write to it.
+// VISIBLE ONLY when the page is opened with `?debug=1` (or, as an explicit
+// opt-in, `localStorage["vowly:music-debug"]="1"`). In every normal production
+// state this returns `false` and the debug overlay is never rendered, so it
+// does not affect real users. The code is intentionally kept in the production
+// bundle (no compile-time `import.meta.env.DEV` gate) so you can open a live
+// Vercel URL with `?debug=1` on your phone and watch real-device diagnostics.
 //
-// Visibility is gated by `musicDebugEnabled()` — dev builds, the `?debug`
-// URL query param, or `localStorage["vowly:music-debug"]="1"`. That last
-// flag lets a production/Vercel build show the panel too, without polluting
-// normal users. Remove this file once the Android case is confirmed fixed.
+// It captures two things:
+//   1. Music-upload diagnostics — what the Android / Telegram file picker
+//      REALLY delivered (name, type, size, MIME, extension, detected format,
+//      validation result, upload error).
+//   2. A live Console — a capture of the browser's console.* output, so you
+//      can read real errors on a phone where devtools is hard to reach.
+//
+// REMOVE THIS FILE + DebugOverlay once the Android case is confirmed.
 
 export interface MusicDebugState {
-  fileName: string;
-  fileType: string;
-  fileSize: number | null;
-  fileLastModified: number | null;
+  // ----- music-upload diagnostics (the requested fields) -----
+  name: string; // original file.name
+  type: string; // browser-reported file.type
+  size: number | null; // file.size in bytes
+  mime: string; // MIME used for the (normalized) upload
+  extension: string; // detected / used extension
+  detectedFormat: string; // magic-byte sniff: mp3 | wav | m4a | aac | ogg | NONE
+  validation: string; // validation result string
+  uploadStatus: string; // uploading | OK | ERROR | ""
+  uploadError: string; // upload error detail
+  // ----- extra deep diagnostics -----
+  lastModified: number | null;
   isFile: boolean;
   isBlob: boolean;
   ctor: string;
-  ext: string;
-  detectedMime: string;
-  magic: string;
-  validation: string;
-  uploadStatus: string;
-  uploadError: string;
+  bytesRead: string; // READ OK (N B) | READ FAIL | skip (healthy)
   uploadPath: string;
   uploadUrl: string;
   uploadContentType: string;
-  log: string[];
+  log: string[]; // narrative music-flow log
 }
 
 export const musicDebug: MusicDebugState = {
-  fileName: "",
-  fileType: "",
-  fileSize: null,
-  fileLastModified: null,
-  isFile: false,
-  isBlob: false,
-  ctor: "",
-  ext: "",
-  detectedMime: "",
-  magic: "",
+  name: "",
+  type: "",
+  size: null,
+  mime: "",
+  extension: "",
+  detectedFormat: "",
   validation: "",
   uploadStatus: "",
   uploadError: "",
+  lastModified: null,
+  isFile: false,
+  isBlob: false,
+  ctor: "",
+  bytesRead: "",
   uploadPath: "",
   uploadUrl: "",
   uploadContentType: "",
   log: [],
 };
 
+// Live capture of the browser console, shown in the "Console" section of the
+// overlay so phone users can read real errors without remote devtools.
+export const consoleLog: string[] = [];
+
+function safeStringify(v: unknown): string {
+  if (v instanceof Error) return v.stack || v.message;
+  if (typeof v === "object" && v !== null) {
+    try {
+      return JSON.stringify(v);
+    } catch {
+      return String(v);
+    }
+  }
+  return String(v);
+}
+
+let consolePatched = false;
+function installConsoleCapture() {
+  if (consolePatched) return;
+  consolePatched = true;
+  const orig = {
+    log: console.log,
+    warn: console.warn,
+    error: console.error,
+    info: console.info,
+  };
+  const push = (level: string, args: unknown[]) => {
+    try {
+      const msg = args.map((a) => safeStringify(a)).join(" ");
+      consoleLog.push(`[${level}] ${msg}`);
+      if (consoleLog.length > 400) consoleLog.shift();
+    } catch {
+      /* noop */
+    }
+  };
+  console.log = (...a) => {
+    orig.log(...a);
+    push("log", a);
+  };
+  console.warn = (...a) => {
+    orig.warn(...a);
+    push("warn", a);
+  };
+  console.error = (...a) => {
+    orig.error(...a);
+    push("error", a);
+  };
+  console.info = (...a) => {
+    orig.info(...a);
+    push("info", a);
+  };
+}
+
 export function musicDebugEnabled(): boolean {
   try {
-    // @ts-ignore - import.meta.env exists in Vite builds
-    if (import.meta.env && import.meta.env.DEV) return true;
+    if (new URLSearchParams(window.location.search).get("debug") === "1") {
+      installConsoleCapture();
+      return true;
+    }
   } catch {
     /* noop */
   }
   try {
-    if (new URLSearchParams(window.location.search).has("debug")) return true;
-    if (localStorage.getItem("vowly:music-debug") === "1") return true;
+    if (localStorage.getItem("vowly:music-debug") === "1") {
+      installConsoleCapture();
+      return true;
+    }
   } catch {
     /* noop */
   }
@@ -67,19 +134,20 @@ export function musicDebugEnabled(): boolean {
 }
 
 export function musicDebugReset() {
-  musicDebug.fileName = "";
-  musicDebug.fileType = "";
-  musicDebug.fileSize = null;
-  musicDebug.fileLastModified = null;
-  musicDebug.isFile = false;
-  musicDebug.isBlob = false;
-  musicDebug.ctor = "";
-  musicDebug.ext = "";
-  musicDebug.detectedMime = "";
-  musicDebug.magic = "";
+  musicDebug.name = "";
+  musicDebug.type = "";
+  musicDebug.size = null;
+  musicDebug.mime = "";
+  musicDebug.extension = "";
+  musicDebug.detectedFormat = "";
   musicDebug.validation = "";
   musicDebug.uploadStatus = "";
   musicDebug.uploadError = "";
+  musicDebug.lastModified = null;
+  musicDebug.isFile = false;
+  musicDebug.isBlob = false;
+  musicDebug.ctor = "";
+  musicDebug.bytesRead = "";
   musicDebug.uploadPath = "";
   musicDebug.uploadUrl = "";
   musicDebug.uploadContentType = "";
@@ -89,7 +157,7 @@ export function musicDebugLog(msg: string) {
   const line = `[${new Date().toISOString()}] ${msg}`;
   musicDebug.log.push(line);
   if (musicDebug.log.length > 200) musicDebug.log.shift();
-  // Always log to console too — visible via Chrome remote debugging on Android.
+  // Also surface through the real console (captured by installConsoleCapture).
   // eslint-disable-next-line no-console
   console.log("[MUSIC-DEBUG]", msg);
 }
