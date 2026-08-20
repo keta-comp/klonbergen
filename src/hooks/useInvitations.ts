@@ -19,7 +19,9 @@ export interface InvitationDraft {
   welcomeText: string;
   invitationText: string;
   finalText: string;
-  music: File | null;
+  // `File` = picked from device; `string` = a pasted direct audio URL (works
+  // even inside Telegram's in-app WebView where the file picker gives 0 bytes).
+  music: File | string | null;
 }
 
 const ALPHABET = "abcdefghijkmnopqrstuvwxyz23456789";
@@ -93,7 +95,9 @@ const EXT_TO_MIME: Record<string, string> = {
   ogg: "audio/ogg",
 };
 
-async function uploadMusicFile(slug: string, file: File): Promise<string> {
+async function uploadMusicFile(slug: string, file: File | string): Promise<string> {
+  // A pasted URL needs no upload — it already is the playable music_url.
+  if (typeof file === "string") return file;
   const ext = file.name.split(".").pop()?.toLowerCase() || "mp3";
   // Derive the content type from the extension (never trust the empty/wrong
   // `file.type` Android may report), then fall back to the reported type.
@@ -178,7 +182,10 @@ export function useCreateInvitation() {
         }
         // Keep a per-device copy in IndexedDB as a last-resort fallback for
         // the creating device (e.g. if the storage backend is unreachable).
-        idbSet(MUSIC_KEY(slug), draft.music).catch(() => {});
+        // URLs don't need local caching.
+        if (typeof draft.music !== "string") {
+          idbSet(MUSIC_KEY(slug), draft.music).catch(() => {});
+        }
       }
 
       const payload: TablesInsert<"invitations"> = {

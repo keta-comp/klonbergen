@@ -14,7 +14,10 @@ export interface BuilderState {
   welcomeText: string;
   invitationText: string;
   finalText: string;
-  music: File | null;
+  // `File` = picked from device; `string` = a direct audio URL pasted by the
+  // user (works even inside restricted WebViews like Telegram's in-app browser
+  // where the <input type=file> picker delivers empty/0-byte files).
+  music: File | string | null;
 }
 
 export interface BuilderStepMeta {

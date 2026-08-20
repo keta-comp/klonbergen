@@ -406,16 +406,36 @@ export function MessageForm({
 
   // Local preview of the picked track (not uploaded until the invitation is
   // published — this is just so the creator can confirm the right file).
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewSrc, setPreviewSrc] = useState<string | null>(null);
+  const [musicUrlInput, setMusicUrlInput] = useState("");
   useEffect(() => {
+    if (typeof state.music === "string") {
+      setPreviewSrc(state.music);
+      return;
+    }
     if (!state.music) {
-      setPreviewUrl(null);
+      setPreviewSrc(null);
       return;
     }
     const u = URL.createObjectURL(state.music);
-    setPreviewUrl(u);
+    setPreviewSrc(u);
     return () => URL.revokeObjectURL(u);
   }, [state.music]);
+
+  // Alternative path that works even inside Telegram's in-app WebView, where
+  // the <input type=file> picker delivers empty/0-byte files: the user pastes
+  // a direct audio URL and we use it as the music source as-is.
+  const onMusicUrlAdd = () => {
+    const url = musicUrlInput.trim();
+    if (!/^https?:\/\/.+/i.test(url)) {
+      toast.error(t("builder.message.musicUrlInvalid"));
+      return;
+    }
+    if (musicDebugEnabled()) { musicDebugLog(`music URL added: ${url}`); }
+    update("music", url);
+    setMusicUrlInput("");
+    toast.success(t("builder.message.musicUrlAdded"));
+  };
 
   // Telegram Android WebView delivers 0-byte files via its in-app file picker,
   // so music uploads never work there. Warn once per session and point the user
@@ -427,7 +447,7 @@ export function MessageForm({
     try { if (sessionStorage.getItem("vowly:tg-warned")) return; } catch {}
     try { sessionStorage.setItem("vowly:tg-warned", "1"); } catch {}
     toast.warning(
-      "Bu sahifa Telegram brauzerida ochilgan. Musiqa yuklash uchun Chrome brauzerida oching.",
+      "Telegram ichidagi brauzerda fayl yuklanmaydi. Audio havolasini (URL) qo'shing yoki Chrome'da oching.",
       { duration: 10000 }
     );
     console.warn(`[MUSIC] Telegram WebView detected (${ua}). File picker delivers 0-byte stubs here. Open in Chrome.`);
@@ -486,8 +506,8 @@ export function MessageForm({
         {state.music ? (
           <div className="inv-music-chip">
             <Music className="mr-1.5 inline h-3.5 w-3.5" />
-            <span className="inv-music-name" title={state.music.name}>{state.music.name}</span>
-            <span className="inv-music-size">{formatBytes(state.music.size)}</span>
+            <span className="inv-music-name" title={typeof state.music === "string" ? state.music : state.music.name}>{typeof state.music === "string" ? state.music : state.music.name}</span>
+            <span className="inv-music-size">{typeof state.music === "string" ? "" : formatBytes(state.music.size)}</span>
             <button
               type="button"
               className="inv-music-remove"
@@ -526,8 +546,32 @@ export function MessageForm({
           onChange={onMusicPick}
           style={{ display: "none" }}
         />
-        {state.music && previewUrl && (
-          <audio className="inv-music-preview" controls src={previewUrl} preload="none" />
+        {/* Alternative: paste a direct audio URL — works inside Telegram's
+            in-app WebView where the file picker delivers 0-byte files. */}
+        <div className="inv-field" style={{ marginTop: "0.5rem" }}>
+          <label className="inv-label">{t("builder.message.musicUrlLabel")}</label>
+          <div style={{ display: "flex", gap: 6 }}>
+            <input
+              className="inv-input"
+              type="url"
+              inputMode="url"
+              placeholder={t("builder.message.musicUrlPlaceholder")}
+              value={musicUrlInput}
+              onChange={(e) => setMusicUrlInput(e.target.value)}
+              style={{ flex: 1, minWidth: 0 }}
+            />
+            <button
+              type="button"
+              className="inv-uploader-add"
+              onClick={onMusicUrlAdd}
+              style={{ width: "auto", padding: "0 0.8rem", whiteSpace: "nowrap" }}
+            >
+              {t("builder.message.musicUrlButton")}
+            </button>
+          </div>
+        </div>
+        {state.music && previewSrc && (
+          <audio className="inv-music-preview" controls src={previewSrc} preload="none" />
         )}
         <p className="inv-step-sub" style={{ marginTop: "0.4rem", fontSize: "0.62rem" }}>
           {state.music
