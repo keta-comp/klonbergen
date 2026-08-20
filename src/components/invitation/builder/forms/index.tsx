@@ -256,6 +256,17 @@ export function MessageForm({
   // Allowed background-music formats (matches the upload pipeline).
   const ALLOWED_EXT = ["mp3", "wav", "m4a", "aac", "ogg"];
 
+  // Canonical MIME per extension — used to assign a correct, uploadable
+  // content-type to Android / Telegram files that arrive with an EMPTY
+  // `file.type` and no filename extension (content-URI display names).
+  const EXT_TO_MIME: Record<string, string> = {
+    mp3: "audio/mpeg",
+    wav: "audio/wav",
+    m4a: "audio/mp4",
+    aac: "audio/aac",
+    ogg: "audio/ogg",
+  };
+
   // Detect a genuine audio file from its magic bytes. Last-resort check for
   // Android / files shared from Telegram that arrive with an EMPTY `file.type`
   // AND no usable filename extension (content-URI display names often do).
@@ -276,20 +287,33 @@ export function MessageForm({
     return null;
   };
 
+  // Read a file's raw bytes. Uses FileReader (not Blob.arrayBuffer) because some
+  // Android / Telegram WebViews do not implement `Blob.arrayBuffer()` reliably.
+  // Resolves to null if the bytes cannot be read (e.g. a locked content-URI).
+  const readFileBytes = (f: Blob): Promise<ArrayBuffer | null> =>
+    new Promise((resolve) => {
+      try {
+        const fr = new FileReader();
+        fr.onload = () => resolve((fr.result as ArrayBuffer) ?? null);
+        fr.onerror = () => resolve(null);
+        fr.readAsArrayBuffer(f);
+      } catch {
+        resolve(null);
+      }
+    });
+
   const onMusicPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = ""; // reset so the same file can be re-picked
     if (!file) return;
 
-    // ---- debug capture (real-device diagnostics) ----
-    const ext = file.name.split(".").pop()?.toLowerCase() || "";
+    // ---- debug capture (what Android REALLY delivered) ----
+    const rawExt = file.name.split(".").pop()?.toLowerCase() || "";
     const isFile = file instanceof File;
     const isBlob = file instanceof Blob;
     const ctor = (file as { constructor?: { name?: string } }).constructor?.name ?? "unknown";
-    const isAudioMime =
-      !!file.type &&
-      file.type !== "application/octet-stream" &&
-      file.type.startsWith("audio/");
+    const audioMime =
+      !!file.type && file.type !== "application/octet-stream" && file.type.startsWith("audio/");
 
     if (musicDebugEnabled()) {
       musicDebugReset();
@@ -301,58 +325,69 @@ export function MessageForm({
         isFile,
         isBlob,
         ctor,
-        ext: ext || "(none)",
+        ext: rawExt || "(none)",
         detectedMime: file.type || "(empty)",
         magic: "pending",
         validation: "pending",
       });
       musicDebugLog(
-        `picker: name=${file.name} type=${file.type || "(empty)"} size=${file.size} ` +
-        `lastModified=${file.lastModified ?? "?"} instanceof File=${isFile} ctor=${ctor} ext=${ext || "(none)"}`
+        `picker RAW: name=${file.name} type=${file.type || "(empty)"} size=${file.size} ` +
+        `lastModified=${file.lastModified ?? "?"} instanceof File=${isFile} ctor=${ctor} ext=${rawExt || "(none)"}`
       );
     }
 
-    // 1) Genuine audio MIME (desktop / modern mobile) → ACCEPT.
-    if (isAudioMime) {
-      if (musicDebugEnabled()) { musicDebug.validation = "ACCEPT (audio MIME)"; musicDebugLog(`validation: ACCEPT via audio MIME ${file.type}`); }
-      if (file.size > 12 * 1024 * 1024) { toast.error(t("builder.message.musicTooLarge")); if (musicDebugEnabled()) musicDebug.validation = "REJECT (too large)"; return; }
+    // Size guard (every path).
+    if (file.size > 12 * 1024 * 1024) {
+      if (musicDebugEnabled()) { musicDebug.validation = "REJECT (too large)"; musicDebugLog("validation: REJECT too large"); }
+      toast.error(t("builder.message.musicTooLarge"));
+      return;
+    }
+
+    // Fast path: a genuinely healthy audio file (real audio MIME + known
+    // extension) — the desktop / modern-mobile case. No re-read needed.
+    if (audioMime && ALLOWED_EXT.includes(rawExt)) {
+      if (musicDebugEnabled()) { musicDebug.magic = "skip (healthy)"; musicDebug.validation = "ACCEPT (audio MIME + ext)"; musicDebugLog(`validation: ACCEPT via healthy audio MIME ${file.type}`); }
       console.log(`[MUSIC] picked ${file.name} (type=${file.type}, ${file.size} bytes)`);
       update("music", file);
       return;
     }
-    // 2) Known filename extension (.mp3/.wav/.m4a/.aac/.ogg) → ACCEPT.
-    if (ALLOWED_EXT.includes(ext)) {
-      if (musicDebugEnabled()) { musicDebug.validation = `ACCEPT (extension .${ext})`; musicDebugLog(`validation: ACCEPT via extension .${ext}`); }
-      if (file.size > 12 * 1024 * 1024) { toast.error(t("builder.message.musicTooLarge")); if (musicDebugEnabled()) musicDebug.validation = "REJECT (too large)"; return; }
-      console.log(`[MUSIC] picked ${file.name} (type=${file.type || "unknown"}, ext=${ext}, ${file.size} bytes)`);
+
+    // Android / Telegram path. Read the ACTUAL bytes — this defeats the empty
+    // `file.type`, the missing extension, AND the content-URI display-name, and
+    // lets us re-wrap the file into a real in-memory File with a guaranteed
+    // extension + correct MIME that Supabase can read and tag. If the bytes
+    // cannot be read (locked content-URI) we still accept the raw object so the
+    // upload surfaces the REAL error instead of a false "wrong format".
+    const bytes = await readFileBytes(file);
+    if (musicDebugEnabled()) { musicDebug.magic = bytes ? `READ OK (${bytes.byteLength}B)` : "READ FAIL"; musicDebugLog(`bytes: ${bytes ? "READ OK " + bytes.byteLength + "B" : "READ FAIL (content-URI locked?)"}`); }
+
+    if (!bytes) {
+      if (musicDebugEnabled()) { musicDebug.validation = "ACCEPT (raw, bytes unreadable)"; musicDebugLog("bytes unreadable -> accepting raw file; upload will surface real error if any"); }
+      console.warn(`[MUSIC] could not read bytes, accepting raw file:`, file);
       update("music", file);
       return;
     }
-    // 3) Last resort: sniff magic bytes (Android file with empty type + no ext).
-    try {
-      const head = await file.slice(0, 64).arrayBuffer();
-      const sniffed = sniffAudioExt(head);
-      if (musicDebugEnabled()) { musicDebug.magic = sniffed ?? "NONE"; musicDebugLog(`magic-byte: ${sniffed ?? "NONE (not an audio format)"}`); }
-      if (!sniffed) {
-        if (musicDebugEnabled()) musicDebug.validation = "REJECT (magic-byte NONE)";
-        toast.error(t("builder.message.musicType"));
-        return;
-      }
-      if (file.size > 12 * 1024 * 1024) { toast.error(t("builder.message.musicTooLarge")); if (musicDebugEnabled()) musicDebug.validation = "REJECT (too large)"; return; }
-      console.log(`[MUSIC] picked ${file.name} (type=${file.type || "unknown"}, sniffed=${sniffed}, ${file.size} bytes)`);
-      update("music", file);
-      return;
-    } catch (err) {
-      // The byte read itself failed (can happen on some Android content-URI
-      // backed files). Do NOT mislabel this as "wrong format" — accept the
-      // file so the upload can run and surface the REAL error there.
-      const msg = err instanceof Error ? err.message : String(err);
-      if (musicDebugEnabled()) { musicDebug.magic = "READ ERROR"; musicDebug.validation = "ACCEPT (magic read failed)"; musicDebugLog(`magic-byte READ ERROR: ${msg} -> accepting file (upload shows real error if any)`); }
-      console.warn(`[MUSIC] magic-byte read failed, accepting file anyway:`, err);
-      if (file.size > 12 * 1024 * 1024) { toast.error(t("builder.message.musicTooLarge")); return; }
-      update("music", file);
+
+    const sniffed = sniffAudioExt(bytes);
+    if (musicDebugEnabled()) { musicDebug.magic = sniffed ?? "NONE"; musicDebugLog(`magic-byte: ${sniffed ?? "NONE (not an audio format)"}`); }
+    if (!sniffed) {
+      if (musicDebugEnabled()) musicDebug.validation = "REJECT (magic NONE)";
+      toast.error(t("builder.message.musicType"));
       return;
     }
+
+    // Normalize: a fresh in-memory File with a guaranteed extension + correct MIME.
+    const finalExt = sniffed;
+    const finalMime = EXT_TO_MIME[sniffed] || "audio/mpeg";
+    const baseName = file.name.replace(/\.[^.]+$/, "") || "music";
+    const finalName = `${baseName}.${finalExt}`;
+    const normalized = new File([bytes], finalName, {
+      type: finalMime,
+      lastModified: (file as { lastModified?: number }).lastModified ?? Date.now(),
+    });
+    if (musicDebugEnabled()) { musicDebug.validation = `ACCEPT (normalized .${finalExt} ${finalMime})`; musicDebugLog(`validation: ACCEPT normalized -> ${finalName} (${finalMime})`); }
+    console.log(`[MUSIC] picked+normalized ${finalName} (type=${finalMime}, ${normalized.size} bytes)`);
+    update("music", normalized);
   };
 
   // Local preview of the picked track (not uploaded until the invitation is
