@@ -80,16 +80,30 @@ function makeSlug(bride: string, groom: string) {
   return base ? `${base}-${rand}` : `toy-${rand}`;
 }
 
+// Canonical MIME type per audio extension. Used to set the Supabase Storage
+// `contentType` from the filename when the browser reports an empty/wrong
+// `file.type` (what Android / files shared from Telegram do).
+const EXT_TO_MIME: Record<string, string> = {
+  mp3: "audio/mpeg",
+  wav: "audio/wav",
+  m4a: "audio/mp4",
+  aac: "audio/aac",
+  ogg: "audio/ogg",
+};
+
 async function uploadMusicFile(slug: string, file: File) {
   const ext = file.name.split(".").pop()?.toLowerCase() || "mp3";
+  // Derive the content type from the extension (never trust the empty/wrong
+  // `file.type` Android may report), then fall back to the reported type.
+  const contentType = EXT_TO_MIME[ext] || file.type || "audio/mpeg";
   const path = `invitations/${slug}-music-${Date.now()}.${ext}`;
-  console.log(`[MUSIC] uploading music for slug=${slug} -> ${path} (${file.type || "unknown"} ${file.size} bytes)`);
+  console.log(`[MUSIC] uploading music for slug=${slug} -> ${path} (type=${file.type || "unknown"}, ext=${ext}, ${file.size} bytes)`);
   const { error } = await supabase.storage
     .from("hall-assets")
     .upload(path, file, {
       cacheControl: "3600",
       upsert: false,
-      contentType: file.type || "audio/mpeg",
+      contentType,
     });
   if (error) throw error;
   const { data } = supabase.storage.from("hall-assets").getPublicUrl(path);

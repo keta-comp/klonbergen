@@ -255,7 +255,27 @@ export function MessageForm({
   // Allowed background-music formats (matches the upload pipeline).
   const ALLOWED_EXT = ["mp3", "wav", "m4a", "aac", "ogg"];
 
-  const onMusicPick = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Detect a genuine audio file from its magic bytes. Last-resort check for
+  // Android / files shared from Telegram that arrive with an EMPTY `file.type`
+  // AND no usable filename extension (content-URI display names often do).
+  const sniffAudioExt = (buf: ArrayBuffer): string | null => {
+    const b = new Uint8Array(buf);
+    if (b.length >= 3 && b[0] === 0x49 && b[1] === 0x44 && b[2] === 0x33) return "mp3"; // ID3v2
+    if (b.length >= 12) {
+      if (b[0] === 0x52 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x46 &&
+          b[8] === 0x57 && b[9] === 0x41 && b[10] === 0x56 && b[11] === 0x45) return "wav"; // RIFF....WAVE
+      if (b[4] === 0x66 && b[5] === 0x74 && b[6] === 0x79 && b[7] === 0x70) return "m4a"; // ftyp box
+    }
+    if (b.length >= 4 &&
+        b[0] === 0x4f && b[1] === 0x67 && b[2] === 0x67 && b[3] === 0x53) return "ogg"; // OggS
+    if (b.length >= 2) {
+      if ((b[0] & 0xff) === 0xff && (b[1] & 0xf0) === 0xf0) return "aac"; // ADTS AAC
+      if ((b[0] & 0xff) === 0xff && (b[1] & 0xe0) === 0xe0) return "mp3"; // MPEG audio frame
+    }
+    return null;
+  };
+
+  const onMusicPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = ""; // reset so the same file can be re-picked
     if (!file) return;
@@ -264,26 +284,44 @@ export function MessageForm({
     // 1) A genuine audio MIME (desktop & modern mobile browsers) → ACCEPT.
     //    Android / older browsers frequently report an EMPTY type or
     //    "application/octet-stream" for files shared from another app
-    //    (e.g. a track picked from Telegram). Those are NOT treated as a
-    //    valid audio MIME, so we fall through to the filename check below.
+    //    (e.g. a track picked from Telegram) — those are NOT a valid audio
+    //    MIME, so we fall through to the extension / magic-byte checks below.
     const isAudioMime =
       !!file.type &&
       file.type !== "application/octet-stream" &&
       file.type.startsWith("audio/");
-    // 2) Unknown / empty MIME → trust the filename extension.
-    // 3) A known audio extension (.mp3/.wav/.m4a/.aac/.ogg) → ACCEPT.
-    // 4) Neither a valid MIME nor a known extension → REJECT.
-    const okType = isAudioMime || ALLOWED_EXT.includes(ext);
-    if (!okType) {
+    // 2) Known filename extension (.mp3/.wav/.m4a/.aac/.ogg) → ACCEPT.
+    if (isAudioMime || ALLOWED_EXT.includes(ext)) {
+      if (file.size > 12 * 1024 * 1024) {
+        toast.error(t("builder.message.musicTooLarge"));
+        return;
+      }
+      console.log(`[MUSIC] picked ${file.name} (type=${file.type || "unknown"}, ext=${ext || "n/a"}, ${file.size} bytes)`);
+      update("music", file);
+      return;
+    }
+    // 3) Last resort: sniff the file's magic bytes. This covers the case where
+    //    Android delivers a REAL audio file with BOTH an empty type AND no
+    //    extension. If the bytes prove it is genuinely one of our formats we
+    //    accept it; otherwise we reject (it is genuinely another format).
+    try {
+      const head = await file.slice(0, 64).arrayBuffer();
+      const sniffed = sniffAudioExt(head);
+      if (!sniffed) {
+        toast.error(t("builder.message.musicType"));
+        return;
+      }
+      if (file.size > 12 * 1024 * 1024) {
+        toast.error(t("builder.message.musicTooLarge"));
+        return;
+      }
+      console.log(`[MUSIC] picked ${file.name} (type=${file.type || "unknown"}, sniffed=${sniffed}, ${file.size} bytes)`);
+      update("music", file);
+      return;
+    } catch {
       toast.error(t("builder.message.musicType"));
       return;
     }
-    if (file.size > 12 * 1024 * 1024) {
-      toast.error(t("builder.message.musicTooLarge"));
-      return;
-    }
-    console.log(`[MUSIC] picked ${file.name} (${file.type || ext}, ${file.size} bytes)`);
-    update("music", file);
   };
 
   // Local preview of the picked track (not uploaded until the invitation is
@@ -387,7 +425,7 @@ export function MessageForm({
         <input
           ref={musicRef}
           type="file"
-          accept="audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/aac,audio/ogg,.mp3,.wav,.m4a,.aac,.ogg"
+          accept=".mp3,.wav,.m4a,.aac,.ogg,audio/*"
           className="hidden"
           onChange={onMusicPick}
           style={{ display: "none" }}
