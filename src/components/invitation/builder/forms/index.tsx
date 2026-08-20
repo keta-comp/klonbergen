@@ -307,6 +307,20 @@ export function MessageForm({
     e.target.value = ""; // reset so the same file can be re-picked
     if (!file) return;
 
+    // ---- 0-byte guard: Telegram Android WebView delivers a 0-byte stub via
+    // its in-app file picker (the real audio is never exposed to the page, so
+    // any "selected" chip would be empty and unplayable). Reject it explicitly
+    // with a clear instruction instead of silently accepting an unusable file.
+    if (file.size === 0) {
+      if (musicDebugEnabled()) { musicDebug.fileSize = 0; musicDebug.validation = "REJECT (0 bytes)"; musicDebugLog("REJECT: file.size is 0 — Telegram WebView delivers an empty file. Open in Chrome to fix."); }
+      toast.error(
+        "Fayl bo'sh (0 bayt). Bu Telegram ichidagi brauzer muammosi — sahifani Chrome brauzerida ochib qayta urinib ko'ring.",
+        { duration: 8000 }
+      );
+      console.warn(`[MUSIC] REJECT: file.size is 0. Telegram WebView blocks the file. UA=${typeof navigator !== "undefined" ? navigator.userAgent : "?"}`);
+      return;
+    }
+
     // ---- debug capture (what Android REALLY delivered) ----
     const rawExt = file.name.split(".").pop()?.toLowerCase() || "";
     const isFile = file instanceof File;
@@ -402,6 +416,22 @@ export function MessageForm({
     setPreviewUrl(u);
     return () => URL.revokeObjectURL(u);
   }, [state.music]);
+
+  // Telegram Android WebView delivers 0-byte files via its in-app file picker,
+  // so music uploads never work there. Warn once per session and point the user
+  // to opening the page in their real browser (Chrome) instead.
+  useEffect(() => {
+    if (typeof navigator === "undefined") return;
+    const ua = navigator.userAgent || "";
+    if (!/TelegramBot|TelegramAndroid|tgWeb/i.test(ua)) return;
+    try { if (sessionStorage.getItem("vowly:tg-warned")) return; } catch {}
+    try { sessionStorage.setItem("vowly:tg-warned", "1"); } catch {}
+    toast.warning(
+      "Bu sahifa Telegram brauzerida ochilgan. Musiqa yuklash uchun Chrome brauzerida oching.",
+      { duration: 10000 }
+    );
+    console.warn(`[MUSIC] Telegram WebView detected (${ua}). File picker delivers 0-byte stubs here. Open in Chrome.`);
+  }, []);
 
   return (
     <div>
