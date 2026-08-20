@@ -259,8 +259,21 @@ export function MessageForm({
     const file = e.target.files?.[0];
     e.target.value = ""; // reset so the same file can be re-picked
     if (!file) return;
+    // Filename extension (lowercased, without the leading dot).
     const ext = file.name.split(".").pop()?.toLowerCase() || "";
-    const okType = file.type.startsWith("audio/") || ALLOWED_EXT.includes(ext);
+    // 1) A genuine audio MIME (desktop & modern mobile browsers) → ACCEPT.
+    //    Android / older browsers frequently report an EMPTY type or
+    //    "application/octet-stream" for files shared from another app
+    //    (e.g. a track picked from Telegram). Those are NOT treated as a
+    //    valid audio MIME, so we fall through to the filename check below.
+    const isAudioMime =
+      !!file.type &&
+      file.type !== "application/octet-stream" &&
+      file.type.startsWith("audio/");
+    // 2) Unknown / empty MIME → trust the filename extension.
+    // 3) A known audio extension (.mp3/.wav/.m4a/.aac/.ogg) → ACCEPT.
+    // 4) Neither a valid MIME nor a known extension → REJECT.
+    const okType = isAudioMime || ALLOWED_EXT.includes(ext);
     if (!okType) {
       toast.error(t("builder.message.musicType"));
       return;
@@ -374,7 +387,7 @@ export function MessageForm({
         <input
           ref={musicRef}
           type="file"
-          accept="audio/mp3,audio/wav,audio/x-m4a,audio/aac,audio/ogg,.mp3,.wav,.m4a,.aac,.ogg"
+          accept="audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/aac,audio/ogg,.mp3,.wav,.m4a,.aac,.ogg"
           className="hidden"
           onChange={onMusicPick}
           style={{ display: "none" }}
