@@ -171,7 +171,7 @@ export function useUpdateHallMusic(hallId: string) {
       };
       const { error } = await supabase
         .from('wedding_halls')
-        .update(update as any)
+        .update(update as Record<string, unknown>)
         .eq('id', hallId);
       if (error) throw error;
     },

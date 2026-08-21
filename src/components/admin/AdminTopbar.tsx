@@ -69,22 +69,22 @@ export default function AdminTopbar({ hallId, userName, userEmail, avatarUrl, on
 
   const notifications = useMemo<NotifItem[]>(() => {
     const items: NotifItem[] = [];
-    (rsvps ?? []).slice(0, 4).forEach((r: any) => {
+    (rsvps ?? []).slice(0, 4).forEach((r: { id: string; guest_name?: string | null; guests_count?: number | null; attending?: boolean | null; created_at?: string }) => {
       items.push({
         key: `rsvp-${r.id}`,
         icon: 'rsvp',
         title: t('admin.notif.rsvpTitle', { name: r.guest_name || t('admin.notif.guest') }),
         sub: `${r.guests_count ?? 1} · ${r.attending ? t('admin.notif.attending') : t('admin.notif.notAttending')}`,
-        time: r.created_at,
+        time: r.created_at ?? '',
       });
     });
-    (moments ?? []).slice(0, 4).forEach((m: any) => {
+    (moments ?? []).slice(0, 4).forEach((m: { id: string; guest_name?: string | null; created_at?: string }) => {
       items.push({
         key: `mom-${m.id}`,
         icon: 'moment',
         title: t('admin.notif.newPhoto'),
         sub: m.guest_name || t('admin.notif.guest'),
-        time: m.created_at,
+        time: m.created_at ?? '',
       });
     });
     return items

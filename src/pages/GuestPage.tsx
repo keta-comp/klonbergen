@@ -23,6 +23,48 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Seo, { breadcrumbLd } from '@/components/seo/Seo';
 import { MusicProvider } from '@/components/guest/MusicPlayer';
 
+interface BrideGroomData {
+  bride_name: string;
+  groom_name: string;
+  bride_photo?: string | null;
+  groom_photo?: string | null;
+  love_story?: string | null;
+  wedding_date?: string | null;
+}
+
+interface FoodItemData {
+  id: string;
+  name: string;
+  price?: number | null;
+  description?: string | null;
+  is_today?: boolean | null;
+}
+
+interface ArtistData {
+  id: string;
+  name: string;
+  description?: string | null;
+  performance_time?: string | null;
+}
+
+interface BannerData {
+  id: string;
+  image_url: string;
+  title?: string | null;
+  sort_order?: number;
+}
+
+interface TimelineData {
+  id: string;
+  hall_id: string;
+  title: string;
+  description: string | null;
+  icon: string | null;
+  start_time: string;
+  end_time: string | null;
+  sort_order: number;
+}
+
 export default function GuestPage() {
   const { hallId } = useParams<{ hallId: string }>();
   const [searchParams] = useSearchParams();
@@ -54,11 +96,11 @@ export default function GuestPage() {
     enabled: isValidHallId,
   });
 
-  const { data: brideGroom } = useBrideGroom(safeHallId === 'preview' ? '__preview__' : safeHallId) as any;
-  const { data: foods } = useFoodItems(safeHallId === 'preview' ? '__preview__' : safeHallId) as any;
-  const { data: artists } = useArtists(safeHallId === 'preview' ? '__preview__' : safeHallId) as any;
-  const { data: banners } = useBanners(safeHallId === 'preview' ? '__preview__' : safeHallId) as any;
-  const { data: timeline } = useTimelineEvents(safeHallId === 'preview' ? '__preview__' : safeHallId) as any;
+  const { data: brideGroom } = useBrideGroom(safeHallId === 'preview' ? '__preview__' : safeHallId) as { data?: BrideGroomData | null };
+  const { data: foods } = useFoodItems(safeHallId === 'preview' ? '__preview__' : safeHallId) as { data?: FoodItemData[] | null };
+  const { data: artists } = useArtists(safeHallId === 'preview' ? '__preview__' : safeHallId) as { data?: ArtistData[] | null };
+  const { data: banners } = useBanners(safeHallId === 'preview' ? '__preview__' : safeHallId) as { data?: BannerData[] | null };
+  const { data: timeline } = useTimelineEvents(safeHallId === 'preview' ? '__preview__' : safeHallId) as { data?: TimelineData[] | null };
 
   // === Preview-mode enrichment — fill realistic sample data so the redesign
   // can be inspected without a live backend. ===
@@ -230,7 +272,7 @@ export default function GuestPage() {
     '/gallery-5.jpg',
   ];
 
-  const musicUrl: string | null = (hall as any)?.music_url ?? null;
+  const musicUrl: string | null = (hall as { music_url?: string | null })?.music_url ?? null;
 
   return (
     <MusicProvider musicUrl={musicUrl}>

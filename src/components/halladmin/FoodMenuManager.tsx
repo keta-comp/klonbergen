@@ -71,7 +71,7 @@ export default function FoodMenuManager({ hallId }: Props) {
       price: item.price?.toString() ?? '',
       description: item.description ?? '',
       is_today: item.is_today ?? true,
-      image_url: (item as any).image_url ?? '',
+      image_url: ('image_url' in item ? (item as { image_url?: string }).image_url : undefined) ?? '',
     });
     setOpen(true);
   };
@@ -142,8 +142,8 @@ export default function FoodMenuManager({ hallId }: Props) {
             <Card className="glass">
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
-                  {(item as any).image_url && (
-                    <img src={(item as any).image_url} alt={item.name} className="h-14 w-14 flex-shrink-0 rounded-xl object-cover" />
+                  {('image_url' in item && (item as { image_url?: string }).image_url) && (
+                    <img src={(item as { image_url?: string }).image_url} alt={item.name} className="h-14 w-14 flex-shrink-0 rounded-xl object-cover" />
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-1">

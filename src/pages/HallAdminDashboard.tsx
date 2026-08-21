@@ -105,6 +105,37 @@ export default function HallAdminDashboard() {
     );
   }
 
+  return <DashboardContent
+    effectiveHallId={effectiveHallId}
+    user={user}
+    signOut={signOut}
+    t={t}
+    drawerOpen={drawerOpen}
+    setDrawerOpen={setDrawerOpen}
+    locale={locale}
+    navigate={navigate}
+    location={location}
+  />;
+}
+
+function DashboardContent({
+  effectiveHallId,
+  user,
+  signOut,
+  t,
+  drawerOpen,
+  setDrawerOpen,
+}: {
+  effectiveHallId: string;
+  user: { id?: string; email?: string; user_metadata?: { full_name?: string; avatar_url?: string | null } } | null;
+  signOut: () => Promise<void>;
+  t: (key: string, params?: Record<string, string | number>) => string;
+  drawerOpen: boolean;
+  setDrawerOpen: (open: boolean) => void;
+  locale?: string;
+  navigate: (path: string) => void;
+  location: { pathname: string; search: string };
+}) {
   // Pull venue info to put in the sidebar footer
   const { data: hall } = useQuery({
     queryKey: ['hall', effectiveHallId],

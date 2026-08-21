@@ -445,8 +445,8 @@ export function MessageForm({
     if (typeof navigator === "undefined") return;
     const ua = navigator.userAgent || "";
     if (!/TelegramBot|TelegramAndroid|tgWeb/i.test(ua)) return;
-    try { if (sessionStorage.getItem("vowly:tg-warned")) return; } catch {}
-    try { sessionStorage.setItem("vowly:tg-warned", "1"); } catch {}
+    try { if (sessionStorage.getItem("vowly:tg-warned")) return; } catch { /* noop */ }
+    try { sessionStorage.setItem("vowly:tg-warned", "1"); } catch { /* noop */ }
     toast.warning(
       "Telegram ichidagi brauzerda fayl yuklanmaydi. Audio havolasini (URL) qo'shing yoki Chrome'da oching.",
       { duration: 10000 }

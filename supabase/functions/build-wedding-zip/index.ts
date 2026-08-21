@@ -39,7 +39,7 @@ const corsHeaders = {
 /** Sanitize a string so it is safe to use as a filename. */
 function safe(s: string | null | undefined, fallback = "wedding"): string {
   if (!s) return fallback;
-  return s.replace(/[^a-zA-Z0-9_\-]+/g, "_").slice(0, 60) || fallback;
+  return s.replace(/[^a-zA-Z0-9_-]+/g, "_").slice(0, 60) || fallback;
 }
 
 function todayInTashkent(): string {
@@ -79,6 +79,21 @@ Deno.serve(async (req) => {
     const usingServiceKey = token === serviceKey;
     let authenticated = usingServiceKey;
 
+    // ---- load wedding + all related rows ----
+    const { data: wedding, error: wErr } = await admin
+      .from("weddings")
+      .select("*")
+      .eq("id", weddingId)
+      .maybeSingle();
+    if (wErr || !wedding) {
+      return new Response(JSON.stringify({ error: "wedding not found" }), {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const hallId = (wedding as { hall_id: string }).hall_id;
+
     if (!authenticated) {
       const { data: userData, error: userErr } = await admin.auth.getUser(token);
       if (!userErr && userData.user) {
@@ -110,21 +125,6 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    // ---- load wedding + all related rows ----
-    const { data: wedding, error: wErr } = await admin
-      .from("weddings")
-      .select("*")
-      .eq("id", weddingId)
-      .maybeSingle();
-    if (wErr || !wedding) {
-      return new Response(JSON.stringify({ error: "wedding not found" }), {
-        status: 404,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const hallId = (wedding as { hall_id: string }).hall_id;
     const wAny = wedding as {
       bride_name?: string;
       groom_name?: string;
@@ -212,7 +212,7 @@ Deno.serve(async (req) => {
       ),
     );
 
-    void hallId;
+    void hallId; // hallId already used in auth check above
     root.file("artists.json", JSON.stringify(artists.data ?? [], null, 2));
     root.file("menu.json", JSON.stringify(foods.data ?? [], null, 2));
     root.file("rsvp.json", JSON.stringify(rsvps.data ?? [], null, 2));

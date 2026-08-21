@@ -165,6 +165,5 @@ export function musicDebugLog(msg: string) {
   musicDebug.log.push(line);
   if (musicDebug.log.length > 200) musicDebug.log.shift();
   // Also surface through the real console (captured by installConsoleCapture).
-  // eslint-disable-next-line no-console
   console.log("[MUSIC-DEBUG]", msg);
 }

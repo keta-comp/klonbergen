@@ -37,8 +37,8 @@ export default function MusicManager({ hallId }: Props) {
   const [uploading, setUploading] = useState(false);
   const [title, setTitle] = useState('');
 
-  const currentUrl: string | null = (hall as any)?.music_url ?? null;
-  const currentTitle: string = (hall as any)?.music_title ?? '';
+  const currentUrl: string | null = (hall as { music_url?: string | null })?.music_url ?? null;
+  const currentTitle: string = (hall as { music_title?: string | null })?.music_title ?? '';
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
