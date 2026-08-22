@@ -2,7 +2,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { idbSet } from "@/lib/idb";
 import { toast } from "sonner";
-import { musicDebug, musicDebugLog, musicDebugEnabled } from "@/lib/musicDebug";
 import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase/types";
 
 export type Invitation = Tables<"invitations">;
@@ -104,14 +103,6 @@ async function uploadMusicFile(slug: string, file: File | string): Promise<strin
   const contentType = EXT_TO_MIME[ext] || file.type || "audio/mpeg";
   const path = `invitations/${slug}-music-${Date.now()}.${ext}`;
   console.log(`[MUSIC] uploading music for slug=${slug} -> ${path} (type=${file.type || "unknown"}, ext=${ext}, ${file.size} bytes)`);
-  if (musicDebugEnabled()) {
-    musicDebug.uploadStatus = "uploading";
-    musicDebug.uploadPath = path;
-    musicDebug.uploadContentType = contentType;
-    musicDebug.size = file.size;
-    musicDebug.mime = contentType;
-    musicDebugLog(`upload: path=${path} contentType=${contentType} size=${file.size} instanceof File=${file instanceof File}`);
-  }
   const { error } = await supabase.storage
     .from("hall-assets")
     .upload(path, file, {
@@ -121,13 +112,11 @@ async function uploadMusicFile(slug: string, file: File | string): Promise<strin
     });
   if (error) {
     const detail = (error as { message?: string })?.message || JSON.stringify(error);
-    if (musicDebugEnabled()) { musicDebug.uploadStatus = "ERROR"; musicDebug.uploadError = detail; musicDebugLog(`upload ERROR: ${detail}`); }
     console.error(`[MUSIC] upload failed:`, error);
     // Surface the REAL error (not the picker's "wrong format" message).
     throw new Error(`Music upload failed: ${detail}`);
   }
   const { data } = supabase.storage.from("hall-assets").getPublicUrl(path);
-  if (musicDebugEnabled()) { musicDebug.uploadStatus = "OK"; musicDebug.uploadUrl = data.publicUrl; musicDebugLog(`upload OK: ${data.publicUrl}`); }
   console.log(`[MUSIC] uploaded OK, publicUrl=${data.publicUrl}`);
   return data.publicUrl;
 }

@@ -4,7 +4,6 @@ import { toast } from "sonner";
 import { motion } from "framer-motion";
 import type { BuilderState } from "../types";
 import { useTranslation } from "@/i18n/LanguageContext";
-import { musicDebug, musicDebugEnabled, musicDebugLog, musicDebugReset } from "@/lib/musicDebug";
 
 type UpdateFn = <K extends keyof BuilderState>(
   key: K,
@@ -347,41 +346,14 @@ export function MessageForm({
     // misreported as 0 (a MediaStore `_SIZE` quirk) even though the REAL bytes
     // ARE available — `readAsArrayBuffer` still serves them. We verify by
     // actually reading the bytes below and ONLY reject if they are genuinely
-    // empty. The debug console stays on so we can watch this on real devices.
+    // empty.
 
-    // ---- debug capture (what Android REALLY delivered) ----
     const rawExt = file.name.split(".").pop()?.toLowerCase() || "";
-    const isFile = file instanceof File;
-    const isBlob = file instanceof Blob;
-    const ctor = (file as { constructor?: { name?: string } }).constructor?.name ?? "unknown";
     const audioMime =
       !!file.type && file.type !== "application/octet-stream" && file.type.startsWith("audio/");
 
-    if (musicDebugEnabled()) {
-      musicDebugReset();
-      Object.assign(musicDebug, {
-        name: file.name,
-        type: file.type || "(empty)",
-        size: file.size,
-        lastModified: (file as { lastModified?: number }).lastModified ?? null,
-        isFile,
-        isBlob,
-        ctor,
-        extension: rawExt || "(none)",
-        mime: file.type || "(empty)",
-        detectedFormat: "pending",
-        validation: "pending",
-        bytesRead: "pending",
-      });
-      musicDebugLog(
-        `picker RAW: name=${file.name} type=${file.type || "(empty)"} size=${file.size} ` +
-        `lastModified=${file.lastModified ?? "?"} instanceof File=${isFile} ctor=${ctor} ext=${rawExt || "(none)"}`
-      );
-    }
-
     // Size guard (every path).
     if (file.size > 12 * 1024 * 1024) {
-      if (musicDebugEnabled()) { musicDebug.validation = "REJECT (too large)"; musicDebugLog("validation: REJECT too large"); }
       toast.error(t("builder.message.musicTooLarge"));
       return;
     }
@@ -391,7 +363,6 @@ export function MessageForm({
     // re-read needed. Files whose size is misreported as 0 fall through to the
     // byte-read path below, which recovers their real content.
     if (audioMime && ALLOWED_EXT.includes(rawExt) && file.size > 0) {
-      if (musicDebugEnabled()) { musicDebug.detectedFormat = "skip (healthy)"; musicDebug.mime = file.type; musicDebug.extension = rawExt || musicDebug.extension; musicDebug.validation = "ACCEPT (audio MIME + ext)"; musicDebugLog(`validation: ACCEPT via healthy audio MIME ${file.type}`); }
       console.log(`[MUSIC] picked ${file.name} (type=${file.type}, ${file.size} bytes)`);
       update("music", file);
       return;
@@ -400,17 +371,17 @@ export function MessageForm({
     // Android / Telegram path. Read the ACTUAL bytes — this defeats the empty
     // `file.type`, the missing extension, AND the content-URI display-name, and
     // lets us re-wrap the file into a real in-memory File with a guaranteed
-    // extension + correct MIME that Supabase can read and tag. If the bytes
-    // cannot be read (locked content-URI) we still accept the raw object so the
-    // upload surfaces the REAL error instead of a false "wrong format".
+    // extension + correct MIME that Supabase can read and tag.
     const bytes = await readFileBytes(file);
-    if (musicDebugEnabled()) { musicDebug.bytesRead = bytes ? `READ OK (${bytes.byteLength}B)` : "READ FAIL"; musicDebugLog(`bytes: ${bytes ? "READ OK " + bytes.byteLength + "B" : "READ FAIL (content-URI locked?)"}`); }
-
-    // Genuinely empty? Only now do we reject — but note: a misreported-size
-    // Android file usually returns real bytes here, so we only land here when
-    // the picker truly handed us nothing.
-    if (bytes && bytes.byteLength === 0) {
-      if (musicDebugEnabled()) { musicDebug.validation = "REJECT (0 bytes, verified by read)"; musicDebugLog("validation: REJECT — 0 bytes actually read; picker returned an empty file"); }
+    if (!bytes) {
+      toast.error(
+        "Brauzer bu faylni o'qiy olmadi. Telefon xotirasidagi Files/Dokumentlar ilovasidan tanlang yoki audio havolasini (URL) qo'shing.",
+        { duration: 8000 }
+      );
+      console.warn(`[MUSIC] REJECT: all read strategies returned 0 bytes / failed. Content-URI unreachable. UA=${typeof navigator !== "undefined" ? navigator.userAgent : "?"}`);
+      return;
+    }
+    if (bytes.byteLength === 0) {
       toast.error(
         "Fayl bo'sh (0 bayt). Pastdagi «Telefon xotirasidan tanlash» tugmasi orqali Files/Dokumentlar ilovasidan tanlang yoki audio havolasini (URL) qo'shing.",
         { duration: 8000 }
@@ -419,20 +390,8 @@ export function MessageForm({
       return;
     }
 
-    if (!bytes) {
-      if (musicDebugEnabled()) { musicDebug.validation = "REJECT (all read strategies failed)"; musicDebugLog("validation: REJECT — FileReader + arrayBuffer + slices all returned 0; content-URI unreachable"); }
-      toast.error(
-        "Brauzer bu faylni o'qiy olmadi. Telefon xotirasidagi Files/Dokumentlar ilovasidan tanlang yoki audio havolasini (URL) qo'shing.",
-        { duration: 8000 }
-      );
-      console.warn(`[MUSIC] REJECT: all read strategies returned 0 bytes / failed. Content-URI unreachable. UA=${typeof navigator !== "undefined" ? navigator.userAgent : "?"}`);
-      return;
-    }
-
     const sniffed = sniffAudioExt(bytes);
-    if (musicDebugEnabled()) { musicDebug.detectedFormat = sniffed ?? "NONE"; if (sniffed) { musicDebug.extension = sniffed; musicDebug.mime = EXT_TO_MIME[sniffed] || "audio/mpeg"; } musicDebugLog(`magic-byte: ${sniffed ?? "NONE (not an audio format)"}`); }
     if (!sniffed) {
-      if (musicDebugEnabled()) musicDebug.validation = "REJECT (magic NONE)";
       toast.error(t("builder.message.musicType"));
       return;
     }
@@ -446,7 +405,6 @@ export function MessageForm({
       type: finalMime,
       lastModified: (file as { lastModified?: number }).lastModified ?? Date.now(),
     });
-    if (musicDebugEnabled()) { musicDebug.validation = `ACCEPT (normalized .${finalExt} ${finalMime})`; musicDebug.mime = finalMime; musicDebug.extension = finalExt; musicDebugLog(`validation: ACCEPT normalized -> ${finalName} (${finalMime})`); }
     console.log(`[MUSIC] picked+normalized ${finalName} (type=${finalMime}, ${normalized.size} bytes)`);
     update("music", normalized);
   };
@@ -478,7 +436,6 @@ export function MessageForm({
       toast.error(t("builder.message.musicUrlInvalid"));
       return;
     }
-    if (musicDebugEnabled()) { musicDebugLog(`music URL added: ${url}`); }
     update("music", url);
     setMusicUrlInput("");
     toast.success(t("builder.message.musicUrlAdded"));

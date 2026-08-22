@@ -13,7 +13,6 @@ import {
   VenueForm,
   MessageForm,
 } from "@/components/invitation/builder/forms";
-import { DebugOverlay } from "@/components/invitation/builder/DebugOverlay";
 import Seo from "@/components/seo/Seo";
 import { useCreateInvitation } from "@/hooks/useInvitations";
 import { idbGet, idbSet, idbDel } from "@/lib/idb";
@@ -348,7 +347,6 @@ export default function InvitationBuilder() {
           </div>
         </aside>
       </main>
-      <DebugOverlay />
     </div>
   );
 }
