@@ -299,9 +299,9 @@
       "musicDeleted": "Music deleted",
       "musicDeleteConfirm": "Confirm deleting the music?",
       "musicUploadError": "Upload error",
-      "musicUrlLabel": "Or paste an audio file link (URL)",
-      "musicUrlPlaceholder": "https://.../music.mp3",
-      "musicUrlButton": "Add via link",
+      "musicUrlLabel": "Or paste an audio link (URL)",
+      "musicUrlPlaceholder": "https://example.com/music.mp3",
+      "musicUrlButton": "Add",
       "musicUrlInvalid": "Invalid link. Use a direct audio URL starting with https://",
       "musicUrlAdded": "Audio link added",
       "musicDeleteError": "Could not delete music",
@@ -349,7 +349,8 @@
       "title": "Create invitation — Vowly",
       "desc": "Create a professional digital wedding invitation in a few minutes. Real-time preview, premium templates, ready in minutes."
     },
-    "errorGeneric": "An error occurred"
+    "errorGeneric": "An error occurred",
+    "missingRequiredTitle": "Please complete the following"
   },
   "invitation": {
     "copyOk": "Link copied!",

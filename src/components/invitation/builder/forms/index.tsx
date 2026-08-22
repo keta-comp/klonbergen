@@ -534,7 +534,7 @@ export function MessageForm({
         ) : (
           <button
             type="button"
-            className="inv-uploader-add"
+            className="inv-uploader-add inv-uploader-add--inline"
             onClick={() => musicRef.current?.click()}
             style={{ width: "100%" }}
           >
@@ -564,9 +564,9 @@ export function MessageForm({
         <div style={{ display: "flex", gap: 8, marginTop: "0.5rem", flexWrap: "wrap" }}>
           <button
             type="button"
-            className="inv-uploader-add"
+            className="inv-uploader-add inv-uploader-add--inline"
             onClick={() => filesRef.current?.click()}
-            style={{ flex: "1 1 auto", fontSize: "0.72rem", padding: "0.55rem 0.9rem" }}
+            style={{ flex: "1 1 auto", fontSize: "0.72rem" }}
             title={t("builder.message.musicFilesHint")}
           >
             <Music className="h-4 w-4" />
@@ -577,7 +577,7 @@ export function MessageForm({
             in-app WebView where the file picker delivers 0-byte files. */}
         <div className="inv-field" style={{ marginTop: "0.5rem" }}>
           <label className="inv-label">{t("builder.message.musicUrlLabel")}</label>
-          <div style={{ display: "flex", gap: 6 }}>
+          <div className="inv-music-url-row">
             <input
               className="inv-input"
               type="url"
@@ -585,13 +585,11 @@ export function MessageForm({
               placeholder={t("builder.message.musicUrlPlaceholder")}
               value={musicUrlInput}
               onChange={(e) => setMusicUrlInput(e.target.value)}
-              style={{ flex: 1, minWidth: 0 }}
             />
             <button
               type="button"
-              className="inv-uploader-add"
+              className="inv-uploader-add inv-uploader-add--inline"
               onClick={onMusicUrlAdd}
-              style={{ width: "auto", padding: "0 0.8rem", whiteSpace: "nowrap" }}
             >
               {t("builder.message.musicUrlButton")}
             </button>

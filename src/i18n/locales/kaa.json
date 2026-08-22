@@ -299,9 +299,9 @@
       "musicDeleted": "Musıqa óshirildi",
       "musicDeleteConfirm": "Musıqanı óshiriwdi tasdiqlaysızba?",
       "musicUploadError": "Júklewde qatelik",
-      "musicUrlLabel": "Yamasa audio fayl havolasın (URL) qosıń",
-      "musicUrlPlaceholder": "https://.../musıqa.mp3",
-      "musicUrlButton": "Havola arqalı qosıw",
+      "musicUrlLabel": "Yamasa URL arqalı qosıń",
+      "musicUrlPlaceholder": "https://example.com/musıqa.mp3",
+      "musicUrlButton": "Qosıw",
       "musicUrlInvalid": "Qáte havola. https:// menen baslanatuǵın tuwrıdan-tuwrı audio havolası bolıwı kerek",
       "musicUrlAdded": "Audio havola qosıldı",
       "musicDeleteError": "Musıqanı óshiriw bolmadı",
@@ -349,7 +349,8 @@
       "title": "Taklifnoma jaratıw — Vowly",
       "desc": "Bir neshe minutta professional raqamlı to'y taklifnoması jaratıń. Real-time preview, premium shablonlar, bir neshe minutta tayar."
     },
-    "errorGeneric": "Qátelik júz berdi"
+    "errorGeneric": "Qátelik júz berdi",
+    "missingRequiredTitle": "Tómendegilerdi toltırıń"
   },
   "invitation": {
     "copyOk": "Siltew kóshirildi!",

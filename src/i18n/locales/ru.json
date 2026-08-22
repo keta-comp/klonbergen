@@ -299,9 +299,9 @@
       "musicDeleted": "Музыка удалена",
       "musicDeleteConfirm": "Подтвердить удаление музыки?",
       "musicUploadError": "Ошибка загрузки",
-      "musicUrlLabel": "Или вставьте ссылку на аудиофайл (URL)",
-      "musicUrlPlaceholder": "https://.../music.mp3",
-      "musicUrlButton": "Добавить по ссылке",
+      "musicUrlLabel": "Или добавьте по ссылке (URL)",
+      "musicUrlPlaceholder": "https://example.com/music.mp3",
+      "musicUrlButton": "Добавить",
       "musicUrlInvalid": "Неверная ссылка. Используйте прямую ссылку на аудио, начинающуюся с https://",
       "musicUrlAdded": "Аудиоссылка добавлена",
       "musicDeleteError": "Не удалось удалить музыку",
@@ -349,7 +349,8 @@
       "title": "Создать приглашение — Vowly",
       "desc": "Создайте профессиональное цифровое свадебное приглашение за несколько минут. Превью в реальном времени, премиальные шаблоны, готово за несколько минут."
     },
-    "errorGeneric": "Произошла ошибка"
+    "errorGeneric": "Произошла ошибка",
+    "missingRequiredTitle": "Заполните следующие поля"
   },
   "invitation": {
     "copyOk": "Ссылка скопирована!",

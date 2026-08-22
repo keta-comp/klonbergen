@@ -32,9 +32,9 @@ const MONTHS = [
 ];
 
 function fmtDate(iso: string) {
-  if (!iso) return { day: "01", month: "oktabr", year: "2026", weekday: "Du" };
+  if (!iso) return null;
   const d = new Date(`${iso}T00:00:00`);
-  if (Number.isNaN(d.getTime())) return { day: "01", month: "oktabr", year: "2026", weekday: "Du" };
+  if (Number.isNaN(d.getTime())) return null;
   return {
     day: String(d.getDate()).padStart(2, "0"),
     month: MONTHS[d.getMonth()],
@@ -60,6 +60,10 @@ function useCountdown(target: Date) {
 
 export default function InvitationPreview({ state }: Props) {
   const d = fmtDate(state.weddingDate);
+  // No wedding date set yet → fall back to "today at 19:00" for the countdown
+  // clock so it doesn't tick at all-zeros (which read as "the wedding already
+  // happened"). On the live text labels show em-dashes so the user clearly
+  // sees what is still missing.
   const target = state.weddingDate && state.weddingTime
     ? new Date(`${state.weddingDate}T${state.weddingTime}:00`)
     : new Date(`${new Date().toISOString().slice(0, 10)}T19:00:00`);
@@ -70,9 +74,14 @@ export default function InvitationPreview({ state }: Props) {
   const venue = state.venueName.trim() || "Toy markazi";
   const address = state.address.trim() || "Manzil";
   const time = state.weddingTime || "19:00";
-  const dateLabel = state.weddingDate
-    ? `${d.day}.${String(new Date(state.weddingDate).getMonth() + 1).padStart(2, "0")}.${d.year}`
-    : "01.10.2026";
+  const dateLabel = d ? `${d.day}.${String(new Date(state.weddingDate).getMonth() + 1).padStart(2, "0")}.${d.year}` : "—.—.—";
+  const monthLabel = d?.month ?? "—";
+  const dayLabel = d?.day ?? "—";
+  const weekdayLabel = d?.weekday ?? "—";
+  const yearLabel = d?.year ?? "—";
+  // When the wedding date is empty, hide the countdown entirely — it's a
+  // placeholder for "X days until the wedding", not for "00 days until nothing".
+  const showCountdown = !!state.weddingDate && !!state.weddingTime;
 
   return (
     <div className="inv-phone" aria-hidden="true">
@@ -104,19 +113,16 @@ export default function InvitationPreview({ state }: Props) {
               <h3 className="inv-overlay-final">{state.welcomeText || "Hurmatli mehmonlar..."}</h3>
               <p className="inv-overlay-text">{state.invitationText}</p>
             </div>
-            <div
-              className="inv-screen-overlay"
-              style={{ justifyContent: "flex-end", paddingBottom: "16%" }}
-            >
+            <div className="inv-screen-overlay" style={{ justifyContent: "flex-end", paddingBottom: "16%" }}>
               <div className="inv-overlay-eyebrow" style={{ marginBottom: 0 }}>
-                {d.month}
+                {monthLabel}
               </div>
               <div style={{ display: "flex", alignItems: "baseline", gap: "0.4rem", marginTop: "0.1rem" }}>
                 <span className="inv-overlay-names" style={{ fontSize: "1.7rem" }}>
-                  {d.day}
+                  {dayLabel}
                 </span>
-                <span className="inv-overlay-meta">{d.weekday}</span>
-                <span className="inv-overlay-meta">{d.year}</span>
+                <span className="inv-overlay-meta">{weekdayLabel}</span>
+                <span className="inv-overlay-meta">{yearLabel}</span>
               </div>
             </div>
           </Screen>
@@ -158,7 +164,7 @@ export default function InvitationPreview({ state }: Props) {
                   { v: cd.seconds, l: "sekund" },
                 ].map((c) => (
                   <div key={c.l} style={{ textAlign: "center" }}>
-                    <div className="inv-overlay-cd-num">{String(c.v).padStart(2, "0")}</div>
+                    <div className="inv-overlay-cd-num">{showCountdown ? String(c.v).padStart(2, "0") : "—"}</div>
                     <div className="inv-overlay-cd-label">{c.l}</div>
                   </div>
                 ))}

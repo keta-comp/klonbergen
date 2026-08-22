@@ -1762,7 +1762,6 @@ img, video, svg, canvas { max-width: 100%; height: auto; }
   color: var(--iv-ink);
 }
 .inv-uploader-add {
-  aspect-ratio: 1;
   border: 1px dashed var(--vi-line-strong);
   border-radius: 6px;
   background: transparent;
@@ -1779,7 +1778,46 @@ img, video, svg, canvas { max-width: 100%; height: auto; }
   text-transform: uppercase;
   transition: border-color 0.3s, color 0.3s;
 }
+/* The square shape only applies inside the photo grid — everywhere else the
+   button is reused (music upload, file picker, URL row) it should render as a
+   normal inline button with auto aspect ratio. */
+.inv-uploader > .inv-uploader-add {
+  aspect-ratio: 1;
+}
+/* Inline variant — icon and label sit side-by-side (not stacked) so the
+   button reads like a normal pill, not a tall thin column. */
+.inv-uploader-add--inline {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.7rem 1rem;
+  width: auto;
+}
 .inv-uploader-add:hover { border-color: var(--vi-gold); color: var(--vi-gold); }
+
+/* ----- music URL row (input + add button) -----
+   The default `.inv-uploader-add` is a square tile for the photo gallery.
+   When reused as the URL-row's "Add" button we want a normal inline button
+   that wraps onto its own line on very narrow phones so the input never
+   overflows the screen. */
+.inv-music-url-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.inv-music-url-row > .inv-input {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+.inv-music-url-row > .inv-uploader-add {
+  aspect-ratio: auto;
+  height: auto;
+  flex: 0 0 auto;
+  padding: 0.6rem 0.9rem;
+  width: auto;
+}
 
 /* ----- date picker ----- */
 .inv-date-grid {

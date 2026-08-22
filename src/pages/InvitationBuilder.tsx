@@ -185,6 +185,21 @@ export default function InvitationBuilder() {
   const canAdvance = stepErrors.length === 0;
   const isLast = stepIdx === STEPS.length - 1;
 
+  // `canAdvance` only checks the CURRENT step's errors. On the LAST step (the
+  // create button) we must additionally verify every required field across all
+  // steps, otherwise the user can land on step 4 with an empty wedding date
+  // (e.g. from a restored draft that skipped step 2) and the Supabase insert
+  // fails with `invalid input syntax for type date: ""`.
+  const allRequiredErrors = useMemo(
+    () => [
+      ...errors.couple,
+      ...errors.date,
+      ...errors.venue,
+    ],
+    [errors]
+  );
+  const canCreate = allRequiredErrors.length === 0;
+
   // Move between steps by updating the URL. Because the active step is derived
   // from the URL, this also makes browser Back/Forward walk the wizard with no
   // full-page reload. A new history entry is pushed so Back/Forward works.
@@ -199,7 +214,15 @@ export default function InvitationBuilder() {
   const prev = () => goToStep(stepIdx - 1);
 
   const handleCreate = async () => {
-    if (!canAdvance) return;
+    // Final guard: every required field across every step must be filled.
+    // The per-step `canAdvance` only checks the CURRENT step's errors, so a
+    // restored draft that lands on step 4 with an empty date could otherwise
+    // fire a Supabase insert that fails with `invalid input syntax for type
+    // date`. Surface the missing-field list to the user instead.
+    if (!canCreate) {
+      toast.error(allRequiredErrors[0] ?? t("builder.errorGeneric"));
+      return;
+    }
     setSubmitting(true);
     try {
       const inv = await create.mutateAsync({
@@ -314,6 +337,80 @@ export default function InvitationBuilder() {
             </motion.div>
           </AnimatePresence>
 
+          {/* On the last step, show the missing required fields if any — the
+              per-step `stepErrors` is empty here, but the user still needs to
+              know WHY the Create button is disabled. Tap an item to jump to
+              the step that owns it. */}
+          {isLast && allRequiredErrors.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              role="alert"
+              style={{
+                marginTop: "1.2rem",
+                padding: "0.9rem 1rem",
+                border: "1px solid rgba(176, 136, 56, 0.35)",
+                borderRadius: 10,
+                background: "rgba(176, 136, 56, 0.06)",
+                fontFamily: "Inter, sans-serif",
+                fontSize: "0.78rem",
+                color: "var(--iv-ink)",
+                lineHeight: 1.6,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "0.62rem",
+                  letterSpacing: "0.28em",
+                  textTransform: "uppercase",
+                  color: "var(--vi-gold)",
+                  marginBottom: "0.4rem",
+                }}
+              >
+                {t("builder.missingRequiredTitle")}
+              </div>
+              {allRequiredErrors.map((msg, i) => {
+                // Map the error message back to the owning step so a tap can
+                // jump the user back to it. The messages themselves are
+                // already localised.
+                const owner =
+                  errors.couple.includes(msg)
+                    ? "couple"
+                    : errors.date.includes(msg)
+                    ? "date"
+                    : errors.venue.includes(msg)
+                    ? "venue"
+                    : null;
+                return (
+                  <button
+                    key={`${msg}-${i}`}
+                    type="button"
+                    onClick={() => owner && goToStep(STEPS.findIndex((x) => x.id === owner))}
+                    style={{
+                      display: "block",
+                      width: "100%",
+                      textAlign: "left",
+                      background: "transparent",
+                      border: 0,
+                      padding: "0.2rem 0",
+                      color: "inherit",
+                      font: "inherit",
+                      cursor: owner ? "pointer" : "default",
+                    }}
+                  >
+                    — {msg}
+                    {owner && (
+                      <span style={{ marginLeft: 6, opacity: 0.55, fontSize: "0.7em" }}>
+                        →
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </motion.div>
+          )}
+
           <div className="inv-nav">
             <button className="inv-btn" onClick={prev} disabled={stepIdx === 0}>
               <ArrowLeft className="mr-1.5 inline h-3.5 w-3.5" /> {t("builder.nav.back")}
@@ -330,7 +427,7 @@ export default function InvitationBuilder() {
               <button
                 className="inv-btn inv-btn-primary"
                 onClick={handleCreate}
-                disabled={!canAdvance || submitting}
+                disabled={!canCreate || submitting}
               >
                 {submitting ? t("builder.nav.creating") : t("builder.nav.create")}{" "}
                 <ArrowRight className="ml-1.5 inline h-3.5 w-3.5" />

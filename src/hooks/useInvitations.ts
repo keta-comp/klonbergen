@@ -178,12 +178,20 @@ export function useCreateInvitation() {
         }
       }
 
+      // Sanitize date / time strings. PostgreSQL's `date` and `time` columns
+      // REJECT empty strings with `invalid input syntax for type date: ""`
+      // — a `null` is the only correct value for "not set". Send null when the
+      // form is empty (defensive: covers restored drafts whose fields were
+      // cleared, plus any path that bypasses the wizard's per-step validation).
+      const safeDate = (draft.weddingDate || "").trim();
+      const safeTime = (draft.weddingTime || "").trim();
+
       const payload: TablesInsert<"invitations"> = {
         slug,
         bride_name: draft.brideName.trim(),
         groom_name: draft.groomName.trim(),
-        wedding_date: draft.weddingDate,
-        wedding_time: draft.weddingTime,
+        wedding_date: safeDate || null,
+        wedding_time: safeTime || null,
         hall_name: draft.venueName.trim(),
         address: draft.address.trim() || null,
         photos,

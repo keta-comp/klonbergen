@@ -299,9 +299,9 @@
       "musicDeleted": "Musiqa o'chirildi",
       "musicDeleteConfirm": "Musiqani o'chirishni tasdiqlaysizmi?",
       "musicUploadError": "Yuklashda xatolik",
-      "musicUrlLabel": "Yoki audio fayl havolasini (URL) qo'shing",
-      "musicUrlPlaceholder": "https://.../musiqa.mp3",
-      "musicUrlButton": "Havola orqali qo'shish",
+      "musicUrlLabel": "Yoki URL orqali qo'shing",
+      "musicUrlPlaceholder": "https://example.com/musiqa.mp3",
+      "musicUrlButton": "Qo'shish",
       "musicUrlInvalid": "Noto'g'ri havola. https:// bilan boshlanadigan to'g'ridan-to'g'ri audio havolasi bo'lishi kerak",
       "musicUrlAdded": "Audio havola qo'shildi",
       "musicFilesBtn": "Telefon xotirasidan tanlash",
@@ -349,7 +349,8 @@
       "title": "Taklifnoma yaratish — Vowly",
       "desc": "Bir necha daqiqada professional raqamli to'y taklifnomasi yarating. Real-time prevyu, premium shablonlar, bir necha daqiqada tayyor."
     },
-    "errorGeneric": "Xatolik yuz berdi"
+    "errorGeneric": "Xatolik yuz berdi",
+    "missingRequiredTitle": "Quyidagilarni to'ldiring"
   },
   "invitation": {
     "copyOk": "Havola nusxalandi!",
