@@ -290,16 +290,33 @@ export function MessageForm({
   // Read a file's raw bytes. Uses FileReader (not Blob.arrayBuffer) because some
   // Android / Telegram WebViews do not implement `Blob.arrayBuffer()` reliably.
   // Resolves to null if the bytes cannot be read (e.g. a locked content-URI).
+  //
+  // Fallback: a misreported-size Android content-URI File can return 0 bytes on
+  // a full read even though the provider serves real content. If the first read
+  // comes back empty, retry by reading a 50 MB slice — that materialises the
+  // real bytes from the provider. (Music is capped well under 50 MB upstream.)
   const readFileBytes = (f: Blob): Promise<ArrayBuffer | null> =>
     new Promise((resolve) => {
-      try {
-        const fr = new FileReader();
-        fr.onload = () => resolve((fr.result as ArrayBuffer) ?? null);
-        fr.onerror = () => resolve(null);
-        fr.readAsArrayBuffer(f);
-      } catch {
-        resolve(null);
-      }
+      const readOnce = (blob: Blob): Promise<ArrayBuffer | null> =>
+        new Promise((res) => {
+          try {
+            const fr = new FileReader();
+            fr.onload = () => res((fr.result as ArrayBuffer) ?? null);
+            fr.onerror = () => res(null);
+            fr.readAsArrayBuffer(blob);
+          } catch {
+            res(null);
+          }
+        });
+      readOnce(f).then((first) => {
+        if (first && first.byteLength > 0) return resolve(first);
+        // Empty on first try — attempt a provider slice before giving up.
+        try {
+          readOnce(f.slice(0, 50 * 1024 * 1024)).then((slice) => resolve(slice));
+        } catch {
+          resolve(first);
+        }
+      });
     });
 
   const onMusicPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -307,19 +324,12 @@ export function MessageForm({
     e.target.value = ""; // reset so the same file can be re-picked
     if (!file) return;
 
-    // ---- 0-byte guard: Telegram Android WebView delivers a 0-byte stub via
-    // its in-app file picker (the real audio is never exposed to the page, so
-    // any "selected" chip would be empty and unplayable). Reject it explicitly
-    // with a clear instruction instead of silently accepting an unusable file.
-    if (file.size === 0) {
-      if (musicDebugEnabled()) { musicDebug.size = 0; musicDebug.validation = "REJECT (0 bytes)"; musicDebugLog("REJECT: file.size is 0 — Telegram WebView delivers an empty file. Open in Chrome to fix."); }
-      toast.error(
-        "Fayl bo'sh (0 bayt). Bu Telegram ichidagi brauzer muammosi — sahifani Chrome brauzerida ochib qayta urinib ko'ring.",
-        { duration: 8000 }
-      );
-      console.warn(`[MUSIC] REJECT: file.size is 0. Telegram WebView blocks the file. UA=${typeof navigator !== "undefined" ? navigator.userAgent : "?"}`);
-      return;
-    }
+    // ---- DO NOT reject on `file.size === 0` up front. On some Android Chrome
+    // builds the <input type=file> picker returns a File whose `size` field is
+    // misreported as 0 (a MediaStore `_SIZE` quirk) even though the REAL bytes
+    // ARE available — `readAsArrayBuffer` still serves them. We verify by
+    // actually reading the bytes below and ONLY reject if they are genuinely
+    // empty. The debug console stays on so we can watch this on real devices.
 
     // ---- debug capture (what Android REALLY delivered) ----
     const rawExt = file.name.split(".").pop()?.toLowerCase() || "";
@@ -359,8 +369,10 @@ export function MessageForm({
     }
 
     // Fast path: a genuinely healthy audio file (real audio MIME + known
-    // extension) — the desktop / modern-mobile case. No re-read needed.
-    if (audioMime && ALLOWED_EXT.includes(rawExt)) {
+    // extension AND a non-zero size) — the desktop / modern-mobile case. No
+    // re-read needed. Files whose size is misreported as 0 fall through to the
+    // byte-read path below, which recovers their real content.
+    if (audioMime && ALLOWED_EXT.includes(rawExt) && file.size > 0) {
       if (musicDebugEnabled()) { musicDebug.detectedFormat = "skip (healthy)"; musicDebug.mime = file.type; musicDebug.extension = rawExt || musicDebug.extension; musicDebug.validation = "ACCEPT (audio MIME + ext)"; musicDebugLog(`validation: ACCEPT via healthy audio MIME ${file.type}`); }
       console.log(`[MUSIC] picked ${file.name} (type=${file.type}, ${file.size} bytes)`);
       update("music", file);
@@ -375,6 +387,19 @@ export function MessageForm({
     // upload surfaces the REAL error instead of a false "wrong format".
     const bytes = await readFileBytes(file);
     if (musicDebugEnabled()) { musicDebug.bytesRead = bytes ? `READ OK (${bytes.byteLength}B)` : "READ FAIL"; musicDebugLog(`bytes: ${bytes ? "READ OK " + bytes.byteLength + "B" : "READ FAIL (content-URI locked?)"}`); }
+
+    // Genuinely empty? Only now do we reject — but note: a misreported-size
+    // Android file usually returns real bytes here, so we only land here when
+    // the picker truly handed us nothing.
+    if (bytes && bytes.byteLength === 0) {
+      if (musicDebugEnabled()) { musicDebug.validation = "REJECT (0 bytes, verified by read)"; musicDebugLog("validation: REJECT — 0 bytes actually read; picker returned an empty file"); }
+      toast.error(
+        "Fayl bo'sh (0 bayt). Musiqani telefoningiz xotirasidan (Files / Dokumentlar ilovasi orqali) tanlang yoki audio havolasini (URL) qo'shing.",
+        { duration: 8000 }
+      );
+      console.warn(`[MUSIC] REJECT: 0 bytes actually read. Picker returned an empty file. UA=${typeof navigator !== "undefined" ? navigator.userAgent : "?"}`);
+      return;
+    }
 
     if (!bytes) {
       if (musicDebugEnabled()) { musicDebug.validation = "ACCEPT (raw, bytes unreadable)"; musicDebugLog("bytes unreadable -> accepting raw file; upload will surface real error if any"); }
