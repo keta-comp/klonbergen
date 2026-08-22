@@ -252,6 +252,11 @@ export function MessageForm({
 }) {
   const { t } = useTranslation();
   const musicRef = useRef<HTMLInputElement>(null);
+  // Second input: open the system file manager (Files / Documents) instead of
+  // the media/audio picker. On some Android builds the media picker hands back
+  // a content-URI File that the web can't read (0 bytes), while the document
+  // picker returns real bytes from the phone's local storage.
+  const filesRef = useRef<HTMLInputElement>(null);
 
   // Allowed background-music formats (matches the upload pipeline).
   const ALLOWED_EXT = ["mp3", "wav", "m4a", "aac", "ogg"];
@@ -287,37 +292,50 @@ export function MessageForm({
     return null;
   };
 
-  // Read a file's raw bytes. Uses FileReader (not Blob.arrayBuffer) because some
-  // Android / Telegram WebViews do not implement `Blob.arrayBuffer()` reliably.
-  // Resolves to null if the bytes cannot be read (e.g. a locked content-URI).
-  //
-  // Fallback: a misreported-size Android content-URI File can return 0 bytes on
-  // a full read even though the provider serves real content. If the first read
-  // comes back empty, retry by reading a 50 MB slice — that materialises the
-  // real bytes from the provider. (Music is capped well under 50 MB upstream.)
-  const readFileBytes = (f: Blob): Promise<ArrayBuffer | null> =>
-    new Promise((resolve) => {
-      const readOnce = (blob: Blob): Promise<ArrayBuffer | null> =>
-        new Promise((res) => {
-          try {
-            const fr = new FileReader();
-            fr.onload = () => res((fr.result as ArrayBuffer) ?? null);
-            fr.onerror = () => res(null);
-            fr.readAsArrayBuffer(blob);
-          } catch {
-            res(null);
-          }
-        });
-      readOnce(f).then((first) => {
-        if (first && first.byteLength > 0) return resolve(first);
-        // Empty on first try — attempt a provider slice before giving up.
+  // Read a file's raw bytes. Different Android Chrome / WebView builds expose
+  // different APIs reliably — some misreport `File.size` as 0 but still serve
+  // bytes through a slice; some break FileReader but keep `Blob.arrayBuffer()`.
+  // We try four strategies in order and return the first non-empty buffer:
+  //   1. FileReader.readAsArrayBuffer on the full file
+  //   2. FileReader on a 50 MB slice (forces the provider to materialise bytes)
+  //   3. Blob.arrayBuffer() on the full file
+  //   4. Blob.arrayBuffer() on the 50 MB slice
+  // Resolves to null only if every strategy returns 0 bytes / fails.
+  const readFileBytes = async (f: Blob): Promise<ArrayBuffer | null> => {
+    const slice = f.slice(0, 50 * 1024 * 1024);
+    const tryFileReader = (blob: Blob): Promise<ArrayBuffer | null> =>
+      new Promise((res) => {
         try {
-          readOnce(f.slice(0, 50 * 1024 * 1024)).then((slice) => resolve(slice));
+          const fr = new FileReader();
+          fr.onload = () => res((fr.result as ArrayBuffer) ?? null);
+          fr.onerror = () => res(null);
+          fr.readAsArrayBuffer(blob);
         } catch {
-          resolve(first);
+          res(null);
         }
       });
-    });
+    const tryArrayBuffer = async (blob: Blob): Promise<ArrayBuffer | null> => {
+      try {
+        if (typeof (blob as Blob & { arrayBuffer?: () => Promise<ArrayBuffer> }).arrayBuffer === "function") {
+          return await blob.arrayBuffer();
+        }
+      } catch {
+        /* noop */
+      }
+      return null;
+    };
+    const strategies: Array<() => Promise<ArrayBuffer | null>> = [
+      () => tryFileReader(f),
+      () => tryFileReader(slice),
+      () => tryArrayBuffer(f),
+      () => tryArrayBuffer(slice),
+    ];
+    for (const strat of strategies) {
+      const ab = await strat();
+      if (ab && ab.byteLength > 0) return ab;
+    }
+    return null;
+  };
 
   const onMusicPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -394,7 +412,7 @@ export function MessageForm({
     if (bytes && bytes.byteLength === 0) {
       if (musicDebugEnabled()) { musicDebug.validation = "REJECT (0 bytes, verified by read)"; musicDebugLog("validation: REJECT — 0 bytes actually read; picker returned an empty file"); }
       toast.error(
-        "Fayl bo'sh (0 bayt). Musiqani telefoningiz xotirasidan (Files / Dokumentlar ilovasi orqali) tanlang yoki audio havolasini (URL) qo'shing.",
+        "Fayl bo'sh (0 bayt). Pastdagi «Telefon xotirasidan tanlash» tugmasi orqali Files/Dokumentlar ilovasidan tanlang yoki audio havolasini (URL) qo'shing.",
         { duration: 8000 }
       );
       console.warn(`[MUSIC] REJECT: 0 bytes actually read. Picker returned an empty file. UA=${typeof navigator !== "undefined" ? navigator.userAgent : "?"}`);
@@ -402,9 +420,12 @@ export function MessageForm({
     }
 
     if (!bytes) {
-      if (musicDebugEnabled()) { musicDebug.validation = "ACCEPT (raw, bytes unreadable)"; musicDebugLog("bytes unreadable -> accepting raw file; upload will surface real error if any"); }
-      console.warn(`[MUSIC] could not read bytes, accepting raw file:`, file);
-      update("music", file);
+      if (musicDebugEnabled()) { musicDebug.validation = "REJECT (all read strategies failed)"; musicDebugLog("validation: REJECT — FileReader + arrayBuffer + slices all returned 0; content-URI unreachable"); }
+      toast.error(
+        "Brauzer bu faylni o'qiy olmadi. Telefon xotirasidagi Files/Dokumentlar ilovasidan tanlang yoki audio havolasini (URL) qo'shing.",
+        { duration: 8000 }
+      );
+      console.warn(`[MUSIC] REJECT: all read strategies returned 0 bytes / failed. Content-URI unreachable. UA=${typeof navigator !== "undefined" ? navigator.userAgent : "?"}`);
       return;
     }
 
@@ -572,6 +593,29 @@ export function MessageForm({
           onChange={onMusicPick}
           style={{ display: "none" }}
         />
+        {/* Fallback picker: open the system file manager (Files / Documents)
+            instead of the media/audio picker. Useful on Android when the audio
+            picker returns an unreadable content-URI file (0 bytes). */}
+        <input
+          ref={filesRef}
+          type="file"
+          accept=".mp3,.wav,.m4a,.aac,.ogg,audio/*,*/*"
+          className="hidden"
+          onChange={onMusicPick}
+          style={{ display: "none" }}
+        />
+        <div style={{ display: "flex", gap: 8, marginTop: "0.5rem", flexWrap: "wrap" }}>
+          <button
+            type="button"
+            className="inv-uploader-add"
+            onClick={() => filesRef.current?.click()}
+            style={{ flex: "1 1 auto", fontSize: "0.72rem", padding: "0.55rem 0.9rem" }}
+            title={t("builder.message.musicFilesHint")}
+          >
+            <Music className="h-4 w-4" />
+            <span>{t("builder.message.musicFilesBtn")}</span>
+          </button>
+        </div>
         {/* Alternative: paste a direct audio URL — works inside Telegram's
             in-app WebView where the file picker delivers 0-byte files. */}
         <div className="inv-field" style={{ marginTop: "0.5rem" }}>

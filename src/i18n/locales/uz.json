@@ -304,6 +304,8 @@
       "musicUrlButton": "Havola orqali qo'shish",
       "musicUrlInvalid": "Noto'g'ri havola. https:// bilan boshlanadigan to'g'ridan-to'g'ri audio havolasi bo'lishi kerak",
       "musicUrlAdded": "Audio havola qo'shildi",
+      "musicFilesBtn": "Telefon xotirasidan tanlash",
+      "musicFilesHint": "Agar audio tanlagich 0 baytli fayl berayotgan bo'lsa, telefon xotirasidagi (Files / Dokumentlar) haqiqiy faylni tanlang",
       "musicDeleteError": "Musiqani o'chirib bo'lmadi",
       "musicHeading": "Fon musiqasi",
       "musicDesc": "Mehmonlar sahifasida avtomatik ijro etiladigan fon musiqasi.",

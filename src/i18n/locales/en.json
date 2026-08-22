@@ -306,6 +306,8 @@
       "musicUrlAdded": "Audio link added",
       "musicDeleteError": "Could not delete music",
       "musicHeading": "Background music",
+      "musicFilesBtn": "Pick from phone storage",
+      "musicFilesHint": "If the audio picker returns an empty file, pick a real file from your phone storage (Files / Documents)",
       "musicDesc": "Ambient background music that auto-plays on the guest page.",
       "musicActive": "Currently active"
     },

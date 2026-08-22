@@ -306,6 +306,8 @@
       "musicUrlAdded": "Audio havola qosıldı",
       "musicDeleteError": "Musıqanı óshiriw bolmadı",
       "musicHeading": "Fon muzıqası",
+      "musicFilesBtn": "Telefon xotirasinan tañlaw",
+      "musicFilesHint": "Eger audio tañlag'ish 0 baytlı fayl berip atırǵan bolsa, telefon xotirasındaǵı (Files / Dokumentler) haqıyqıy fayldı tañlań",
       "musicDesc": "Mehmonlar betinde avtomatik oynalatuǵın fon muzıqası.",
       "musicActive": "Házirde aktiv"
     },
