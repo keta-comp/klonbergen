@@ -193,7 +193,8 @@
       "newsletterSub": "Yangiliklar va maxsus takliflardan birinchilardan bo‘lib xabardor bo‘ling.",
       "emailPlaceholder": "Email",
       "send": "Yuborish",
-      "copyright": "© {year} Vowly. Barcha huquqlar himoyalangan."
+      "copyright": "© {year} Vowly. Barcha huquqlar himoyalangan.",
+      "builtBy": "Bu sayt Keta.uz tomonidan yaratilgan."
     }
   },
   "seo": {
