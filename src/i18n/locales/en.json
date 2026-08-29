@@ -193,7 +193,8 @@
       "newsletterSub": "News and special offers.",
       "emailPlaceholder": "Email",
       "send": "Send",
-      "copyright": "© {year} Vowly. All rights reserved."
+      "copyright": "© {year} Vowly. All rights reserved.",
+      "builtBy": "This website was created by Keta.uz."
     }
   },
   "seo": {
