@@ -9,18 +9,18 @@
         "baylanis": "Baylanıs"
       },
       "demo": "Demo soraw",
-      "menuOpen": "Menyuni jabıw",
-      "menuClosed": "Menyuni ashıw"
+      "menuOpen": "Menyunidijabıw",
+      "menuClosed": "Menyundi ashıw"
     },
     "hero": {
-      "eyebrow": "SANLI MIRÁTNAMA",
-      "title1": "Ómirińizdegi",
-      "title2": "eń ullı kúnińiz",
-      "sub": "Atları, sáne hám súwretleri kórip, sanlı mirátnama jaratıwıńız.",
-      "ctaPrimary": "Tógın mirátnama jaratıw",
+      "eyebrow": "ONLAYN MIRÁTNAMA",
+      "title1": "Baxıtlı kúnińizdi",
+      "title2": "umıtılmas qılıń",
+      "sub": "Atlarıńızdı, toy sánesin hám súwretlerińizdi qosıp, ózińizge miratnama jaratıń.",
+      "ctaPrimary": "Biypul mirátnama jaratıw",
       "ctaDemo": "Demo kórıw",
       "bottomHow": "QALAY ISLEYDI? OQÍW ARQALÍ ÚYRENIW",
-      "bottomDown": "ASAGA"
+      "bottomDown": "Tómenge"
     },
     "qr": {
       "eyebrow": "Bir QR kópúlik toy",
