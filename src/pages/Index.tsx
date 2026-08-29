@@ -764,10 +764,10 @@ function Footer() {
               style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
             >
               <Mail className="h-3.5 w-3.5" />
-              info@vowly.uz
+              nursultantv94@gmail.com
             </a>
             <a
-              href="https://t.me/vowly"
+              href="https://t.me/vowlyuz"
               target="_blank"
               rel="noopener noreferrer"
               className="premium-footer-link"
@@ -777,7 +777,7 @@ function Footer() {
               Telegram
             </a>
             <a
-              href="https://instagram.com/vowly"
+              href="https://instagram.com/vowlyuz"
               target="_blank"
               rel="noopener noreferrer"
               className="premium-footer-link"
