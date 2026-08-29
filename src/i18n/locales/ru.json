@@ -193,7 +193,8 @@
       "newsletterSub": "Новости и специальные предложения.",
       "emailPlaceholder": "Email",
       "send": "Отправить",
-      "copyright": "© {year} Vowly. Все права защищены."
+      "copyright": "© {year} Vowly. Все права защищены.",
+      "builtBy": "Этот сайт создан Keta.uz."
     }
   },
   "seo": {
