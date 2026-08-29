@@ -23,21 +23,21 @@
       "bottomDown": "Tómenge"
     },
     "qr": {
-      "eyebrow": "Bir QR kópúlik toy",
-      "title1": "Stolıńızdaǵı QR —",
-      "title2": "toyıńızdıń sanlı esigi.",
-      "sub": "Mehmanlar stolındaǵı QR kódi skanerlep, haq toyıńızdıń sanlı tájiriybesine kiredi.",
+      "eyebrow": "Bir QR kod - hámmesi bir jerde",
+      "title1": "Bir QR kod penen ",
+      "title2": "toyıńızdı jánede qolaylı etiń",
+      "sub": "Miymanlar stolındaǵı QR kódi skanerlep, toy dástúri, galereya, menyu hám basqa maǵlıwmatlardı bir jerde kóredi.",
       "flow": {
         "qr": "QR kod stolıda",
-        "scan": "Skanerlewi",
-        "open": "Vowly eshildi",
+        "scan": "Skanerlew",
+        "open": "Vowly ashıldı",
         "experience": "Toy tájiriybesi baslandı"
       }
     },
     "features": {
-      "eyebrow": "Barcha qóllap-quwatlaw",
-      "title1": "Hár bir jerde —",
-      "title2": "mehmanlar ushın eń jaqsı tájiriybe.",
+      "eyebrow": "Barlıq kerekli imkaniyatlar",
+      "title1": "HToyıńız ushın",
+      "title2": "kerekli barlıq nárse bir jerde",
       "items": {
         "liveToy": "Live toy",
         "couple": "Kelin-kúyew",
@@ -47,19 +47,19 @@
         "rsvp": "RSVP"
       },
       "descs": {
-        "liveToy": "Toy basına jetip atırgan waqıt hám baǵdarlamanı kóriw.",
+        "liveToy": "Toy baslanıwına shekem qalǵan waqıttı kóriń hám kún dawamında neler bolatuǵının xabardar bolıń.",
         "couple": "Kelin-kúyew haqqında maǵlıwmatlar hám súwretler.",
-        "gallery": "Mehmanlar jaqsılaw súwretlerin bólisedi.",
-        "shows": "Artistler hám ilaj háreketlerin basqarıw.",
+        "gallery": "Miymanlar óziniń súwretlerin bólisedi.",
+        "shows": "Qosıqshılar hám ilaj háreketlerin basqarıw.",
         "menu": "Toy menyu hám awqatlar haqqında maǵlıwmat.",
-        "rsvp": "Qatnasıwshılardı basqarıw hám ruqsat tizimi."
+        "rsvp": "Qatnasıwshılardı basqarıw."
       },
       "more": "Bilip alıw"
     },
     "timeline": {
       "eyebrow": "Toy kúni",
       "title1": "Bir kinolenta —",
-      "title2": "waqıyali hám tássirli.",
+      "title2": "waqıyalar hám tásirli.",
       "sub": "Sáhárden túnge shekemgi to'y kúni — bir cinematic hikáya. Hár bir waqıya óz watında hám óz ornında.",
       "cta": "Toy qádarma arqalında kórıw",
       "events": {
