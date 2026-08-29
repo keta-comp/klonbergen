@@ -764,10 +764,10 @@ function Footer() {
               style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
             >
               <Mail className="h-3.5 w-3.5" />
-              nursultantv94@gmail.com
+              info@vowly.uz
             </a>
             <a
-              href="https://t.me/vowlyuz"
+              href="https://t.me/vowly"
               target="_blank"
               rel="noopener noreferrer"
               className="premium-footer-link"
@@ -777,7 +777,7 @@ function Footer() {
               Telegram
             </a>
             <a
-              href="https://instagram.com/vowlyuz"
+              href="https://instagram.com/vowly"
               target="_blank"
               rel="noopener noreferrer"
               className="premium-footer-link"
@@ -815,7 +815,12 @@ function Footer() {
           </div>
         </div>
         <div className="premium-footer-bottom">
-          <p>{t("home.footer.copyright", { year })}</p>
+          <div className="premium-footer-bottom-left">
+            <p>{t("home.footer.copyright", { year })}</p>
+            <p className="premium-footer-builtby">
+              {t("home.footer.builtBy")}
+            </p>
+          </div>
           <div className="premium-social">
             <a
               href="https://instagram.com/vowly"
